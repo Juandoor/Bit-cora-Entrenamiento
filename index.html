@@ -1,0 +1,3360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitácora de Entrenamiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root{
+    /* ===== PALETA — "taller de entrenamiento" =====
+       Fondo verde-carbón (no negro puro, menos fatiga visual de uso diario/nocturno).
+       Coral cálido = acción/energía. Teal = técnica/foco. Ladrillo = prioridad.
+       Hueso cálido en vez de blanco puro para el texto. */
+    --bg:        #15201C;
+    --surface:   #1E2B25;
+    --surface-2: #243730;
+    --surface-3: #2C423A;
+    --line:      #3A5048;
+    --line-soft: #2C3E37;
+
+    --text:      #EDE6D6;
+    --text-soft: #8FA39A;
+    --text-dim:  #5E7268;
+
+    --coral:     #E8714A;
+    --coral-soft:#3A2A22;
+    --teal:      #4FA3A3;
+    --teal-soft: #1F3838;
+    --brick:     #D14F3D;
+    --brick-soft:#3A2420;
+    --gold:      #D9A24B;
+    --gold-vivid: #F4C13D;
+    --gold-vivid-soft: rgba(244,193,61,0.10);
+    --plum:      #A78BDB;
+    --plum-soft: #2A2340;
+    --violet:    #A98FD6;
+    --violet-soft: rgba(169,143,214,0.14);
+    --sage:      #8FA86B;
+    --sage-soft: rgba(143,168,107,0.14);
+    --rose:      #D68FA8;
+    --rose-soft: rgba(214,143,168,0.14);
+
+    --font-display: 'Georgia', 'Spectral', serif;
+    --font-body: -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'SF Mono', 'Consolas', monospace;
+    --font-meta: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+
+    --radius: 6px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    padding-bottom: 80px;
+  }
+
+  /* ===== FONDO AMBIENTE — capa decorativa fija detrás de todo =====
+     Solo se ve en los márgenes, huecos entre paneles y detrás del panel
+     del Muro (que no tiene padding). Nunca se ve "a través" de un panel,
+     tarjeta, portada o avatar: todos esos tienen su propio fondo sólido
+     encima. Usa los mismos acentos de fase que el resto de la app, a muy
+     baja opacidad para no competir con el contenido. z-index:-1 la deja
+     siempre detrás de todo lo demás (que no declara z-index negativo). */
+  body::before{
+    content:"";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 8% 4%, rgba(232,113,74,0.20), transparent 38%),
+      radial-gradient(circle at 94% 8%, rgba(79,163,163,0.18), transparent 42%),
+      radial-gradient(circle at 26% 96%, rgba(167,139,219,0.16), transparent 46%),
+      radial-gradient(circle at 84% 82%, rgba(217,162,75,0.14), transparent 42%);
+  }
+  /* Retícula fina tipo "plano técnico de taller", se desvanece hacia abajo */
+  body::after{
+    content:"";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(237,230,214,0.075) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(237,230,214,0.075) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 88%);
+    mask-image: linear-gradient(180deg, #000 0%, transparent 88%);
+  }
+
+  ::selection{ background: var(--coral); color: var(--bg); }
+
+  /* ===== HEADER ===== */
+  .masthead{
+    background: linear-gradient(160deg, #101a16, #182621 60%, #1a2d26);
+    color: var(--text);
+    padding: 28px 24px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .masthead-row{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:16px;
+    max-width: 1040px; margin:0 auto;
+  }
+  .masthead h1{
+    font-family: var(--font-display);
+    font-size: clamp(26px, 4.5vw, 38px);
+    font-weight: 600;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .masthead .sub{
+    font-size: 12px;
+    color: var(--coral);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight:600;
+  }
+  .masthead .meta{
+    text-align:right;
+    font-family: var(--font-meta);
+    font-size: 12px;
+    color: var(--text-soft);
+    line-height:1.8;
+  }
+  .masthead .meta b{ color: var(--text); font-weight:600; }
+  .masthead .meta #cycleName{ color: var(--coral); }
+
+  .drive-sync-widget{
+    margin-top:10px;
+    display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-wrap:wrap;
+  }
+  .drive-sync-status{
+    font-size:11px;
+    color: var(--text-dim);
+    letter-spacing:0.01em;
+  }
+  .drive-sync-status.ok{ color: var(--teal); }
+  .drive-sync-status.warn{ color: var(--gold-vivid); }
+  .drive-sync-status.err{ color: var(--brick); }
+  .drive-sync-btn{
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight:700;
+    padding: 4px 11px;
+    border-radius: 20px;
+    border: 1px solid var(--teal);
+    background: var(--teal-soft);
+    color: #8FD4D4;
+    cursor:pointer;
+    transition: opacity .15s;
+  }
+  .drive-sync-btn:hover{ opacity:0.8; }
+  .drive-sync-btn.secondary{
+    border-color: var(--line);
+    background: transparent;
+    color: var(--text-soft);
+  }
+
+  .tabs{
+    max-width: 1040px; margin: 20px auto 0;
+    display:flex; gap:4px; flex-wrap:wrap;
+  }
+  .tab-btn{
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 7px 7px 0 0;
+    border:none;
+    background: transparent;
+    color: var(--text-soft);
+    cursor:pointer;
+    transition: background .15s, color .15s;
+    letter-spacing:0.01em;
+  }
+  .tab-btn:hover{ background: rgba(255,255,255,0.04); color: var(--text); }
+  .tab-btn.active{ background: var(--surface); color: var(--text); }
+
+  /* ===== LAYOUT ===== */
+  .wrap{ max-width: 1040px; margin: 0 auto; padding: 24px 24px 0; }
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  .panel{
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+  }
+
+  .panel-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .panel-head h2{
+    font-family: var(--font-display);
+    font-size: 19px;
+    margin:0;
+    font-weight:600;
+    display:flex; align-items:center; gap:10px;
+  }
+  .panel-head .count{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--teal);
+    background: var(--teal-soft);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .panel-body{ padding: 18px 20px 20px; }
+
+  /* ===== EDITABLE ===== */
+  [contenteditable="true"]{
+    outline: none;
+    border-radius: 3px;
+    transition: background .12s;
+  }
+  [contenteditable="true"]:hover{ background: rgba(232,113,74,0.12); cursor: text; }
+  [contenteditable="true"]:focus{
+    background: var(--surface-3);
+    box-shadow: 0 0 0 2px var(--coral);
+  }
+  [contenteditable="true"]:empty:before{
+    content: attr(data-placeholder);
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  /* ===== ZONA DE FONDO detrás de las tarjetas de ejercicios =====
+     Contenedor recesado (más oscuro que el panel) para que las tarjetas
+     de cada ejercicio floten con contraste sobre este fondo propio. */
+  .ex-list{
+    background: var(--bg);
+    border: 1px solid var(--line-soft);
+    border-radius: 8px;
+    padding: 14px;
+  }
+
+  /* ===== FASE DIVIDER (separador de bloque fisiológico dentro de cada rutina) ===== */
+  .fase-divider{
+    display:flex; align-items:center; gap:10px;
+    margin: 22px 0 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+  }
+  .fase-divider:first-child{ margin-top:0; }
+  .fase-divider::after{ content:""; flex:1; height:1px; background: var(--line-soft); }
+  .fase-divider .dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .fase-divider.activacion .dot{ background: var(--teal); }
+  .fase-divider.correctivo .dot{ background: var(--sage); }
+  .fase-divider.fuerza .dot{ background: var(--coral); }
+  .fase-divider.hipertrofia .dot{ background: var(--violet); }
+  .fase-divider.pliometria .dot{ background: var(--gold); }
+  .fase-divider.cardio .dot{ background: #6BA3D6; }
+  .fase-divider.isometricos .dot{ background: var(--brick); }
+  .fase-divider.estiramiento .dot{ background: var(--rose); }
+  .fase-divider.accesorio .dot{ background: var(--text-dim); }
+
+  /* ===== EXERCISE CARD ===== */
+  .ex-card{
+    border: 1px solid var(--line-soft);
+    border-left: 3px solid var(--teal);
+    border-radius: 5px;
+    margin-bottom: 12px;
+    background: var(--surface-2);
+    position: relative;
+    overflow: hidden;
+  }
+  .ex-card.priority{ border-left-color: var(--brick); }
+  .ex-card.cardio{ border-left-color: #6BA3D6; }
+
+  .ex-top{
+    display:flex; align-items:flex-start; gap:11px;
+    padding: 13px 14px 10px;
+  }
+  .ex-num{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight:700;
+    color: var(--text-soft);
+    background: var(--surface-3);
+    border: 1px solid var(--line);
+    width: 24px; height:24px;
+    border-radius: 6px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    margin-top: 2px;
+  }
+  .ex-title{
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    flex:1;
+    padding: 2px 4px;
+    color: var(--text);
+  }
+  .ex-tag{
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight:700;
+    white-space:nowrap;
+    margin-top:3px;
+    cursor:pointer;
+    border:none;
+  }
+  .ex-tag.priority{ background: var(--brick-soft); color: #F0A296; }
+  .ex-tag.cardio{ background: #1c2e3c; color:#9CC4E8; }
+  .ex-tag.normal{ background: var(--teal-soft); color: #8FD4D4; }
+
+  .ex-del{
+    background:none; border:none; color: var(--text-dim); cursor:pointer;
+    font-size:18px; line-height:1; padding:2px 6px; border-radius:4px;
+    transition: color .15s, background .15s;
+  }
+  .ex-del:hover{ color: var(--brick); background: var(--brick-soft); }
+
+  .ex-stats{
+    display:flex; flex-wrap:wrap; gap:7px;
+    padding: 0 14px 12px;
+  }
+  .stat{
+    background: var(--surface-3);
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text);
+    display:flex; flex-direction:column;
+    min-width: 56px;
+  }
+  .stat label{
+    font-size: 8.5px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color: var(--text-dim);
+    font-family: var(--font-body);
+    font-weight:700;
+    margin-bottom:1px;
+  }
+  .stat .val{ font-weight:600; }
+
+  /* ===== NOTAS — cuatro pestañas satélite en grilla 2×2, cada una con su panel expandible =====
+     Antes iban las 4 forzadas en una sola fila (flex:1 + nowrap + ellipsis), lo que
+     apretaba el texto hasta que las palabras se pisaban/juntaban en pantallas angostas.
+     Ahora cada pestaña ocupa 50% de ancho (2 filas de 2), con espacio real para el texto. */
+  .ex-notes-row{
+    display:flex;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--line-soft);
+  }
+  .ex-notes-toggle{
+    flex: 1 1 50%;
+    max-width: 50%;
+    box-sizing: border-box;
+    display:flex; align-items:center; gap:7px;
+    padding: 9px 12px;
+    background: rgba(0,0,0,0.12);
+    cursor:pointer;
+    font-size: 12px;
+    color: var(--gold);
+    font-weight:600;
+    user-select:none;
+    min-width:0;
+  }
+  .ex-notes-toggle span:last-child{
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .ex-notes-toggle:nth-child(odd){ border-right: 1px solid var(--line-soft); }
+  .ex-notes-toggle:nth-child(-n+2){ border-bottom: 1px solid var(--line-soft); }
+  .ex-notes-toggle:hover{ background: rgba(0,0,0,0.2); }
+  .ex-notes-toggle.aclaracion{ color: var(--gold-vivid); }
+  .ex-notes-toggle.aclaracion:hover{ background: var(--gold-vivid-soft); }
+  .ex-notes-toggle .chevron{ transition: transform .15s; font-size:10px; }
+  .ex-notes-toggle.open .chevron{ transform: rotate(90deg); }
+  /* Quinta pestaña satélite condicional (Subtipo isométrico / Tipo de estiramiento):
+     ocupa la fila completa para no dejar una tarjeta a medio ancho con un borde
+     apuntando a la nada. */
+  .ex-notes-toggle.full{
+    flex-basis: 100%;
+    max-width: 100%;
+    border-right: none !important;
+    border-top: 1px solid var(--line-soft);
+  }
+  .ex-notes-toggle.isotipo{ color: var(--brick); }
+  .ex-notes-toggle.isotipo:hover{ background: var(--brick-soft); }
+  .ex-notes-panel.isotipo{ border-top: 1px dashed var(--brick); background: var(--brick-soft); }
+  .ex-notes-toggle.estiratipo{ color: var(--rose); }
+  .ex-notes-toggle.estiratipo:hover{ background: var(--rose-soft); }
+  .ex-notes-panel.estiratipo{ border-top: 1px dashed var(--rose); background: var(--rose-soft); }
+  .ex-notes-panel .subtipo-def{ margin:10px 0 0; font-size:12.5px; color: var(--text-soft); line-height:1.5; }
+  .ex-notes-panel .subtipo-select{ width:auto; min-width:220px; }
+  .ex-notes-panel{
+    display:none;
+    padding: 12px 14px 14px;
+    background: rgba(0,0,0,0.18);
+    border-top: 1px dashed var(--line);
+    font-size: 13px;
+    color: var(--text-soft);
+  }
+  .ex-notes-panel.aclaracion{
+    border-top: 1px dashed var(--gold-vivid);
+    background: var(--gold-vivid-soft);
+  }
+  .ex-notes-panel.open{ display:block; }
+  .ex-notes-panel [contenteditable]{ color: var(--text-soft); }
+
+  .add-ex-btn{
+    width:100%;
+    padding: 12px;
+    border: 1.5px dashed var(--line);
+    background: transparent;
+    border-radius: var(--radius);
+    color: var(--text-soft);
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+    transition: border-color .15s, color .15s, background .15s;
+  }
+  .add-ex-btn:hover{ border-color: var(--teal); color: var(--teal); background: var(--teal-soft); }
+
+  /* select de fase, dentro de cada tarjeta */
+  .fase-select{
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    background: var(--surface-3);
+    color: var(--text-soft);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin-top: 3px;
+  }
+
+  /* ===== TECHNIQUE BLOCK ===== */
+  .rule-list{ list-style:none; padding:0; margin: 0 0 14px; }
+  .rule-list li{
+    padding: 8px 0 8px 26px;
+    position: relative;
+    font-size: 14px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .rule-list li:last-child{ border-bottom:none; }
+  .rule-list.good li::before{ content:"✓"; position:absolute; left:0; color: var(--teal); font-weight:700; }
+  .rule-list.bad li::before{ content:"✕"; position:absolute; left:0; color: var(--brick); font-weight:700; }
+
+  .callout{
+    background: var(--brick-soft);
+    border-left: 3px solid var(--brick);
+    border-radius: 3px;
+    padding: 13px 15px;
+    font-size: 13.5px;
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+  .callout b{ color: #F0A296; }
+  .callout.gold{ background: #2e2616; border-left-color: var(--gold); }
+  .callout.gold b{ color:var(--gold); }
+  .callout.teal{ background: var(--teal-soft); border-left-color: var(--teal); }
+  .callout.teal b{ color: #8FD4D4; }
+
+  /* ===== DAILY LOG ===== */
+  .log-entry{
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    margin-bottom: 14px;
+    background: var(--surface-2);
+  }
+  .log-entry-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 12px 16px;
+    background: var(--surface-3);
+    border-radius: 5px 5px 0 0;
+  }
+  .log-date{
+    font-family: var(--font-mono);
+    font-weight:700;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .log-type-badge{
+    font-size:10px; text-transform:uppercase; letter-spacing:0.07em;
+    background: var(--coral); color: #1a0f0a;
+    padding:3px 9px; border-radius:20px; font-weight:700;
+  }
+  .log-grid{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+    gap: 10px;
+    padding: 14px 16px;
+  }
+  .log-field label{
+    font-size: 10px; text-transform:uppercase; letter-spacing:0.06em;
+    color: var(--text-dim); font-weight:700; display:block; margin-bottom:4px;
+  }
+  .log-field .v{
+    font-size: 14px; padding: 6px 8px; background: var(--surface-3); border-radius:4px; min-height:20px;
+    color: var(--text);
+  }
+  .log-notes{
+    padding: 0 16px 16px;
+    font-size: 13.5px;
+    color: var(--text-soft);
+  }
+  .log-notes .v{ background: var(--surface-3); border-radius:4px; padding:8px 10px; margin-top:4px; }
+
+  .scale-row{ display:flex; gap:4px; margin-top:2px; }
+  .scale-dot{
+    width:22px; height:22px; border-radius:50%;
+    border: 1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; cursor:pointer; font-family:var(--font-mono);
+    background: var(--surface-2); color: var(--text-soft);
+    transition: all .12s;
+  }
+  .scale-dot.active{ background: var(--coral); color: #1a0f0a; border-color: var(--coral); }
+
+  /* ===== FORM ===== */
+  .form-grid{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+    gap:14px; margin-bottom:16px;
+  }
+  .form-field label{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--text-dim); font-weight:700; display:block; margin-bottom:5px;
+  }
+  .form-field input, .form-field select, .form-field textarea{
+    width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:4px;
+    font-family:var(--font-body); font-size:13.5px; background: var(--surface-2); color:var(--text);
+  }
+  .form-field textarea{ resize:vertical; min-height:60px; }
+  .form-field input::placeholder, .form-field textarea::placeholder{ color: var(--text-dim); }
+
+  .primary-btn{
+    background: var(--coral); color:#1a0f0a; border:none;
+    padding: 10px 22px; border-radius:5px; font-weight:700; font-size:13.5px;
+    cursor:pointer; font-family:var(--font-body);
+    transition: opacity .15s;
+  }
+  .primary-btn:hover{ opacity:0.88; }
+  .secondary-btn{
+    background:transparent; color:var(--text-soft); border:1px solid var(--line);
+    padding:9px 18px; border-radius:5px; font-weight:600; font-size:13px; cursor:pointer;
+    font-family: var(--font-body);
+  }
+  .secondary-btn:hover{ background: var(--surface-3); }
+
+  /* ===== WEEKLY SUMMARY ===== */
+  .week-card{
+    border:1px solid var(--line-soft); border-radius:var(--radius); background: var(--surface-2); margin-bottom:14px;
+  }
+  .week-card-head{
+    padding:12px 16px; border-bottom:1px solid var(--line-soft);
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--font-display); font-weight:600; font-size:16px;
+  }
+  .week-card-body{ padding:14px 16px; }
+  .week-stat-row{ display:flex; gap:18px; margin-bottom:12px; flex-wrap:wrap; }
+  .week-stat{ text-align:center; }
+  .week-stat .num{ font-family:var(--font-mono); font-size:24px; font-weight:700; color: var(--coral); }
+  .week-stat .lbl{ font-size:10px; text-transform:uppercase; color:var(--text-dim); letter-spacing:0.05em; }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state{
+    text-align:center; padding: 40px 20px; color: var(--text-dim);
+  }
+  .empty-state .icon{
+    width:52px; height:52px; margin: 0 auto 10px;
+    border-radius: 14px;
+    background: var(--surface-3);
+    border: 1px solid var(--line-soft);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--text-dim);
+  }
+  .empty-state .icon svg{ width:24px; height:24px; }
+
+  /* ===== FOOTER BAR ===== */
+  .floatbar{
+    position:fixed; bottom:0; left:0; right:0;
+    background: #0E1612; color: var(--text-soft);
+    padding: 10px 24px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:12px;
+    z-index:50;
+    border-top: 1px solid var(--line-soft);
+  }
+  .floatbar .right{ display:flex; gap:8px; }
+  .floatbar button{
+    background: var(--surface-3); border:none; color: var(--text);
+    padding:7px 14px; border-radius:5px; font-size:12px; font-weight:600; cursor:pointer;
+    font-family: var(--font-body);
+  }
+  .floatbar button:hover{ background: var(--surface-3); filter:brightness(1.3); }
+
+  .saved-flash{
+    position:fixed; top:16px; right:16px;
+    background: var(--coral); color:#1a0f0a; padding:8px 16px; border-radius:5px;
+    font-size:12px; font-weight:700; opacity:0; transition: opacity .25s; z-index:100;
+    pointer-events:none;
+  }
+  .saved-flash.show{ opacity:1; }
+
+  /* ===== LEYENDA DE FASES — fondo propio con diseño, cada fase como chip ===== */
+  .fase-legend{
+    display:flex; gap:8px; flex-wrap:wrap;
+    padding: 11px 13px;
+    margin: 2px 0 16px;
+    background: linear-gradient(135deg, var(--surface-2), var(--surface-3) 60%, var(--surface-2));
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+    font-size: 11.5px; color: var(--text-soft);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+  .fase-legend span{
+    display:flex; align-items:center; gap:6px;
+    padding: 5px 11px 5px 8px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.16);
+    border: 1px solid var(--line-soft);
+    transition: border-color .15s, background .15s;
+  }
+  .fase-legend .dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+  @media (max-width:640px){
+    .masthead-row{ flex-direction:column; gap:6px; }
+    .masthead .meta{ text-align:left; }
+    .wrap{ padding: 18px 14px 0; }
+    .log-grid{ grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ===== Pantallas 720p (1280×720 / 1366×768, y similares de poca altura) =====
+     Se compactan paddings/márgenes verticales para aprovechar mejor el alto
+     disponible sin recortar contenido ni forzar scroll excesivo. */
+  @media (max-height:760px){
+    .masthead{ padding: 16px 24px 0; }
+    .masthead h1{ font-size: clamp(21px, 3.4vw, 28px); margin-bottom: 2px; }
+    .tabs{ margin: 12px auto 0; }
+    .tab-btn{ padding: 8px 14px; font-size:12.5px; }
+    .wrap{ padding: 16px 24px 0; }
+    .panel{ margin-bottom: 14px; }
+    .panel-head{ padding: 10px 18px; }
+    .panel-head h2{ font-size: 17px; }
+    .panel-body{ padding: 14px 18px 15px; }
+    .fase-divider{ margin: 16px 0 9px; }
+    .ex-card{ margin-bottom: 9px; }
+    .ex-top{ padding: 10px 14px 8px; }
+    .ex-stats{ padding: 0 14px 9px; gap:6px; }
+    .ex-notes-toggle{ padding: 7px 14px; }
+    .ex-notes-panel{ padding: 9px 14px 11px; }
+    body{ padding-bottom: 64px; }
+    .floatbar{ padding: 7px 24px; }
+  }
+
+  @media (max-width:1366px) and (max-height:800px){
+    .wrap, .masthead-row, .tabs{ max-width: 980px; }
+  }
+
+  /* ===== VIDEO LINKS (panel "satélite" por tarjeta) ===== */
+  .ex-notes-toggle.video{ color: var(--plum); }
+  .ex-notes-toggle.video:hover{ background: var(--plum-soft); }
+  .ex-notes-panel.video{ border-top: 1px dashed var(--plum); background: var(--plum-soft); }
+  .video-links{ display:flex; flex-direction:column; gap:6px; }
+  .video-link-row{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    background: rgba(0,0,0,0.18); border-radius:4px; padding:6px 10px;
+  }
+  .video-link-row a{ color: var(--plum); font-size:13px; text-decoration:none; word-break:break-all; display:inline-flex; align-items:center; gap:6px; }
+  .video-link-row a svg{ width:13px; height:13px; flex-shrink:0; }
+  .video-link-row a:hover{ text-decoration:underline; }
+  .video-link-del{
+    background:none; border:none; color: var(--text-dim); cursor:pointer;
+    font-size:16px; line-height:1; padding:0 4px; flex-shrink:0;
+  }
+  .video-link-del:hover{ color: var(--brick); }
+  .muro-btn{
+    font-family: var(--font-body); font-size:12px; font-weight:600;
+    padding:6px 12px; border-radius:5px; border:1px solid var(--plum);
+    background:transparent; color: var(--plum); cursor:pointer;
+    transition: background .15s;
+  }
+  .muro-btn:hover{ background: var(--plum-soft); }
+
+  /* ===== MURO ===== */
+  .muro-cover{
+    position:relative;
+    width:100%;
+    aspect-ratio: 16 / 5;
+    min-height: 160px;
+    cursor: default;
+    border-bottom: 1px solid var(--line-soft);
+    /* overflow visible a propósito: el avatar sobresale del marco.
+       Lo que sí debe recortarse (foto + fondo decorativo) va en
+       .muro-cover-media, una capa interna aparte. */
+  }
+  .muro-cover.has-img{ cursor: zoom-in; }
+  /* Franja superior de acento, en el espectro de colores de fase de la app */
+  .muro-cover::before{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:3px;
+    background: linear-gradient(90deg, var(--coral), var(--gold-vivid), var(--teal), var(--plum));
+    z-index:3;
+  }
+  /* Viñeta inferior: aporta contraste bajo el avatar y los botones */
+  .muro-cover::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0; height:72px;
+    background: linear-gradient(transparent, rgba(10,14,12,0.5));
+    pointer-events:none;
+    z-index:2;
+  }
+  .muro-cover-media{
+    position:absolute; inset:0;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at 12% 18%, rgba(232,113,74,0.20), transparent 42%),
+      radial-gradient(circle at 88% 15%, rgba(79,163,163,0.20), transparent 46%),
+      radial-gradient(circle at 55% 105%, rgba(167,139,219,0.18), transparent 55%),
+      linear-gradient(135deg, var(--surface-2), var(--surface-3));
+  }
+  /* Textura sutil de líneas diagonales, queda debajo de la foto si hay una */
+  .muro-cover-media::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 15px);
+    pointer-events:none;
+  }
+  .muro-cover-media img{
+    position:relative; z-index:1;
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  .muro-cover-empty{
+    position:absolute; inset:0; z-index:1;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px;
+    color: var(--text-dim);
+  }
+  .muro-cover-empty-icon{
+    width:44px; height:44px; border-radius:12px;
+    background: var(--plum-soft);
+    border: 1.5px dashed rgba(167,139,219,0.45);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--plum);
+    opacity:0.9;
+  }
+  .muro-cover-empty-icon svg{ width:20px; height:20px; }
+  .muro-cover-empty-text{ font-size:13px; font-style:italic; }
+  .muro-avatar-wrap{
+    position:absolute; left:20px; bottom:-34px;
+    z-index:5;
+  }
+  .muro-avatar{
+    width:88px; height:88px; border-radius:50%;
+    border:3px solid var(--surface);
+    box-shadow: 0 0 0 2px var(--plum), 0 4px 14px rgba(0,0,0,0.4);
+    background: var(--surface-3);
+    overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    color: var(--text-dim); font-size:22px;
+    cursor:pointer;
+    transition: box-shadow .15s;
+  }
+  .muro-avatar:hover{ box-shadow: 0 0 0 2px var(--coral), 0 4px 14px rgba(0,0,0,0.45); }
+  .muro-avatar img{ width:100%; height:100%; object-fit:cover; }
+  .muro-cover-actions{
+    position:absolute; right:14px; bottom:14px;
+    display:flex; gap:8px;
+    z-index:5;
+  }
+  .muro-cover-actions .muro-btn{
+    background: rgba(21,32,28,0.75); backdrop-filter: blur(2px);
+    color: var(--text); border-color: var(--line);
+  }
+  .muro-cover-actions .muro-btn:hover{ background: rgba(21,32,28,0.92); }
+  .muro-modal{
+    display:none; position:fixed; inset:0; z-index:200;
+    background: rgba(10,14,12,0.92);
+    align-items:center; justify-content:center;
+    cursor: zoom-out;
+    padding: 30px;
+  }
+  .muro-modal.open{ display:flex; }
+  .muro-modal img{ max-width:100%; max-height:100%; border-radius:6px; box-shadow:0 10px 40px rgba(0,0,0,0.5); }
+
+
+  /* ===== EXTRA STATS (Time Work / Metrónomo) — barras anchas, apiladas ===== */
+  .ex-stats-extra{
+    display:flex; flex-direction:column; gap:8px;
+    padding: 0 14px 12px;
+  }
+  .stat-wide{
+    display:flex; align-items:center; gap:12px;
+    background: var(--surface-3);
+    border: 1px solid var(--line-soft);
+    border-radius: 8px;
+    padding: 9px 14px;
+  }
+  .stat-wide-icon{
+    flex-shrink:0;
+    width: 28px; height:28px;
+    border-radius: 8px;
+    display:flex; align-items:center; justify-content:center;
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
+  }
+  .stat-wide-icon svg{ width:15px; height:15px; }
+  .stat-wide-body{
+    flex:1; min-width:0;
+    display:flex; flex-direction:column;
+  }
+  .stat-wide-body label{
+    font-size: 9px;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    color: var(--text-dim);
+    font-family: var(--font-body);
+    font-weight:700;
+    margin-bottom:2px;
+  }
+  .stat-wide .val{
+    font-weight:700; font-size:14px;
+    font-family: var(--font-mono);
+    color: var(--text);
+  }
+  /* Time Work: color propio para distinguirlo del metrónomo */
+  .stat-tiempowork{
+    background: var(--gold-vivid-soft);
+    border-color: rgba(244,193,61,0.35);
+  }
+  .stat-tiempowork .stat-wide-icon{ color: var(--gold-vivid); background: var(--gold-vivid-soft); border-color: rgba(244,193,61,0.35); }
+  .stat-metro .stat-wide-icon{ color: var(--teal); background: var(--teal-soft); border-color: rgba(79,163,163,0.4); }
+  .stat-tiempowork .val{ color: var(--gold-vivid); }
+  /* Metrónomo: dos campos lado a lado dentro de la misma barra */
+  .stat-metro-body{ flex-direction:row; align-items:flex-end; gap:16px; }
+  .stat-metro-field{ display:flex; flex-direction:column; }
+  .stat-metro-field label{
+    font-size: 9px; text-transform:uppercase; letter-spacing:0.07em;
+    color: var(--text-dim); font-family: var(--font-body); font-weight:700; margin-bottom:2px;
+  }
+  .stat-metro-field span[contenteditable]{
+    font-weight:700; font-size:14px; font-family: var(--font-mono); color: var(--gold-vivid);
+  }
+  .stat-metro .metro-x{ color: var(--text-dim); font-weight:700; padding-bottom:1px; }
+  .stat-wide .stat-quitar{
+    flex-shrink:0; margin-left:auto;
+    background:none; border:none; color: var(--text-dim);
+    font-size:10px; text-transform:uppercase; letter-spacing:0.05em;
+    cursor:pointer; padding:2px 4px; font-family:var(--font-body); font-weight:700;
+  }
+  .stat-wide .stat-quitar:hover{ color: var(--brick); }
+  .stat-add-btn-wide{
+    width:100%; text-align:left;
+    font-family: var(--font-body); font-size:12px; font-weight:600;
+    padding:9px 14px; border-radius:8px; border:1.5px dashed var(--line);
+    background:transparent; color: var(--text-dim); cursor:pointer;
+    transition: border-color .15s, color .15s, background .15s;
+  }
+  .stat-add-btn-wide:hover{ border-color: var(--teal); color: var(--teal); background: var(--teal-soft); }
+
+  /* ===== REGLAS DE PROGRESIONES (toggle extra en tarjeta) ===== */
+  .ex-notes-toggle.progresion{ color: #8FD4A0; }
+  .ex-notes-toggle.progresion:hover{ background: rgba(143,212,160,0.08); }
+  .ex-notes-panel.progresion{ border-top: 1px dashed #8FD4A0; background: rgba(143,212,160,0.06); }
+
+  /* ===== VIDEO EMBEDS dentro del panel satélite ===== */
+  .video-embed{ margin-top:8px; border-radius:5px; overflow:hidden; background:#000; }
+  .video-embed iframe{ width:100%; aspect-ratio:16/9; border:none; display:block; }
+  .video-embed video{ width:100%; max-height:360px; display:block; }
+  .video-embed-note{ margin-top:6px; font-size:11.5px; color: var(--text-dim); font-style:italic; }
+  .instagram-media, .tiktok-embed{ max-width:100% !important; margin-top:8px !important; }
+
+  /* ===== MURO — diseño distintivo del panel-head (ícono + acento violeta) ===== */
+  .muro-panel-head{
+    background: linear-gradient(120deg, var(--plum-soft) 0%, transparent 65%);
+    border-bottom: 1px solid rgba(167,139,219,0.32);
+  }
+  .muro-panel-icon{
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: var(--plum-soft);
+    border: 1px solid rgba(167,139,219,0.45);
+    color: var(--plum);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .muro-panel-icon svg{ width:16px; height:16px; }
+
+  /* ===== MURO — píldora "Sin comprimir" junto al título, en el panel-head ===== */
+  .muro-compress-toggle{
+    position: relative;
+    display:flex; align-items:center; gap:6px;
+    background: var(--surface-3);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 13px 6px 11px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight:600;
+    color: var(--text-soft);
+    cursor:pointer;
+    user-select:none;
+    transition: border-color .15s, color .15s, background .15s;
+  }
+  .muro-compress-toggle:hover{ border-color: var(--coral); color: var(--text); }
+  .muro-compress-toggle input{ position:absolute; opacity:0; width:0; height:0; }
+  .muro-compress-icon{ display:flex; align-items:center; }
+  .muro-compress-icon svg{ width:13px; height:13px; }
+  .muro-compress-toggle.active{
+    border-color: var(--coral); color: var(--coral);
+    background: rgba(232,113,74,0.16);
+  }
+  /* Animación al hacer click: rebote elástico */
+  @keyframes muroTogglePulse{
+    0%{ transform: scale(1); }
+    35%{ transform: scale(1.14); }
+    65%{ transform: scale(0.93); }
+    100%{ transform: scale(1); }
+  }
+  .muro-toggle-pulse{ animation: muroTogglePulse .4s ease; }
+  /* Animación al abrir/cargar el Muro: entra deslizando desde la derecha */
+  @keyframes muroToggleEnter{
+    0%{ opacity:0; transform: translateX(14px) scale(0.85); }
+    60%{ opacity:1; transform: translateX(-3px) scale(1.04); }
+    100%{ opacity:1; transform: translateX(0) scale(1); }
+  }
+  .muro-toggle-enter{ animation: muroToggleEnter .5s cubic-bezier(.34,1.56,.64,1) both; }
+
+  /* ===== TRACKER DE CONSTANCIA (dentro de Registro diario) ===== */
+  .tracker-header-row{
+    display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap;
+    gap:12px; margin-bottom:14px;
+  }
+  .tracker-title{
+    font-family: var(--font-display); font-size:17px; font-weight:600; color: var(--text);
+  }
+  .tracker-meta{
+    font-size:11.5px; color: var(--text-dim); font-family: var(--font-mono); margin-top:2px;
+  }
+  .tracker-pct-wrap{ text-align:right; }
+  .tracker-pct{
+    font-family: var(--font-mono); font-size:26px; font-weight:700; color: var(--coral); line-height:1;
+  }
+  .tracker-pct-label{
+    font-size:9.5px; color: var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; margin-top:2px;
+  }
+  .tracker-progress-bar{
+    height:9px; background: var(--surface-3); border-radius:6px; overflow:hidden;
+    border: 1px solid var(--line-soft);
+  }
+  .tracker-progress-fill{
+    height:100%; background: linear-gradient(90deg, var(--teal), var(--coral));
+    border-radius:6px; transition: width .3s ease;
+  }
+  .tracker-legend{
+    display:flex; gap:14px; flex-wrap:wrap; margin: 14px 0 4px;
+    font-size: 11.5px; color: var(--text-soft);
+  }
+  .tracker-legend span{ display:flex; align-items:center; gap:5px; }
+  .tracker-legend .dot{ width:9px; height:9px; border-radius:3px; flex-shrink:0; }
+  .tracker-weeks{ margin-top:14px; display:flex; flex-direction:column; gap:8px; }
+  .tracker-week-row{ display:flex; align-items:center; gap:10px; }
+  .tracker-week-label{
+    font-family: var(--font-mono); font-size:10.5px; color: var(--text-dim);
+    width:44px; flex-shrink:0; text-transform:uppercase; letter-spacing:0.04em;
+  }
+  .tracker-days-row{ display:flex; gap:6px; flex-wrap:wrap; flex:1; }
+  .tracker-day{
+    width:38px; height:44px; border-radius:6px;
+    background: var(--surface-3); border:1px solid var(--line-soft);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor:pointer; user-select:none; position:relative;
+    font-family: var(--font-mono); color: var(--text-soft);
+    transition: transform .12s ease, border-color .12s ease;
+  }
+  .tracker-day:hover{ transform: translateY(-2px); border-color: var(--teal); }
+  .tracker-day .num{ font-size:12.5px; font-weight:700; line-height:1.2; }
+  .tracker-day .wd{ font-size:8px; text-transform:uppercase; opacity:0.75; letter-spacing:0.03em; }
+  .tracker-day.status-A{ background: var(--coral); border-color: var(--coral); color:#1a0f0a; }
+  .tracker-day.status-Descanso{ background: var(--teal); border-color: var(--teal); color:#08201d; }
+  .tracker-day.status-Otro{ background: var(--gold-vivid); border-color: var(--gold-vivid); color:#2b2205; }
+  .tracker-day.haslog::after{
+    content:"●"; position:absolute; top:2px; right:4px; font-size:6px; opacity:0.8;
+  }
+  .tracker-setup-grid{ margin-bottom: 4px; }
+  .tracker-reconfig summary{
+    cursor:pointer; color: var(--text-dim); font-size:12px; font-weight:600;
+    padding:4px 0;
+  }
+  .tracker-reconfig summary:hover{ color: var(--text-soft); }
+  .tracker-hint{ font-size:12px; color: var(--text-dim); margin-top:10px; }
+
+  @media (max-width:640px){
+    .tracker-day{ width:30px; height:38px; }
+    .tracker-week-label{ width:36px; font-size:9.5px; }
+  }
+
+  @media print{
+    .floatbar, .tabs, .add-ex-btn, .ex-del, .ex-notes-row{ display:none !important; }
+    .ex-notes-panel{ display:block !important; }
+    .view{ display:block !important; }
+    body{ background:white; color:#111; }
+    .panel, .ex-card{ background:white; border-color:#ccc; }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="saved-flash" id="savedFlash">Guardado ✓</div>
+
+<header class="masthead">
+  <div class="masthead-row">
+    <div>
+      <div class="sub">Bitácora personal · Editable</div>
+      <h1 contenteditable="true" data-placeholder="Tu nombre o título del plan">Plan de Entrenamiento</h1>
+    </div>
+    <div class="meta">
+      Inicio: <b contenteditable="true" id="startDate">25 May 2026</b><br>
+      Última actualización: <b id="lastUpdate">—</b><br>
+      Ciclo actual: <b contenteditable="true" id="cycleName">Fuerza + Core</b>
+      <div class="drive-sync-widget" id="driveSyncWidget">
+        <span class="drive-sync-status" id="driveSyncStatus">☁️ Google Drive: sin conectar</span>
+        <button class="drive-sync-btn" id="driveConnectBtn" onclick="connectDrive()">Conectar</button>
+        <button class="drive-sync-btn secondary" id="driveSyncNowBtn" onclick="manualSyncDrive()" style="display:none">Sincronizar ahora</button>
+      </div>
+    </div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn" data-view="muro">Muro</button>
+    <button class="tab-btn active" data-view="rutinaA">Rutina A</button>
+    <button class="tab-btn" data-view="rutinaB">Rutina B</button>
+    <button class="tab-btn" data-view="calentamiento">Calentamiento / Enfriamiento</button>
+    <button class="tab-btn" data-view="tecnica">Técnica y prioridades</button>
+    <button class="tab-btn" data-view="registro">Registro diario</button>
+    <button class="tab-btn" data-view="semanal">Conclusiones semanales</button>
+  </nav>
+</header>
+
+<div class="wrap">
+  <div class="view" id="view-muro"></div>
+  <div class="view active" id="view-rutinaA"></div>
+  <div class="view" id="view-rutinaB"></div>
+  <div class="view" id="view-calentamiento"></div>
+  <div class="view" id="view-tecnica"></div>
+  <div class="view" id="view-registro"></div>
+  <div class="view" id="view-semanal"></div>
+</div>
+
+<div class="floatbar">
+  <div class="left">Los cambios se guardan automáticamente en este navegador.</div>
+  <div class="right">
+    <button onclick="window.print()">Imprimir / Exportar PDF</button>
+    <button onclick="exportJSON()">Exportar copia (.json)</button>
+    <button onclick="document.getElementById('importFile').click()">Importar copia</button>
+    <input type="file" id="importFile" accept=".json" style="display:none">
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATOS INICIALES — semilla de la app, sincronizada con el JSON
+// bitacora_entrenamiento_2026-08-02.json (fuente de verdad).
+// Se usa solo si el navegador no tiene ya datos guardados en
+// localStorage. Podés editar todo desde la interfaz.
+// ============================================================
+
+const DEFAULT_DATA = {
+  "meta": {
+    "startDate": "27 jun 2026",
+    "cycleName": "Fuerza + Core",
+    "lastUpdate": "2 de ago de 2026 12:21 a. m."
+  },
+  "muro": {
+    "cover": null,
+    "avatar": null,
+    "coverAspect": null
+  },
+  "tracker": null,
+  "rutinaA": {
+    "title": "Rutina A — Fuerza y Acondicionamiento",
+    "desc": "Pesas: tren superior, piernas con mancuernas, accesorios. Orden pensado para llegar fresco a lo pesado y dejar los accesorios chicos al final.",
+    "exercises": [
+      {
+        "nombre": "Flexiones declinadas",
+        "tag": "normal",
+        "fase": "activacion",
+        "stats": {
+          "series": "2",
+          "reps": "20",
+          "descanso": "2:00",
+          "bpm": "60",
+          "tempo": "S-P-B / 1-1-2",
+          "enfriamiento": "4:00",
+          "tiempoWork": "01:20 min"
+        },
+        "notas": "Pies elevados, control en bajada. Mantener cuerpo en línea recta de hombros a tobillos.",
+        "metronomo": {
+          "pulsosCompas": "4",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Elevaciones frontales con mancuerna (9.5 kg)",
+        "tag": "normal",
+        "fase": "activacion",
+        "stats": {
+          "series": "3",
+          "reps": "18-20",
+          "descanso": "2:30",
+          "bpm": "65",
+          "tempo": "3-1-2",
+          "enfriamiento": "02:00",
+          "tiempoWork": "36 segundos"
+        },
+        "notas": "No sobrepasar la línea de los ojos. Codos apenas flexionados. Estira deltoide anterior y pectoral menor al terminar.\n3 subida/ 1 pausa/ 2 bajada",
+        "metronomo": {
+          "pulsosCompas": "2",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Elevación para glúteo medio, unilateral con tobillera (2.85 kg)",
+        "tag": "normal",
+        "fase": "activacion",
+        "stats": {
+          "series": "2",
+          "reps": "20",
+          "descanso": "1:00",
+          "bpm": "60",
+          "tempo": "2-1-3 / S-P-B",
+          "enfriamiento": "02:00"
+        },
+        "notas": "S 2 seg-P 1seg-B 3seg = Subida-Pausa-Bajada. Accesorio de carga baja, exigencia neural mínima.\nCon retroversión pélvica.",
+        "metronomo": {
+          "pulsosCompas": "6",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Búlgaras con mancuernas (13.5 kg)",
+        "tag": "normal",
+        "fase": "activacion",
+        "stats": {
+          "series": "3",
+          "reps": "12",
+          "descanso": "2:00",
+          "bpm": "60",
+          "tempo": "2-1-1 / B-P-S",
+          "enfriamiento": "2:30",
+          "tiempoWork": "48 segundos"
+        },
+        "notas": "Unilateral pesado, exige equilibrio. Último ejercicio de fuerza pesada antes de pasar a la pliometría.",
+        "metronomo": {
+          "pulsosCompas": "4",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Peso muerto con salto sobre cajas (mancuernas 13.5 kg)",
+        "tag": "normal",
+        "fase": "fuerza",
+        "stats": {
+          "series": "2",
+          "reps": "15",
+          "descanso": "3:00",
+          "bpm": "—",
+          "tempo": "—",
+          "enfriamiento": "5:00"
+        },
+        "notas": "El movimiento más demandante a nivel de sistema nervioso y articular de toda la rutina. Por eso va temprano, antes de acumular fatiga.",
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Peso muerto convencional con mancuernas (variante sin salto)",
+        "tag": "normal",
+        "fase": "fuerza",
+        "stats": {
+          "series": "4",
+          "reps": "15",
+          "descanso": "4:00",
+          "bpm": "58",
+          "tempo": "3-1-2 / B-P-S",
+          "enfriamiento": "5:00",
+          "tiempoWork": "01:00 min"
+        },
+        "notas": "Hacer esta variante solo si NO hacés la versión con salto sobre cajas.",
+        "metronomo": {
+          "pulsosCompas": "4",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Sentadillas con press, mancuernas (13.5 kg)",
+        "tag": "normal",
+        "fase": "fuerza",
+        "stats": {
+          "series": "3",
+          "reps": "12",
+          "descanso": "3:00",
+          "bpm": "64",
+          "tempo": "2-0-1",
+          "enfriamiento": "06:00",
+          "tiempoWork": "36 seg"
+        },
+        "notas": "Tempo ideal 2-0-1.",
+        "metronomo": {
+          "pulsosCompas": "2",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Dominadas con agarre pronado",
+        "tag": "normal",
+        "fase": "fuerza",
+        "stats": {
+          "series": "3",
+          "reps": "9",
+          "descanso": "03:00",
+          "bpm": "54",
+          "tempo": "S-P-B / 2-0-2",
+          "enfriamiento": "04:00",
+          "tiempoWork": "25 seg"
+        },
+        "notas": "",
+        "metronomo": {
+          "pulsosCompas": "2",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Press de banca plano con mancuernas (13.5 kg)",
+        "tag": "normal",
+        "fase": "hipertrofia",
+        "stats": {
+          "series": "2",
+          "reps": "15",
+          "descanso": "1:00",
+          "bpm": "60",
+          "tempo": "S-P-B / 1-1-2",
+          "enfriamiento": "02:00",
+          "tiempoWork": "60 seg"
+        },
+        "notas": "Compuesto principal de empuje. Va primero entre los pesados, con el sistema nervioso fresco.",
+        "metronomo": {
+          "pulsosCompas": "4",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Sentadillas con salto, mancuerna única (9.5 kg)",
+        "tag": "cardio",
+        "fase": "pliometria",
+        "stats": {
+          "series": "4",
+          "reps": "10",
+          "descanso": "1:00",
+          "bpm": "52",
+          "tempo": "1-0-1 7 S-P-B",
+          "enfriamiento": "4:00",
+          "tiempoWork": "15 seg"
+        },
+        "notas": "Pliometría liviana después de la fuerza pesada: el patrón motor ya está activado pero las piernas todavía no están destruidas.",
+        "metronomo": {
+          "pulsosCompas": "2",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Extensión de tríceps tras nuca con mancuernas (9.5 kg)",
+        "tag": "normal",
+        "fase": "accesorio",
+        "stats": {
+          "series": "3",
+          "reps": "8",
+          "descanso": "1:30",
+          "bpm": "60",
+          "tempo": "2-1-2",
+          "enfriamiento": "04:00",
+          "tiempoWork": "16"
+        },
+        "notas": "Si te cansás antes, podés bajar a mancuernas de 5.5 kg. Articulación chica, queda al final.",
+        "metronomo": {
+          "pulsosCompas": "2",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Curl con mancuernas tipo martillo (13.5 kg)",
+        "tag": "normal",
+        "fase": "accesorio",
+        "stats": {
+          "series": "2",
+          "reps": "10",
+          "descanso": "1:00",
+          "bpm": "—",
+          "tempo": "1-0-2",
+          "enfriamiento": "2:00"
+        },
+        "notas": "Accesorio de aislamiento, no compite con los compuestos.",
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Curl isométrico medio con mancuernas (13.5 kg)",
+        "tag": "normal",
+        "fase": "accesorio",
+        "stats": {
+          "series": "2",
+          "reps": "",
+          "descanso": "1:30",
+          "bpm": "—",
+          "tempo": "—",
+          "enfriamiento": "2:00",
+          "tiempoWork": "45 seg"
+        },
+        "notas": "Isométrico final: fatiga local pura, no compromete la técnica de nada que venga después porque es lo último.",
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Colgada Muerta con lastre de 5.8kg",
+        "tag": "normal",
+        "fase": "accesorio",
+        "stats": {
+          "series": "2",
+          "reps": "01:00",
+          "descanso": "03:00",
+          "bpm": "",
+          "tempo": "",
+          "enfriamiento": "02:00"
+        },
+        "notas": "",
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Descompresión en colgada muerta con lastre de 15.1kg",
+        "tag": "normal",
+        "fase": "accesorio",
+        "stats": {
+          "series": "1",
+          "reps": "45s work",
+          "descanso": "",
+          "bpm": "",
+          "tempo": "",
+          "enfriamiento": "05:00"
+        },
+        "notas": "",
+        "notasAclaracion": ""
+      }
+    ],
+    "regresion": "Regresión más ligera sin perder técnica: usar pesas más livianas, una pierna algo más elevada o una pierna flexionada (en ejercicios unilaterales). Nunca aliviar el ejercicio echando mano de los brazos para compensar."
+  },
+  "rutinaB": {
+    "title": "Rutina B — Cardio + Core",
+    "desc": "Día de cardio y core. Orden pensado para hacer la técnica fina de core con el sistema nervioso fresco, antes de la fatiga del cardio.",
+    "exercises": [
+      {
+        "nombre": "Elevación de piernas suspendido para abdomen",
+        "tag": "normal",
+        "fase": "activacion",
+        "stats": {
+          "series": "4",
+          "reps": "15",
+          "descanso": "1:30",
+          "bpm": "44",
+          "tempo": "S-P-B / 2-1-3",
+          "enfriamiento": "2:30",
+          "tiempoWork": "01:05 min"
+        },
+        "notas": "4 clicks por compás.",
+        "metronomo": {
+          "pulsosCompas": "4",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Retención arriba en elevación de piernas suspendido",
+        "tag": "normal",
+        "fase": "activacion",
+        "stats": {
+          "series": "4",
+          "reps": "",
+          "descanso": "1:30",
+          "bpm": "—",
+          "tempo": "Bajada excéntrica 5s",
+          "enfriamiento": "2:00",
+          "tiempoWork": "15 segundos"
+        },
+        "notas": "",
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Hollow Body Hold con tobilleras (3,475 kg)",
+        "tag": "priority",
+        "fase": "activacion",
+        "stats": {
+          "series": "4",
+          "reps": "",
+          "descanso": "2:00",
+          "bpm": "—",
+          "tempo": "—",
+          "enfriamiento": "—",
+          "tiempoWork": "30s"
+        },
+        "notas": "REALMENTE brazos extendidos detrás de cabeza. Ejercicio prioritario — va temprano porque exige precisión técnica fina en zona lumbo-pélvica, antes de que aparezca fatiga. Ver pestaña Técnica para la ejecución completa.",
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Crunch inverso suspendido en barra",
+        "tag": "priority",
+        "fase": "activacion",
+        "stats": {
+          "series": "1",
+          "reps": "8",
+          "descanso": "sin descanso",
+          "bpm": "60",
+          "tempo": "Ver ejecución abajo",
+          "enfriamiento": "02:00",
+          "tiempoWork": ""
+        },
+        "notas": "POSICIÓN INICIAL:\n\n1) Cuélgate de la barra con agarre prono.\n2) Escápulas ligeramente deprimidas (hombros lejos de las orejas).\n3) Rodillas flexionadas a unos 90°.\n4) Abdomen contraído.\n\n\nEJECUCIÓN:\n\n1) Sube las rodillas hasta aproximadamente la altura de la cadera.\n2) Desde ahí, continúa el movimiento girando la pelvis hacia arriba (retroversión pélvica).\n3) Intenta acercar las rodillas al pecho.\n4) Mantén la contracción un segundo.\n5) Baja lentamente desenrollando la pelvis primero y luego descendiendo las piernas.\n\nPRIORITARIO:\n\nNo olvides utilizar Metronome Beats para hacer en un tempo correcto en cada repetición.\nNo te balancees,\nNo uses impulso,\nNo hacer retroversión pélvica,\nno bajar rápido.",
+        "metronomo": {
+          "pulsosCompas": "4",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Sentadilla con disco de 4,8kg",
+        "tag": "normal",
+        "fase": "activacion",
+        "stats": {
+          "series": "4",
+          "reps": "18",
+          "descanso": "01:00",
+          "bpm": "60 B-P-S/3-1-1",
+          "tempo": "—",
+          "enfriamiento": "02:00",
+          "tiempoWork": "01:30"
+        },
+        "notas": "",
+        "metronomo": {
+          "pulsosCompas": "4",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Remo unilateral con mancuernas Mark 3",
+        "tag": "normal",
+        "fase": "fuerza",
+        "stats": {
+          "series": "3",
+          "reps": "6",
+          "descanso": "3:00",
+          "bpm": "62 S-P-B/1-0-2",
+          "tempo": "2-1-2",
+          "enfriamiento": "4:00",
+          "tiempoWork": "00:18"
+        },
+        "notas": "Con retroversión pélvica controlada. Tracción pesada, todavía con energía fresca.",
+        "metronomo": {
+          "pulsosCompas": "3",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Split jack con disco (1,6 kg)",
+        "tag": "cardio",
+        "fase": "pliometria",
+        "stats": {
+          "series": "1",
+          "reps": "",
+          "descanso": "",
+          "bpm": "60",
+          "tempo": "—",
+          "enfriamiento": "02:30",
+          "tiempoWork": "01:00"
+        },
+        "notas": "Pliometría con carga, después de la fuerza pesada y antes del cardio puro.",
+        "metronomo": {
+          "pulsosCompas": "2",
+          "clicksPulso": "1"
+        },
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Power Jack con disco (4.8 kg)",
+        "tag": "cardio",
+        "fase": "pliometria",
+        "stats": {
+          "series": "4",
+          "reps": "15",
+          "descanso": "1:45",
+          "bpm": "—",
+          "tempo": "Máxima intención de velocidad en subida",
+          "enfriamiento": "4:00"
+        },
+        "notas": "Con salto profundo.",
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Mountain Climbers",
+        "tag": "cardio",
+        "fase": "cardio",
+        "stats": {
+          "series": "—",
+          "reps": "1:00 work",
+          "descanso": "—",
+          "bpm": "—",
+          "tempo": "—",
+          "enfriamiento": "1:00"
+        },
+        "notas": "",
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Sprints en el lugar",
+        "tag": "cardio",
+        "fase": "cardio",
+        "stats": {
+          "series": "—",
+          "reps": "30s",
+          "descanso": "—",
+          "bpm": "—",
+          "tempo": "—",
+          "enfriamiento": "1:00"
+        },
+        "notas": "",
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Jumping Jack con mancuernas (3.5 kg)",
+        "tag": "cardio",
+        "fase": "cardio",
+        "stats": {
+          "series": "—",
+          "reps": "—",
+          "descanso": "—",
+          "bpm": "—",
+          "tempo": "—",
+          "enfriamiento": "1:00 + caminata ligera"
+        },
+        "notas": "Respiración nasal profunda: inhalar 4s, exhalar 6-8s. Círculos suaves de hombros.",
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Crunch en el suelo con disco (1.6 kg)",
+        "tag": "normal",
+        "fase": "accesorio",
+        "stats": {
+          "series": "3",
+          "reps": "12",
+          "descanso": "1:30",
+          "bpm": "—",
+          "tempo": "—",
+          "enfriamiento": "1:30"
+        },
+        "notas": "Accesorio liviano de cierre, carga baja.",
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Crunch oblicuo con disco (2.5 kg) sobre banca",
+        "tag": "normal",
+        "fase": "accesorio",
+        "stats": {
+          "series": "2",
+          "reps": "20",
+          "descanso": "1:00",
+          "bpm": "—",
+          "tempo": "5s",
+          "enfriamiento": "1:00"
+        },
+        "notas": "",
+        "notasAclaracion": ""
+      },
+      {
+        "nombre": "Elevación plantar unilateral con mancuernas (13.5 kg)",
+        "tag": "normal",
+        "fase": "accesorio",
+        "stats": {
+          "series": "—",
+          "reps": "30",
+          "descanso": "—",
+          "bpm": "—",
+          "tempo": "—",
+          "enfriamiento": "—"
+        },
+        "notas": "Articulación chica (tobillo), va al final como en Rutina A.",
+        "notasAclaracion": ""
+      }
+    ]
+  },
+  "tecnica": {
+    "prioridad": {
+      "titulo": "Hollow Hold — Ejercicio prioritario",
+      "puntos": [
+        "Bíceps cerca de las orejas.",
+        "Lumbar completamente apoyada contra el piso.",
+        "Si está bien ejecutado: el abdomen debería arder rápido, las piernas sentirse absurdamente pesadas, y deberías empezar a temblar antes de los 40-50 segundos."
+      ]
+    },
+    "tempoGeneral": {
+      "subida": "2 segundos",
+      "pausa": "1 segundo (contracción/pausa)",
+      "bajada": "3 segundos",
+      "bpm": "60 BPM"
+    },
+    "reglasNo": [
+      "No rebalancearse.",
+      "No usar impulso.",
+      "No hacer retroversión pélvica (salvo que el ejercicio la pida explícitamente, como el crunch inverso suspendido).",
+      "No bajar rápido."
+    ],
+    "palesYRegresiones": {
+      "titulo": "Uso de palés / regresión más ligera",
+      "contenido": "Regresión más ligera sin perder técnica que con palés sostenido.\n\nQué usar: piernas algo más altas, o una pierna flexionada.\n\nNunca: apoyarse en los brazos para aliviar el ejercicio."
+    },
+    "notaElevacionesFrontales": "Elevaciones frontales: no sobrepasar la línea de los ojos. Codos apenas flexionados. Estirar deltoide anterior y pectoral menor al finalizar.",
+    "secuenciacion": {
+      "titulo": "Por qué este orden",
+      "contenido": "Cada rutina sigue la misma lógica fisiológica, de principio a fin:\n\n1) Activación / core / técnica fina — el sistema nervioso está fresco, así que es el mejor momento para los movimientos que exigen más precisión (Hollow Hold, crunch inverso suspendido, control lumbo-pélvico).\n\n2) Fuerza pesada — compuestos con más carga externa y mayor demanda neural y articular (press, peso muerto, sentadillas, dorsales, remo). Van con energía intacta.\n\n3) Cardio y pliometría — saltos y movimientos explosivos. Van después de la fuerza pesada porque ya activaron el patrón motor, pero antes de los accesorios porque todavía necesitan algo de frescura para mantener la calidad del salto.\n\n4) Accesorios livianos — aislamiento de articulaciones chicas (codo, tobillo) o isométricos de cierre. Van al final porque su fatiga no compromete la técnica de nada que venga después: no hay nada después."
+    }
+  },
+  "logs": {
+    "daily": [
+      {
+        "id": "log_9lkybnd",
+        "date": "2026-06-28",
+        "dateFormatted": "dom, 28 jun 2026",
+        "routine": "A",
+        "energia": "2",
+        "fatiga": "1",
+        "sueno": "8h",
+        "comida": "intermedia",
+        "notas": "agregué un set extra a la extensión de tríceps tras nuca con mancuernas de 9.5kg quedando en 3 sets."
+      },
+      {
+        "id": "log_3o8zdq4",
+        "date": "2026-06-29",
+        "dateFormatted": "lun, 29 jun 2026",
+        "routine": "A",
+        "energia": "3",
+        "fatiga": "2",
+        "sueno": "7h",
+        "comida": "intermedia",
+        "notas": "1. Reemplacé las flexiones declinadas este día, por un press militar con mancuernas de 13.5kg con la misma configuración de 2 sets/20 reps/02:00 descanso e ignoré el tempo y enfriamiento. No llegué a hacer 20 reps en los dos sets.\n7. Con las búlgaras me fue bien, completé de manera ejemplar los tres sets y se sintió genial el ejercicio. Experimenté nauseas al finalizar el último set y acabé realizando sólo estos dos ejercicios durante la madrugada.\n8. A la tarde retomé con elevaciones laterales para glúteo medio con tobilleras de 2,850kg 2 sets/20 reps/01:30 rest (porque estaba mal configurado el registro)/ enfriamiento de 02:00. El tempo no lo tomé. \nLo hice parado para no ensuciar la alfombra.\n9. Dominadas con agarre pronado= 3 sets sin tomar el tempo. En el primer set, hice 13 reps, 2° set 8 reps, 3° set 6 reps; descanso de 3 min, 04:00 enfriamiento.\n14. Colgada Muerta con lastre de 4.8kg: Todo bien, ya se puede progresar en este. Recomiendo aumentar el peso a 5.8kg\n15. Descompresión en colgada muerta con lastre de 13.5kg: Excelente! Ya se puede avanzar con este también. Aumentar el peso a 15.1kg"
+      },
+      {
+        "id": "log_26um196",
+        "date": "2026-07-06",
+        "dateFormatted": "lun, 6 jul 2026",
+        "routine": "A",
+        "energia": "4",
+        "fatiga": "2",
+        "sueno": "8h",
+        "comida": "buena",
+        "notas": "Press de banca: ya se puede progresar.\nHice press militar con mancuernas de 13.5kg sin sentadillas por dolor muscular en esa zona. Me fue bien, completé todas las reps de cada set con excelente técnica y máximo esfuerzo. \nLa última se sintió difícil pero no llegué al fallo. Respeté muy bien el tempo y conseguí encontrar y mantener la sincronía.\n\nEn dominadas: El primer set ya fue exigente por tratar de encontrar y mantener el ritmo del tempo; logré hacer las 9 reps y en el segundo set ya me costo mucho más; no podía retraer muy bien las escápulas pero pude completar las nueve. Y en el tercer set ya llegué sólo a seis o siete, no recuerdo, y como no conseguí completar las nueve reps, hice un isométrico en la parte media del recorrido hasta que se acabó el tiempo de trabajo."
+      }
+    ],
+    "weekly": []
+  },
+  "bloques": [
+    {
+      "id": "bloque_hipertrofia_2026",
+      "nombre": "Hipertrofia + Core",
+      "objetivo": "Hipertrofia muscular y elasticidad de músculos y tendones. Preparación de base para movilidad avanzada (splits, yoga).",
+      "fechaInicio": "2026-05-25",
+      "duracion": "3 semanas",
+      "estado": "activo",
+      "notas": "Rutinas A y B alternadas diariamente. Énfasis en tempo controlado, rango de movimiento completo y trabajo isométrico."
+    },
+    {
+      "id": "bloque_yoga_pendiente",
+      "nombre": "Yoga",
+      "objetivo": "",
+      "fechaInicio": "",
+      "duracion": "",
+      "estado": "planificado",
+      "notas": ""
+    }
+  ]
+};
+
+// Estructura vacía para cuando el usuario reinicia datos
+const EMPTY_LOGS = {
+  daily: [],
+  weekly: []
+};
+</script>
+<script>
+// ============================================================
+// MOTOR DE LA BITÁCORA
+// Todo se guarda en IndexedDB de este navegador (permite fotos más pesadas
+// que localStorage). Usa "Exportar copia" para tener un respaldo fuera del navegador.
+// ============================================================
+
+const STORAGE_KEY = "bitacora_entrenamiento_v2"; // clave legada de localStorage (para migrar datos viejos una sola vez)
+const IDB_NAME = "bitacoraDB";
+const IDB_STORE = "kv";
+const IDB_KEY = "state";
+let STATE = null;
+
+// ---------- IndexedDB helpers ----------
+function idbOpen(){
+  return new Promise((resolve, reject)=>{
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = ()=>{
+      req.result.createObjectStore(IDB_STORE);
+    };
+    req.onsuccess = ()=> resolve(req.result);
+    req.onerror = ()=> reject(req.error);
+  });
+}
+async function idbGet(key){
+  const db = await idbOpen();
+  return new Promise((resolve, reject)=>{
+    const tx = db.transaction(IDB_STORE, "readonly");
+    const req = tx.objectStore(IDB_STORE).get(key);
+    req.onsuccess = ()=> resolve(req.result);
+    req.onerror = ()=> reject(req.error);
+  });
+}
+async function idbSet(key, value){
+  const db = await idbOpen();
+  return new Promise((resolve, reject)=>{
+    const tx = db.transaction(IDB_STORE, "readwrite");
+    tx.objectStore(IDB_STORE).put(value, key);
+    tx.oncomplete = ()=> resolve(true);
+    tx.onerror = ()=> reject(tx.error);
+  });
+}
+
+const FASE_LABELS = {
+  activacion: "Activación / técnica fina",
+  correctivo: "Correctivos / movilidad",
+  fuerza: "Fuerza pesada",
+  hipertrofia: "Hipertrofia",
+  pliometria: "Pliometría / potencia",
+  cardio: "Cardio",
+  isometricos: "Isométricos",
+  estiramiento: "Estiramientos",
+  accesorio: "Accesorio liviano"
+};
+const FASE_ORDER = ["activacion","correctivo","fuerza","hipertrofia","pliometria","cardio","isometricos","estiramiento","accesorio"];
+const FASE_COLOR = {
+  activacion:   "#4FA3A3",
+  correctivo:   "#8FA86B",
+  fuerza:       "#E8714A",
+  hipertrofia:  "#A98FD6",
+  pliometria:   "#D9A24B",
+  cardio:       "#6BA3D6",
+  isometricos:  "#D14F3D",
+  estiramiento: "#D68FA8",
+  accesorio:    "#5E7268"
+};
+function faseColorFor(f){ return FASE_COLOR[f] || "#5E7268"; }
+
+// ---------- Subtipos: Isométricos (superación/sostenimiento/funcional) y
+// Estiramientos (activo/pasivo). Cada uno con su definición breve, que se
+// usa como referencia dentro de la tarjeta y (si la nota de aclaración
+// está vacía) se copia ahí automáticamente para no dejarla en blanco. ----------
+const ISO_TIPO_LABELS = { superacion:"Superación", sostenimiento:"Sostenimiento", funcional:"Funcional" };
+function isoTipoDef(t){
+  if(t === "superacion") return "Superación: empuje o tracción máxima contra una resistencia inamovible (pin fijo, pared, barra bloqueada en un rack). No hay desplazamiento articular; el objetivo es la máxima producción de fuerza posible en ese punto.";
+  if(t === "sostenimiento") return "Sostenimiento: mantener una posición articular fija contra una resistencia que sí podría moverse (plancha, sentadilla en pared, hollow hold). Trabaja resistencia muscular y control postural.";
+  if(t === "funcional") return "Funcional: pausa isométrica en un punto específico de un movimiento dinámico (ej. a mitad de camino de una sentadilla o dominada), para reforzar un rango de movimiento débil o un punto de estancamiento (sticking point).";
+  return "";
+}
+const ESTIRA_TIPO_LABELS = { activo:"Activo", pasivo:"Pasivo" };
+function estiraTipoDef(t){
+  if(t === "activo") return "Activo: el estiramiento se logra contrayendo el músculo opuesto (agonista), sin ayuda externa. Ej: elevar la pierna estirada sin apoyarla en nada.";
+  if(t === "pasivo") return "Pasivo: el estiramiento se logra con una fuerza externa (peso corporal, gravedad, pared, banda, compañero), sin que el músculo objetivo se contraiga activamente.";
+  return "";
+}
+function setIsoTipo(routineKey, idx, value){
+  const ex = STATE[routineKey].exercises[idx];
+  ex.isoTipo = value;
+  if(value && (!ex.notasAclaracion || !ex.notasAclaracion.trim())){
+    ex.notasAclaracion = isoTipoDef(value);
+  }
+  saveState();
+  renderRoutine(routineKey);
+}
+function setEstiramientoTipo(routineKey, idx, value){
+  const ex = STATE[routineKey].exercises[idx];
+  ex.estiramientoTipo = value;
+  if(value && (!ex.notasAclaracion || !ex.notasAclaracion.trim())){
+    ex.notasAclaracion = estiraTipoDef(value);
+  }
+  saveState();
+  renderRoutine(routineKey);
+}
+
+// ---------- helpers ----------
+function uid(prefix){ return prefix + "_" + Math.random().toString(36).slice(2,9); }
+function escapeHtml(s){
+  if(!s) return "";
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function nl2br(s){ return escapeHtml(s).replace(/\n/g, "<br>"); }
+function flashSaved(){
+  const el = document.getElementById("savedFlash");
+  el.classList.add("show");
+  clearTimeout(window._flashTimeout);
+  window._flashTimeout = setTimeout(()=>el.classList.remove("show"), 1200);
+}
+function nowStr(){
+  const d = new Date();
+  return d.toLocaleDateString('es-AR', {day:'numeric', month:'short', year:'numeric'}) + " " +
+         d.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+}
+
+// ---------- load / save ----------
+async function loadState(){
+  // 1) ¿Hay datos ya en IndexedDB?
+  try{
+    const fromIdb = await idbGet(IDB_KEY);
+    if(fromIdb) return fromIdb;
+  }catch(e){ console.error("Error leyendo IndexedDB", e); }
+
+  // 2) Migración única: ¿había datos viejos en localStorage de una versión anterior?
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){
+    try{
+      const migrated = JSON.parse(raw);
+      await idbSet(IDB_KEY, migrated);
+      localStorage.removeItem(STORAGE_KEY);
+      return migrated;
+    }catch(e){ console.error("Error migrando datos guardados", e); }
+  }
+
+  // 3) Primera vez: arrancamos con la última copia conocida.
+  return {
+    meta: { ...DEFAULT_DATA.meta },
+    muro: JSON.parse(JSON.stringify(DEFAULT_DATA.muro || {cover:null, avatar:null, coverAspect:null})),
+    rutinaA: JSON.parse(JSON.stringify(DEFAULT_DATA.rutinaA)),
+    rutinaB: JSON.parse(JSON.stringify(DEFAULT_DATA.rutinaB)),
+    tecnica: JSON.parse(JSON.stringify(DEFAULT_DATA.tecnica)),
+    logs: JSON.parse(JSON.stringify(DEFAULT_DATA.logs || EMPTY_LOGS)),
+    bloques: JSON.parse(JSON.stringify(DEFAULT_DATA.bloques || [])),
+    tracker: DEFAULT_DATA.tracker ? JSON.parse(JSON.stringify(DEFAULT_DATA.tracker)) : null
+  };
+}
+async function saveState(silent){
+  STATE.meta.lastUpdate = nowStr();
+  STATE.meta.lastUpdateTs = Date.now();
+  try{
+    await idbSet(IDB_KEY, STATE);
+  }catch(e){
+    console.error("Error guardando en IndexedDB", e);
+    alert("No se pudo guardar (posible falta de espacio). Exportá una copia .json como respaldo.");
+    return;
+  }
+  document.getElementById("lastUpdate").textContent = STATE.meta.lastUpdate;
+  if(!silent) flashSaved();
+  scheduleDrivePush();
+}
+
+// ============================================================
+// SINCRONIZACIÓN CON GOOGLE DRIVE
+// Guarda una copia de STATE como archivo JSON en el Drive del usuario
+// (accesible únicamente por esta app, scope drive.file) para que los
+// cambios se vean en cualquier dispositivo sin exportar/importar a mano.
+// ============================================================
+const DRIVE_CLIENT_ID = "196367232149-jc4vrhs5vfrqcsb1egr1hsn3jusfdhjc.apps.googleusercontent.com";
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+const DRIVE_FILENAME = "bitacora_entrenamiento_sync.json";
+const DRIVE_TOKEN_KEY = "bitacora_drive_token_v1";
+// Bandera persistente (no expira con el token): indica que el usuario ya
+// conectó Drive alguna vez en este navegador. Sirve para saber si conviene
+// intentar una reconexión silenciosa cuando el token cacheado ya venció.
+const DRIVE_CONNECTED_FLAG_KEY = "bitacora_drive_ever_connected_v1";
+
+let driveTokenClient = null;
+let driveAccessToken = null;   // token vigente en memoria
+let driveTokenExpiresAt = 0;   // epoch ms
+let driveFileId = null;        // id del archivo en Drive (se busca/crea una vez)
+let drivePushTimer = null;
+let driveSyncing = false;
+let driveSilentAttemptInFlight = false; // true mientras se intenta la reconexión silenciosa automática
+
+function setDriveStatus(text, kind){
+  const el = document.getElementById("driveSyncStatus");
+  if(!el) return;
+  el.textContent = text;
+  el.className = "drive-sync-status" + (kind ? " " + kind : "");
+}
+
+function driveHasValidToken(){
+  return !!driveAccessToken && Date.now() < driveTokenExpiresAt - 30000;
+}
+
+function saveDriveTokenCache(){
+  try{
+    localStorage.setItem(DRIVE_TOKEN_KEY, JSON.stringify({ token: driveAccessToken, expiresAt: driveTokenExpiresAt }));
+  }catch(e){}
+}
+function loadDriveTokenCache(){
+  try{
+    const raw = localStorage.getItem(DRIVE_TOKEN_KEY);
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    if(parsed && parsed.token && parsed.expiresAt > Date.now() + 30000){
+      driveAccessToken = parsed.token;
+      driveTokenExpiresAt = parsed.expiresAt;
+    }
+  }catch(e){}
+}
+
+function markDriveEverConnected(){
+  try{ localStorage.setItem(DRIVE_CONNECTED_FLAG_KEY, "1"); }catch(e){}
+}
+function driveWasEverConnected(){
+  try{ return localStorage.getItem(DRIVE_CONNECTED_FLAG_KEY) === "1"; }catch(e){ return false; }
+}
+
+function initDriveAuth(){
+  if(!window.google || !google.accounts || !google.accounts.oauth2){
+    // El script de Google todavía no cargó; reintentar en un momento.
+    setTimeout(initDriveAuth, 400);
+    return;
+  }
+  driveTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: DRIVE_CLIENT_ID,
+    scope: DRIVE_SCOPE,
+    callback: async (resp)=>{
+      if(resp.error){
+        console.error("Error de autenticación Drive:", resp);
+        // Si fue un intento SILENCIOSO (auto-reconexión al abrir la app) no
+        // mostramos error: simplemente dejamos visible el botón "Conectar"
+        // para que el usuario lo haga manualmente, sin alarmar con un
+        // mensaje de error por algo que el propio navegador bloqueó
+        // (ej. popup silencioso bloqueado) o que requiere elegir cuenta.
+        if(!driveSilentAttemptInFlight){
+          setDriveStatus("☁️ No se pudo conectar (" + resp.error + ")", "err");
+        } else {
+          setDriveStatus("☁️ Sin conectar — tocá \"Conectar\"", "warn");
+        }
+        driveSilentAttemptInFlight = false;
+        return;
+      }
+      driveSilentAttemptInFlight = false;
+      driveAccessToken = resp.access_token;
+      driveTokenExpiresAt = Date.now() + (resp.expires_in ? resp.expires_in*1000 : 3500*1000);
+      saveDriveTokenCache();
+      markDriveEverConnected();
+      updateDriveUiConnected();
+      await syncPullAndMerge(true);
+    }
+  });
+
+  // 1) Intento silencioso con token cacheado: si ya hay un token cacheado
+  // vigente (no venció todavía, típicamente dura ~1h), lo usamos directo
+  // sin pedirle nada al usuario.
+  loadDriveTokenCache();
+  if(driveHasValidToken()){
+    updateDriveUiConnected();
+    syncPullAndMerge(false);
+    return;
+  }
+
+  // 2) Reconexión silenciosa automática: si el token cacheado venció pero
+  // el usuario ya conectó Drive antes en este navegador, intentamos pedir
+  // un token nuevo SIN mostrar la pantalla de consentimiento (prompt:"").
+  // Si el usuario sigue con sesión de Google activa en el navegador y ya
+  // había dado permiso antes, esto puede renovar la conexión sin que
+  // tenga que tocar nada. Nota: algunos navegadores pueden bloquear este
+  // intento por no venir de un click directo del usuario — en ese caso
+  // simplemente no pasa nada y queda visible el botón "Conectar" como
+  // respaldo, igual que antes.
+  if(driveWasEverConnected()){
+    driveSilentAttemptInFlight = true;
+    setDriveStatus("☁️ Reconectando…", "warn");
+    try{
+      driveTokenClient.requestAccessToken({ prompt: "" });
+    }catch(e){
+      driveSilentAttemptInFlight = false;
+      setDriveStatus("☁️ Sin conectar — tocá \"Conectar\"", "warn");
+    }
+  }
+}
+
+function connectDrive(){
+  if(!driveTokenClient){ setDriveStatus("☁️ Iniciando…", "warn"); setTimeout(connectDrive, 500); return; }
+  driveSilentAttemptInFlight = false;
+  driveTokenClient.requestAccessToken({ prompt: driveAccessToken ? "" : "consent" });
+}
+
+function updateDriveUiConnected(){
+  document.getElementById("driveConnectBtn").style.display = "none";
+  document.getElementById("driveSyncNowBtn").style.display = "inline-block";
+  setDriveStatus("☁️ Google Drive conectado", "ok");
+}
+
+function driveAuthHeaders(){
+  return { "Authorization": "Bearer " + driveAccessToken };
+}
+
+async function driveFindFile(){
+  const q = encodeURIComponent(`name='${DRIVE_FILENAME}' and trashed=false`);
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,modifiedTime)&spaces=drive`, {
+    headers: driveAuthHeaders()
+  });
+  if(!res.ok) throw new Error("No se pudo buscar el archivo en Drive (" + res.status + ")");
+  const data = await res.json();
+  if(data.files && data.files.length > 0) return data.files[0].id;
+  return null;
+}
+
+async function driveDownloadFile(fileId){
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+    headers: driveAuthHeaders()
+  });
+  if(!res.ok) throw new Error("No se pudo descargar el archivo de Drive (" + res.status + ")");
+  return await res.json();
+}
+
+async function driveCreateFile(content){
+  const metadata = { name: DRIVE_FILENAME, mimeType: "application/json" };
+  const boundary = "bitacora_boundary_" + Math.random().toString(36).slice(2);
+  const body =
+    `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n` +
+    `--${boundary}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(content)}\r\n` +
+    `--${boundary}--`;
+  const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id", {
+    method: "POST",
+    headers: { ...driveAuthHeaders(), "Content-Type": `multipart/related; boundary=${boundary}` },
+    body
+  });
+  if(!res.ok) throw new Error("No se pudo crear el archivo en Drive (" + res.status + ")");
+  const data = await res.json();
+  return data.id;
+}
+
+async function driveUpdateFile(fileId, content){
+  const res = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
+    method: "PATCH",
+    headers: { ...driveAuthHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify(content)
+  });
+  if(!res.ok) throw new Error("No se pudo actualizar el archivo en Drive (" + res.status + ")");
+}
+
+function scheduleDrivePush(){
+  if(!driveHasValidToken()) return; // no conectado, no hay nada que empujar
+  clearTimeout(drivePushTimer);
+  drivePushTimer = setTimeout(()=>{ pushToDrive().catch(e=>{
+    console.error(e);
+    setDriveStatus("☁️ Error al sincronizar", "err");
+  }); }, 1800);
+}
+
+async function pushToDrive(){
+  if(!driveHasValidToken() || driveSyncing) return;
+  driveSyncing = true;
+  setDriveStatus("☁️ Sincronizando…", "warn");
+  try{
+    if(!driveFileId) driveFileId = await driveFindFile();
+    if(!driveFileId){
+      driveFileId = await driveCreateFile(STATE);
+    } else {
+      await driveUpdateFile(driveFileId, STATE);
+    }
+    setDriveStatus("☁️ Sincronizado ✓", "ok");
+  } finally {
+    driveSyncing = false;
+  }
+}
+
+async function syncPullAndMerge(askIfNewer){
+  if(!driveHasValidToken() || driveSyncing) return;
+  driveSyncing = true;
+  setDriveStatus("☁️ Buscando cambios…", "warn");
+  try{
+    if(!driveFileId) driveFileId = await driveFindFile();
+    if(!driveFileId){
+      // Todavía no existe copia en Drive: la creamos con lo que tenemos localmente.
+      driveFileId = await driveCreateFile(STATE);
+      setDriveStatus("☁️ Sincronizado ✓", "ok");
+      return;
+    }
+    const remote = await driveDownloadFile(driveFileId);
+    const remoteTs = (remote && remote.meta && remote.meta.lastUpdateTs) || 0;
+    const localTs = (STATE && STATE.meta && STATE.meta.lastUpdateTs) || 0;
+    if(remoteTs > localTs){
+      const remoteWhen = (remote.meta && remote.meta.lastUpdate) || "desconocida";
+      const proceed = !askIfNewer || confirm(
+        `Hay una versión más reciente en Google Drive (última edición: ${remoteWhen}).\n\n¿Reemplazar los datos de este dispositivo con esa versión?`
+      );
+      if(proceed){
+        STATE = remote;
+        if(!STATE.logs) STATE.logs = JSON.parse(JSON.stringify(EMPTY_LOGS));
+        if(!STATE.muro) STATE.muro = {cover:null, avatar:null, coverAspect:null};
+        if(STATE.tracker === undefined) STATE.tracker = null;
+        await idbSet(IDB_KEY, STATE);
+        renderAll();
+        setDriveStatus("☁️ Sincronizado ✓ (traído de Drive)", "ok");
+        return;
+      }
+    }
+    // Si lo local es igual o más nuevo, empujamos lo local para dejar todo alineado.
+    if(localTs >= remoteTs){
+      await driveUpdateFile(driveFileId, STATE);
+    }
+    setDriveStatus("☁️ Sincronizado ✓", "ok");
+  } catch(e){
+    console.error(e);
+    setDriveStatus("☁️ Error al sincronizar", "err");
+  } finally {
+    driveSyncing = false;
+  }
+}
+
+function manualSyncDrive(){
+  syncPullAndMerge(true);
+}
+
+// ---------- exercise card markup ----------
+function statBlock(stats){
+  const labels = {series:"Sets", reps:"Reps", descanso:"Descanso", bpm:"BPM", tempo:"Tempo", enfriamiento:"Enfriam."};
+  let html = "";
+  for(const key in labels){
+    if(stats[key] === undefined) continue;
+    html += `<div class="stat">
+      <label>${labels[key]}</label>
+      <span class="val" contenteditable="true" data-field="${key}" data-placeholder="—">${escapeHtml(stats[key])}</span>
+    </div>`;
+  }
+  return html;
+}
+
+function extraStatsBlock(ex, routineKey, idx){
+  let html = "";
+  if(ex.stats && ex.stats.tiempoWork !== undefined){
+    html += `<div class="stat-wide stat-tiempowork">
+      <span class="stat-wide-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12M6 21h12M6 3c0 6 6 7 6 9s-6 3-6 9M18 3c0 6-6 7-6 9s6 3 6 9"/></svg></span>
+      <div class="stat-wide-body">
+        <label>Time Work</label>
+        <span class="val" contenteditable="true" data-field="tiempoWork" data-placeholder="—">${escapeHtml(ex.stats.tiempoWork)}</span>
+      </div>
+      <button class="stat-quitar" onclick="removeTiempoWork('${routineKey}',${idx})" title="Quitar tiempo work">Quitar</button>
+    </div>`;
+  } else {
+    html += `<button class="stat-add-btn-wide" onclick="addTiempoWork('${routineKey}',${idx})">+ Agregar Time Work</button>`;
+  }
+  if(ex.metronomo){
+    html += `<div class="stat-wide stat-metro">
+      <span class="stat-wide-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></span>
+      <div class="stat-wide-body stat-metro-body">
+        <div class="stat-metro-field">
+          <label>Pulsos/compás</label>
+          <span contenteditable="true" data-metro="pulsosCompas" data-placeholder="—">${escapeHtml(ex.metronomo.pulsosCompas||"")}</span>
+        </div>
+        <span class="metro-x">×</span>
+        <div class="stat-metro-field">
+          <label>Clicks/pulso</label>
+          <span contenteditable="true" data-metro="clicksPulso" data-placeholder="—">${escapeHtml(ex.metronomo.clicksPulso||"")}</span>
+        </div>
+      </div>
+      <button class="stat-quitar" onclick="removeMetronomo('${routineKey}',${idx})" title="Quitar metrónomo">Quitar</button>
+    </div>`;
+  } else {
+    html += `<button class="stat-add-btn-wide" onclick="addMetronomo('${routineKey}',${idx})">+ Agregar metrónomo (Pulsos/Clicks)</button>`;
+  }
+  return html;
+}
+function addTiempoWork(routineKey, idx){
+  STATE[routineKey].exercises[idx].stats.tiempoWork = "";
+  saveState();
+  renderRoutine(routineKey);
+}
+function removeTiempoWork(routineKey, idx){
+  delete STATE[routineKey].exercises[idx].stats.tiempoWork;
+  saveState();
+  renderRoutine(routineKey);
+}
+function addMetronomo(routineKey, idx){
+  STATE[routineKey].exercises[idx].metronomo = { pulsosCompas:"", clicksPulso:"" };
+  saveState();
+  renderRoutine(routineKey);
+}
+function removeMetronomo(routineKey, idx){
+  delete STATE[routineKey].exercises[idx].metronomo;
+  saveState();
+  renderRoutine(routineKey);
+}
+
+function tagLabel(tag){
+  if(tag === "priority") return {cls:"priority", text:"Prioridad"};
+  if(tag === "cardio") return {cls:"cardio", text:"Cardio"};
+  return {cls:"normal", text:"Fuerza"};
+}
+
+function faseSelectHtml(routineKey, idx, currentFase){
+  const opts = FASE_ORDER.map(f=>`<option value="${f}" ${f===currentFase?"selected":""}>${FASE_LABELS[f]}</option>`).join("");
+  return `<select class="fase-select" onchange="changeFase('${routineKey}',${idx},this.value)">${opts}</select>`;
+}
+
+function exerciseCard(ex, routineKey, idx){
+  const t = tagLabel(ex.tag);
+  const cardCls = ex.tag === "priority" ? "priority" : (ex.tag === "cardio" ? "cardio" : "");
+  const timerId = `${routineKey}_${idx}`;
+  const hasNotes = ex.notas && ex.notas.trim().length > 0;
+  const hasAclaracion = ex.notasAclaracion && ex.notasAclaracion.trim().length > 0;
+  const hasProgresion = ex.reglasProgresion && ex.reglasProgresion.trim().length > 0;
+  const videos = ex.videos || [];
+  const fase = ex.fase || "fuerza";
+
+  // Quinta pestaña satélite condicional: sólo aparece en tarjetas de la fase
+  // correspondiente (Isométricos → subtipo; Estiramientos → activo/pasivo).
+  let extraTabHtml = "";
+  let extraPanelHtml = "";
+  if(fase === "isometricos"){
+    const cur = ex.isoTipo || "";
+    extraTabHtml = `<div class="ex-notes-toggle isotipo full" onclick="toggleNotes(this,'iso_${timerId}')">
+        <span class="chevron">▸</span>
+        <span>Subtipo isométrico ${cur ? `(${ISO_TIPO_LABELS[cur]})` : "(sin definir)"}</span>
+      </div>`;
+    extraPanelHtml = `<div class="ex-notes-panel isotipo" id="panel_iso_${timerId}">
+        <select class="fase-select subtipo-select" onchange="setIsoTipo('${routineKey}',${idx},this.value)">
+          <option value="">— Elegir subtipo —</option>
+          <option value="superacion" ${cur==="superacion"?"selected":""}>Superación</option>
+          <option value="sostenimiento" ${cur==="sostenimiento"?"selected":""}>Sostenimiento</option>
+          <option value="funcional" ${cur==="funcional"?"selected":""}>Funcional</option>
+        </select>
+        ${cur ? `<p class="subtipo-def">${escapeHtml(isoTipoDef(cur))}</p>` : ""}
+      </div>`;
+  } else if(fase === "estiramiento"){
+    const cur = ex.estiramientoTipo || "";
+    extraTabHtml = `<div class="ex-notes-toggle estiratipo full" onclick="toggleNotes(this,'esti_${timerId}')">
+        <span class="chevron">▸</span>
+        <span>Tipo de estiramiento ${cur ? `(${ESTIRA_TIPO_LABELS[cur]})` : "(sin definir)"}</span>
+      </div>`;
+    extraPanelHtml = `<div class="ex-notes-panel estiratipo" id="panel_esti_${timerId}">
+        <select class="fase-select subtipo-select" onchange="setEstiramientoTipo('${routineKey}',${idx},this.value)">
+          <option value="">— Elegir tipo —</option>
+          <option value="activo" ${cur==="activo"?"selected":""}>Activo</option>
+          <option value="pasivo" ${cur==="pasivo"?"selected":""}>Pasivo</option>
+        </select>
+        ${cur ? `<p class="subtipo-def">${escapeHtml(estiraTipoDef(cur))}</p>` : ""}
+      </div>`;
+  }
+  return `
+  <div class="ex-card ${cardCls}" data-routine="${routineKey}" data-idx="${idx}">
+    <div class="ex-top">
+      <div class="ex-num">${idx+1}</div>
+      <div style="flex:1">
+        <div class="ex-title" contenteditable="true" data-field="nombre" data-placeholder="Nombre del ejercicio">${escapeHtml(ex.nombre)}</div>
+        ${faseSelectHtml(routineKey, idx, ex.fase || "fuerza")}
+      </div>
+      <span class="ex-tag ${t.cls}" data-field="tag" onclick="cycleTag('${routineKey}',${idx})" title="Click para cambiar tipo">${t.text}</span>
+      <button class="ex-del" onclick="deleteExercise('${routineKey}',${idx})" title="Eliminar ejercicio">×</button>
+    </div>
+    <div class="ex-stats">${statBlock(ex.stats)}</div>
+    <div class="ex-stats ex-stats-extra">${extraStatsBlock(ex, routineKey, idx)}</div>
+    <div class="ex-notes-row">
+      <div class="ex-notes-toggle" onclick="toggleNotes(this,'ejec_${timerId}')">
+        <span class="chevron">▸</span>
+        <span>Notas de ejecución ${hasNotes ? "" : "(vacío)"}</span>
+      </div>
+      <div class="ex-notes-toggle aclaracion" onclick="toggleNotes(this,'acl_${timerId}')">
+        <span class="chevron">▸</span>
+        <span>Notas de aclaración ${hasAclaracion ? "" : "(vacío)"}</span>
+      </div>
+      <div class="ex-notes-toggle progresion" onclick="toggleNotes(this,'prog_${timerId}')">
+        <span class="chevron">▸</span>
+        <span>Reglas de progresiones ${hasProgresion ? "" : "(vacío)"}</span>
+      </div>
+      <div class="ex-notes-toggle video" onclick="toggleNotes(this,'vid_${timerId}')">
+        <span class="chevron">▸</span>
+        <span>Videos ${videos.length ? `(${videos.length})` : "(vacío)"}</span>
+      </div>
+      ${extraTabHtml}
+    </div>
+    <div class="ex-notes-panel" id="panel_ejec_${timerId}">
+      <div contenteditable="true" data-field="notas" data-placeholder="Agregar nota de ejecución, técnica, o referencia...">${nl2br(ex.notas||"")}</div>
+    </div>
+    <div class="ex-notes-panel aclaracion" id="panel_acl_${timerId}">
+      <div contenteditable="true" data-field="notasAclaracion" data-placeholder="Agregar una aclaración: por qué se hace así, contexto, advertencias...">${nl2br(ex.notasAclaracion||"")}</div>
+    </div>
+    <div class="ex-notes-panel progresion" id="panel_prog_${timerId}">
+      <div contenteditable="true" data-field="reglasProgresion" data-placeholder="Opciones de progresión: Principiante / Intermedio / Avanzado...">${nl2br(ex.reglasProgresion||"")}</div>
+    </div>
+    <div class="ex-notes-panel video" id="panel_vid_${timerId}">
+      <div class="video-links">
+        ${videos.map((v,vi)=>`
+          <div class="video-link-row">
+            <div style="flex:1; min-width:0">
+              <a href="${escapeHtml(v.url)}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.07 0l2-2a5 5 0 00-7.07-7.07l-1 1"/><path d="M14 11a5 5 0 00-7.07 0l-2 2a5 5 0 007.07 7.07l1-1"/></svg>${escapeHtml(v.label || v.url)}</a>
+              ${videoEmbedHtml(v)}
+            </div>
+            <button class="video-link-del" onclick="deleteVideoLink('${routineKey}',${idx},${vi})" title="Eliminar enlace">×</button>
+          </div>`).join("") || `<div style="color:var(--text-dim); font-size:12.5px">Sin enlaces todavía.</div>`}
+      </div>
+      <button class="muro-btn" style="margin-top:8px" onclick="addVideoLink('${routineKey}',${idx})">+ Agregar enlace de video</button>
+    </div>
+    ${extraPanelHtml}
+  </div>`;
+}
+
+// ---------- video embeds: YouTube / Instagram / TikTok / Drive / archivo directo ----------
+function detectVideoPlatform(url){
+  try{
+    const u = new URL(url);
+    const h = u.hostname.replace(/^www\./,"");
+    if(h.includes("youtube.com") || h === "youtu.be") return "youtube";
+    if(h.includes("instagram.com")) return "instagram";
+    if(h.includes("tiktok.com")) return "tiktok";
+    if(h.includes("drive.google.com")) return "drive";
+    if(/\.(mp4|webm|mov|m3u8)(\?.*)?$/i.test(u.pathname)) return "file";
+    return "other";
+  }catch(e){ return "other"; }
+}
+function youtubeEmbedUrl(url){
+  let id = null;
+  try{
+    const u = new URL(url);
+    if(u.hostname.replace(/^www\./,"") === "youtu.be") id = u.pathname.slice(1);
+    else if(u.searchParams.get("v")) id = u.searchParams.get("v");
+    else{
+      const m = u.pathname.match(/\/(embed|shorts)\/([^/?]+)/);
+      if(m) id = m[2];
+    }
+  }catch(e){}
+  return id ? `https://www.youtube.com/embed/${id}` : null;
+}
+function driveEmbedUrl(url){
+  const m = url.match(/\/d\/([^/]+)/) || url.match(/[?&]id=([^&]+)/);
+  return m ? `https://drive.google.com/file/d/${m[1]}/preview` : null;
+}
+let _igScriptLoaded = false, _ttScriptLoaded = false;
+function ensureEmbedScript(kind){
+  if(kind === "instagram" && !_igScriptLoaded){
+    _igScriptLoaded = true;
+    const s = document.createElement("script");
+    s.src = "https://www.instagram.com/embed.js";
+    s.async = true;
+    document.body.appendChild(s);
+  }
+  if(kind === "tiktok" && !_ttScriptLoaded){
+    _ttScriptLoaded = true;
+    const s = document.createElement("script");
+    s.src = "https://www.tiktok.com/embed.js";
+    s.async = true;
+    document.body.appendChild(s);
+  }
+}
+function reprocessEmbeds(){
+  if(window.instgrm && window.instgrm.Embeds) window.instgrm.Embeds.process();
+}
+function videoEmbedHtml(v){
+  const platform = detectVideoPlatform(v.url);
+  if(platform === "youtube"){
+    const embed = youtubeEmbedUrl(v.url);
+    if(embed) return `<div class="video-embed"><iframe src="${embed}" allowfullscreen loading="lazy" allow="encrypted-media; picture-in-picture"></iframe></div>`;
+  }
+  if(platform === "drive"){
+    const embed = driveEmbedUrl(v.url);
+    if(embed) return `<div class="video-embed"><iframe src="${embed}" allow="autoplay" allowfullscreen loading="lazy"></iframe></div>`;
+  }
+  if(platform === "file"){
+    return `<div class="video-embed"><video controls preload="metadata" src="${escapeHtml(v.url)}"></video></div>`;
+  }
+  if(platform === "instagram"){
+    ensureEmbedScript("instagram");
+    return `<blockquote class="instagram-media" data-instgrm-permalink="${escapeHtml(v.url)}" data-instgrm-version="14" style="margin:8px 0 0;background:transparent;border:none;"></blockquote>`;
+  }
+  if(platform === "tiktok"){
+    ensureEmbedScript("tiktok");
+    return `<blockquote class="tiktok-embed" cite="${escapeHtml(v.url)}" style="margin:8px 0 0;"></blockquote>`;
+  }
+  return `<div class="video-embed-note">No pude embeber este enlace automáticamente — usá el link de arriba para abrirlo.</div>`;
+}
+
+function addVideoLink(routineKey, idx){
+  const url = prompt("Pegá el enlace del video (Drive, YouTube, etc.):");
+  if(!url || !url.trim()) return;
+  const label = prompt("Etiqueta corta para este video (opcional):", "") || "";
+  const ex = STATE[routineKey].exercises[idx];
+  if(!ex.videos) ex.videos = [];
+  ex.videos.push({ url: url.trim(), label: label.trim() });
+  saveState();
+  renderRoutine(routineKey);
+}
+function deleteVideoLink(routineKey, idx, videoIdx){
+  const ex = STATE[routineKey].exercises[idx];
+  ex.videos.splice(videoIdx, 1);
+  saveState();
+  renderRoutine(routineKey);
+}
+
+function toggleNotes(el, targetId){
+  el.classList.toggle("open");
+  const panel = document.getElementById(`panel_${targetId}`);
+  if(panel) panel.classList.toggle("open");
+}
+
+function fasesLegend(){
+  return `<div class="fase-legend">
+    ${FASE_ORDER.map(f=>{
+      const colorVar = faseColorFor(f);
+      return `<span style="border-color:${colorVar}66"><span class="dot" style="background:${colorVar}"></span>${FASE_LABELS[f]}</span>`;
+    }).join("")}
+  </div>`;
+}
+
+function renderRoutine(routineKey){
+  const r = STATE[routineKey];
+  const container = document.getElementById(`view-${routineKey}`);
+
+  // agrupar por fase en el orden FASE_ORDER, pero respetando el orden interno del array
+  let exHtml = "";
+  let lastFase = null;
+  r.exercises.forEach((ex, i)=>{
+    const fase = ex.fase || "fuerza";
+    if(fase !== lastFase){
+      exHtml += `<div class="fase-divider ${fase}"><span class="dot"></span>${FASE_LABELS[fase]}</div>`;
+      lastFase = fase;
+    }
+    exHtml += exerciseCard(ex, routineKey, i);
+  });
+
+  let html = `
+  <div class="panel">
+    <div class="panel-head">
+      <h2 contenteditable="true" data-routine-field="title" data-routine="${routineKey}">${escapeHtml(r.title)}</h2>
+      <span class="count">${r.exercises.length} ejercicios</span>
+    </div>
+    <div class="panel-body">
+      <p contenteditable="true" data-routine-field="desc" data-routine="${routineKey}" style="color:var(--text-soft); font-size:13.5px; margin-top:-4px; margin-bottom:10px;">${escapeHtml(r.desc)}</p>
+      ${fasesLegend()}
+      <div id="exlist-${routineKey}" class="ex-list">
+        ${exHtml}
+      </div>
+      <button class="add-ex-btn" onclick="addExercise('${routineKey}')">+ Agregar ejercicio</button>
+    </div>
+  </div>`;
+  if(routineKey === "rutinaA" && r.regresion !== undefined){
+    html += `
+    <div class="panel">
+      <div class="panel-head"><h2>Notas generales de la rutina</h2></div>
+      <div class="panel-body">
+        <div class="callout gold">
+          <b>Regresión / palés:</b>
+          <span contenteditable="true" data-field="regresionA">${escapeHtml(r.regresion)}</span>
+        </div>
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+  attachEditableHandlers(container);
+  reprocessEmbeds();
+}
+
+function attachEditableHandlers(container){
+  container.querySelectorAll('[contenteditable="true"]').forEach(el=>{
+    el.addEventListener('blur', onEditableBlur);
+  });
+}
+
+function onEditableBlur(e){
+  const el = e.target;
+  const card = el.closest('.ex-card');
+  if(card){
+    const routineKey = card.dataset.routine;
+    const idx = parseInt(card.dataset.idx);
+    const ex = STATE[routineKey].exercises[idx];
+    if(el.dataset.metro){
+      if(!ex.metronomo) ex.metronomo = { pulsosCompas:"", clicksPulso:"" };
+      ex.metronomo[el.dataset.metro] = el.innerText.trim();
+      saveState();
+      return;
+    }
+    const field = el.dataset.field;
+    if(field === "notas"){
+      ex.notas = el.innerText.trim();
+    } else if(field === "notasAclaracion"){
+      ex.notasAclaracion = el.innerText.trim();
+    } else if(field === "reglasProgresion"){
+      ex.reglasProgresion = el.innerText.trim();
+    } else if(ex.stats && field in ex.stats){
+      ex.stats[field] = el.innerText.trim();
+    } else if(field === "nombre"){
+      ex.nombre = el.innerText.trim();
+    }
+    saveState();
+    return;
+  }
+  if(el.dataset.routineField){
+    const rk = el.dataset.routine;
+    STATE[rk][el.dataset.routineField] = el.innerText.trim();
+    saveState();
+    return;
+  }
+  if(el.dataset.field === "regresionA"){
+    STATE.rutinaA.regresion = el.innerText.trim();
+    saveState();
+    return;
+  }
+  if(el.dataset.key){
+    setByPath(STATE, el.dataset.key, el.innerText.trim());
+    saveState();
+  }
+}
+
+function setByPath(obj, path, value){
+  const parts = path.split(".");
+  let cur = obj;
+  for(let i=0;i<parts.length-1;i++){ cur = cur[parts[i]]; }
+  cur[parts[parts.length-1]] = value;
+}
+
+function cycleTag(routineKey, idx){
+  const order = ["normal","cardio","priority"];
+  const ex = STATE[routineKey].exercises[idx];
+  const cur = order.indexOf(ex.tag);
+  ex.tag = order[(cur+1)%order.length];
+  saveState();
+  renderRoutine(routineKey);
+}
+
+function changeFase(routineKey, idx, newFase){
+  STATE[routineKey].exercises[idx].fase = newFase;
+  // reordenar: mover el ejercicio al final del bloque de su nueva fase
+  const arr = STATE[routineKey].exercises;
+  const moved = arr.splice(idx,1)[0];
+  let insertAt = arr.length;
+  for(let i=arr.length-1;i>=0;i--){
+    if((arr[i].fase||"fuerza") === newFase){ insertAt = i+1; break; }
+  }
+  // si no hay ningún elemento de esa fase todavía, insertar respetando el orden general de fases
+  if(!arr.some(e=>(e.fase||"fuerza")===newFase)){
+    const faseIdx = FASE_ORDER.indexOf(newFase);
+    insertAt = arr.findIndex(e=>FASE_ORDER.indexOf(e.fase||"fuerza") > faseIdx);
+    if(insertAt === -1) insertAt = arr.length;
+  }
+  arr.splice(insertAt,0,moved);
+  saveState();
+  renderRoutine(routineKey);
+}
+
+function deleteExercise(routineKey, idx){
+  if(!confirm("¿Eliminar este ejercicio de la rutina?")) return;
+  STATE[routineKey].exercises.splice(idx,1);
+  saveState();
+  renderRoutine(routineKey);
+}
+
+function addExercise(routineKey){
+  STATE[routineKey].exercises.push({
+    nombre: "Nuevo ejercicio",
+    tag: "normal",
+    fase: "accesorio",
+    stats: { series:"", reps:"", descanso:"", bpm:"", tempo:"", enfriamiento:"" },
+    notas: "",
+    notasAclaracion: "",
+    reglasProgresion: "",
+    videos: []
+  });
+  saveState();
+  renderRoutine(routineKey);
+  setTimeout(()=>{
+    const container = document.getElementById(`view-${routineKey}`);
+    const cards = container.querySelectorAll('.ex-card');
+    const last = cards[cards.length-1];
+    if(last){
+      last.scrollIntoView({behavior:"smooth", block:"center"});
+      const titleEl = last.querySelector('.ex-title');
+      if(titleEl){ titleEl.focus(); document.execCommand('selectAll', false, null); }
+    }
+  }, 60);
+}
+
+// ============================================================
+// CALENTAMIENTO / ENFRIAMIENTO + TÉCNICA
+// ============================================================
+function renderCalentamiento(){
+  const container = document.getElementById("view-calentamiento");
+  container.innerHTML = `
+  <div class="panel">
+    <div class="panel-head"><h2>Calentamiento</h2></div>
+    <div class="panel-body">
+      <ul class="rule-list good" id="warmupList">
+        <li contenteditable="true" data-warmup-idx="0">Jumping Jack reducido → 60s work, 2 series, 2:00 descanso entre series, 3:00 enfriamiento, caminata lenta 60s.</li>
+        <li contenteditable="true" data-warmup-idx="1">Respiración nasal profunda: inhalar 4s, exhalar 6s.</li>
+        <li contenteditable="true" data-warmup-idx="2">Movilidad suave de hombros y cuello, círculos lentos. Retracción escapular ligera. Aflojar mandíbula.</li>
+        <li contenteditable="true" data-warmup-idx="3">Estiramiento de pantorrillas — 20 segundos.</li>
+        <li contenteditable="true" data-warmup-idx="4">Sacudir brazos y manos.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Enfriamiento / estiramiento final</h2></div>
+    <div class="panel-body">
+      <ul class="rule-list good" id="cooldownList">
+        <li contenteditable="true" data-cooldown-idx="0">Caminata lenta — 2 minutos.</li>
+        <li contenteditable="true" data-cooldown-idx="1">Inhalar nasal (profundo), exhalación larga.</li>
+        <li contenteditable="true" data-cooldown-idx="2">Cuádriceps — 20 segundos por lado.</li>
+        <li contenteditable="true" data-cooldown-idx="3">Pantorrillas — 30 segundos por lado. Apoyo de manos en pared, pierna a estirar atrás completamente apoyada. Pierna adelante, flexionada. Después inclinás el cuerpo hacia adelante.</li>
+        <li contenteditable="true" data-cooldown-idx="4">Estiramiento de flexores de antebrazo — 20 segundos.</li>
+        <li contenteditable="true" data-cooldown-idx="5">Sacudir brazos.</li>
+      </ul>
+    </div>
+  </div>`;
+  attachEditableHandlers(container);
+  container.querySelectorAll('[data-warmup-idx]').forEach(el=>{
+    el.addEventListener('blur', ()=>{ saveSimpleList('warmup', container, '[data-warmup-idx]'); });
+  });
+  container.querySelectorAll('[data-cooldown-idx]').forEach(el=>{
+    el.addEventListener('blur', ()=>{ saveSimpleList('cooldown', container, '[data-cooldown-idx]'); });
+  });
+}
+function saveSimpleList(key, container, selector){
+  if(!STATE.listas) STATE.listas = {};
+  STATE.listas[key] = Array.from(container.querySelectorAll(selector)).map(el=>el.innerText.trim());
+  saveState();
+}
+
+function renderTecnica(){
+  const t = STATE.tecnica;
+  const container = document.getElementById("view-tecnica");
+  container.innerHTML = `
+  <div class="panel">
+    <div class="panel-head"><h2 contenteditable="true" data-key="tecnica.secuenciacion.titulo">${escapeHtml(t.secuenciacion ? t.secuenciacion.titulo : "Por qué este orden")}</h2></div>
+    <div class="panel-body">
+      <div class="callout teal" contenteditable="true" data-key="tecnica.secuenciacion.contenido">${nl2br(t.secuenciacion ? t.secuenciacion.contenido : "")}</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2 contenteditable="true" data-key="tecnica.prioridad.titulo">${escapeHtml(t.prioridad.titulo)}</h2></div>
+    <div class="panel-body">
+      <div class="callout">
+        ${t.prioridad.puntos.map((p,i)=>`<div style="margin-bottom:6px" contenteditable="true" data-tecnica-list="prioridad.puntos" data-tecnica-idx="${i}">${escapeHtml(p)}</div>`).join("")}
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Tempo general (la mayoría de los ejercicios de fuerza)</h2></div>
+    <div class="panel-body">
+      <div class="ex-stats" style="padding:0">
+        <div class="stat"><label>Subida</label><span class="val" contenteditable="true" data-key="tecnica.tempoGeneral.subida">${escapeHtml(t.tempoGeneral.subida)}</span></div>
+        <div class="stat"><label>Pausa</label><span class="val" contenteditable="true" data-key="tecnica.tempoGeneral.pausa">${escapeHtml(t.tempoGeneral.pausa)}</span></div>
+        <div class="stat"><label>Bajada</label><span class="val" contenteditable="true" data-key="tecnica.tempoGeneral.bajada">${escapeHtml(t.tempoGeneral.bajada)}</span></div>
+        <div class="stat"><label>BPM</label><span class="val" contenteditable="true" data-key="tecnica.tempoGeneral.bpm">${escapeHtml(t.tempoGeneral.bpm)}</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Reglas a evitar (técnica general)</h2></div>
+    <div class="panel-body">
+      <ul class="rule-list bad">
+        ${t.reglasNo.map((r,i)=>`<li contenteditable="true" data-tecnica-list="reglasNo" data-tecnica-idx="${i}">${escapeHtml(r)}</li>`).join("")}
+      </ul>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2 contenteditable="true" data-key="tecnica.palesYRegresiones.titulo">${escapeHtml(t.palesYRegresiones.titulo)}</h2></div>
+    <div class="panel-body">
+      <div class="callout gold" contenteditable="true" data-key="tecnica.palesYRegresiones.contenido">${nl2br(t.palesYRegresiones.contenido)}</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Nota — elevaciones frontales</h2></div>
+    <div class="panel-body">
+      <div class="callout" contenteditable="true" data-key="tecnica.notaElevacionesFrontales">${escapeHtml(t.notaElevacionesFrontales)}</div>
+    </div>
+  </div>`;
+  attachEditableHandlers(container);
+  container.querySelectorAll('[data-tecnica-list]').forEach(el=>{
+    el.addEventListener('blur', ()=>{
+      const path = el.dataset.tecnicaList;
+      const idx = parseInt(el.dataset.tecnicaIdx);
+      const arr = path.split(".").reduce((o,k)=>o[k], STATE.tecnica);
+      arr[idx] = el.innerText.trim();
+      saveState();
+    });
+  });
+}
+
+// ============================================================
+// REGISTRO DIARIO
+// ============================================================
+// ============================================================
+// TRACKER DE CONSTANCIA — vive dentro de Registro diario.
+// Se auto-completa con cada registro guardado en el formulario de abajo
+// (matcheando por fecha). Los días sin registro se pueden marcar a mano.
+// ============================================================
+function isoAddDays(iso, n){
+  const d = new Date(iso + "T12:00:00");
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0,10);
+}
+function trackerDayNum(iso){
+  return new Date(iso + "T12:00:00").getDate();
+}
+function trackerWeekdayShort(iso){
+  return new Date(iso + "T12:00:00").toLocaleDateString('es-AR', {weekday:'short'}).replace(/\.$/, "");
+}
+
+// Recalcula, para cada día del tracker, si hay un registro diario guardado
+// en esa fecha. Si lo hay, el color se deriva de ese registro (auto).
+// Si no lo hay, se respeta lo que el usuario haya marcado a mano.
+function syncTrackerFromLogs(){
+  const t = STATE.tracker;
+  if(!t || !t.days) return;
+  const byDate = {};
+  STATE.logs.daily.forEach(l=>{ byDate[l.date] = l.routine; });
+  t.days.forEach((day, i)=>{
+    const dateStr = isoAddDays(t.startDate, i);
+    day.date = dateStr;
+    if(byDate[dateStr] !== undefined){
+      day.status = byDate[dateStr];
+      day.hasLog = true;
+    } else {
+      day.hasLog = false;
+    }
+  });
+}
+
+function trackerStatusClass(status){
+  if(status === "A" || status === "B") return "status-A";
+  if(status === "Descanso") return "status-Descanso";
+  if(status === "Otro") return "status-Otro";
+  return "";
+}
+
+function trackerPercent(){
+  const t = STATE.tracker;
+  if(!t || !t.days.length) return 0;
+  const done = t.days.filter(d=>d.status).length;
+  return Math.round((done / t.days.length) * 100);
+}
+
+function createOrUpdateTracker(){
+  const nombreEl = document.getElementById("trackerNombre");
+  const semanasEl = document.getElementById("trackerSemanas");
+  const startEl = document.getElementById("trackerStart");
+  const nombre = (nombreEl.value || "").trim() || "Ciclo de entrenamiento";
+  const semanas = Math.max(1, parseInt(semanasEl.value) || 1);
+  const startDate = startEl.value || new Date().toISOString().slice(0,10);
+  const totalDays = semanas * 7;
+
+  // Preserva marcas manuales (días sin registro de tarjeta) cuya fecha
+  // vuelva a caer dentro del nuevo rango.
+  const prevByDate = {};
+  if(STATE.tracker && STATE.tracker.days){
+    STATE.tracker.days.forEach(d=>{ if(d.date && d.status && !d.hasLog) prevByDate[d.date] = d.status; });
+  }
+
+  const days = [];
+  for(let i=0;i<totalDays;i++){
+    const dateStr = isoAddDays(startDate, i);
+    days.push({ date: dateStr, status: prevByDate[dateStr] || null, hasLog:false });
+  }
+
+  STATE.tracker = { nombre, semanas, startDate, days };
+  syncTrackerFromLogs();
+  saveState();
+  renderRegistro();
+  flashSaved();
+}
+
+function cycleTrackerDay(idx){
+  const t = STATE.tracker;
+  if(!t) return;
+  const day = t.days[idx];
+  if(day.hasLog){
+    alert("Este día ya tiene un registro cargado abajo. Para cambiarle el color, editá o eliminá ese registro.");
+    return;
+  }
+  const order = [null, "A", "Descanso", "Otro"];
+  const cur = order.indexOf(day.status);
+  day.status = order[(cur+1) % order.length];
+  saveState(true);
+  renderRegistro();
+}
+
+function renderTrackerPanel(){
+  const t = STATE.tracker;
+  let inner;
+  if(!t){
+    inner = `
+      <div class="tracker-setup-grid form-grid">
+        <div class="form-field">
+          <label>Nombre del registro</label>
+          <input type="text" id="trackerNombre" placeholder="Ej: Ciclo Hipertrofia + Core">
+        </div>
+        <div class="form-field">
+          <label>Duración (semanas)</label>
+          <input type="number" id="trackerSemanas" min="1" value="3">
+        </div>
+        <div class="form-field">
+          <label>Fecha de inicio</label>
+          <input type="date" id="trackerStart" value="${new Date().toISOString().slice(0,10)}">
+        </div>
+      </div>
+      <button class="primary-btn" onclick="createOrUpdateTracker()">Crear tracker</button>
+      <p class="tracker-hint">Se completa solo con cada registro que guardes en el formulario de abajo (según la fecha). Los días sin registro los podés tocar para marcarlos a mano.</p>`;
+  } else {
+    syncTrackerFromLogs();
+    const pct = trackerPercent();
+    const weeksHtml = [];
+    for(let w=0; w<t.semanas; w++){
+      const daysHtml = [];
+      for(let d=0; d<7; d++){
+        const idx = w*7 + d;
+        const day = t.days[idx];
+        if(!day) continue;
+        const cls = trackerStatusClass(day.status);
+        daysHtml.push(`<div class="tracker-day ${cls} ${day.hasLog ? "haslog" : ""}" onclick="cycleTrackerDay(${idx})" title="${day.date}${day.hasLog ? " · con registro" : " · click para marcar"}">
+          <span class="num">${trackerDayNum(day.date)}</span>
+          <span class="wd">${trackerWeekdayShort(day.date)}</span>
+        </div>`);
+      }
+      weeksHtml.push(`<div class="tracker-week-row"><span class="tracker-week-label">Sem ${w+1}</span><div class="tracker-days-row">${daysHtml.join("")}</div></div>`);
+    }
+    inner = `
+      <div class="tracker-header-row">
+        <div>
+          <div class="tracker-title">${escapeHtml(t.nombre)}</div>
+          <div class="tracker-meta">${t.semanas} semana${t.semanas===1?"":"s"} · desde ${t.startDate}</div>
+        </div>
+        <div class="tracker-pct-wrap">
+          <div class="tracker-pct">${pct}%</div>
+          <div class="tracker-pct-label">completado</div>
+        </div>
+      </div>
+      <div class="tracker-progress-bar"><div class="tracker-progress-fill" style="width:${pct}%"></div></div>
+      <div class="tracker-legend">
+        <span><span class="dot" style="background:var(--coral)"></span>Actividad (Rutina A/B)</span>
+        <span><span class="dot" style="background:var(--teal)"></span>Descanso</span>
+        <span><span class="dot" style="background:var(--gold-vivid)"></span>Otra actividad</span>
+        <span><span class="dot" style="background:var(--surface-3);border:1px solid var(--line)"></span>Sin marcar</span>
+      </div>
+      <div class="tracker-weeks">${weeksHtml.join("")}</div>
+      <details class="tracker-reconfig" style="margin-top:16px">
+        <summary>Reconfigurar tracker (nombre, semanas o fecha de inicio)</summary>
+        <div class="tracker-setup-grid form-grid" style="margin-top:10px">
+          <div class="form-field">
+            <label>Nombre del registro</label>
+            <input type="text" id="trackerNombre" value="${escapeHtml(t.nombre)}">
+          </div>
+          <div class="form-field">
+            <label>Duración (semanas)</label>
+            <input type="number" id="trackerSemanas" min="1" value="${t.semanas}">
+          </div>
+          <div class="form-field">
+            <label>Fecha de inicio</label>
+            <input type="date" id="trackerStart" value="${t.startDate}">
+          </div>
+        </div>
+        <button class="primary-btn" onclick="if(confirm('Esto recalcula los días del tracker según la nueva configuración. Las marcas manuales en fechas que ya no coincidan se pierden. ¿Continuar?')) createOrUpdateTracker()">Actualizar tracker</button>
+      </details>`;
+  }
+  return `
+  <div class="panel">
+    <div class="panel-head"><h2>Tracker de constancia</h2></div>
+    <div class="panel-body">${inner}</div>
+  </div>`;
+}
+
+function renderRegistro(){
+  const container = document.getElementById("view-registro");
+  let html = `
+  ${renderTrackerPanel()}
+  <div class="panel">
+    <div class="panel-head"><h2>Nuevo registro diario</h2></div>
+    <div class="panel-body">
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Fecha</label>
+          <input type="date" id="newLogDate" value="${new Date().toISOString().slice(0,10)}">
+        </div>
+        <div class="form-field">
+          <label>Rutina realizada</label>
+          <select id="newLogRoutine">
+            <option value="A">Rutina A — Fuerza y acondicionamiento</option>
+            <option value="B">Rutina B — Cardio + Core</option>
+            <option value="Descanso">Día de descanso</option>
+            <option value="Otro">Otra actividad</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Energía (1-5)</label>
+          <div class="scale-row" id="scaleEnergia">${[1,2,3,4,5].map(n=>`<div class="scale-dot" data-val="${n}">${n}</div>`).join("")}</div>
+        </div>
+        <div class="form-field">
+          <label>Fatiga / dolor muscular (1-5)</label>
+          <div class="scale-row" id="scaleFatiga">${[1,2,3,4,5].map(n=>`<div class="scale-dot" data-val="${n}">${n}</div>`).join("")}</div>
+        </div>
+        <div class="form-field">
+          <label>Sueño (horas)</label>
+          <input type="text" id="newLogSueno" placeholder="ej. 7h">
+        </div>
+        <div class="form-field">
+          <label>Alimentación del día</label>
+          <input type="text" id="newLogComida" placeholder="ej. buena / liviana / poca proteína">
+        </div>
+      </div>
+      <div class="form-field" style="margin-bottom:14px">
+        <label>Notas (qué se hizo, qué se modificó, qué se sintió)</label>
+        <textarea id="newLogNotas" placeholder="Ej: aumenté peso en sentadillas a 16kg, bajé tobilleras en hollow porque temblaba antes de 20s..."></textarea>
+      </div>
+      <button class="primary-btn" onclick="saveNewLog()">Guardar registro</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Historial de registros</h2>
+      <span class="count">${STATE.logs.daily.length} entradas</span>
+    </div>
+    <div class="panel-body" id="logHistory">
+      ${STATE.logs.daily.length === 0 ?
+        `<div class="empty-state"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg></div>Todavía no hay registros. Completá el formulario de arriba después de cada entrenamiento.</div>` :
+        STATE.logs.daily.slice().reverse().map(entryToHtml).join("")
+      }
+    </div>
+  </div>`;
+  container.innerHTML = html;
+
+  document.querySelectorAll('#scaleEnergia .scale-dot').forEach(d=>{
+    d.addEventListener('click', ()=>{
+      document.querySelectorAll('#scaleEnergia .scale-dot').forEach(x=>x.classList.remove('active'));
+      d.classList.add('active');
+    });
+  });
+  document.querySelectorAll('#scaleFatiga .scale-dot').forEach(d=>{
+    d.addEventListener('click', ()=>{
+      document.querySelectorAll('#scaleFatiga .scale-dot').forEach(x=>x.classList.remove('active'));
+      d.classList.add('active');
+    });
+  });
+}
+
+function entryToHtml(entry){
+  const typeLabel = {A:"Rutina A", B:"Rutina B", Descanso:"Descanso", Otro:"Otra actividad"}[entry.routine] || entry.routine;
+  return `
+  <div class="log-entry">
+    <div class="log-entry-head">
+      <span class="log-date">${entry.dateFormatted}</span>
+      <span class="log-type-badge">${typeLabel}</span>
+    </div>
+    <div class="log-grid">
+      <div class="log-field"><label>Energía</label><div class="v">${entry.energia ? entry.energia+"/5" : "—"}</div></div>
+      <div class="log-field"><label>Fatiga</label><div class="v">${entry.fatiga ? entry.fatiga+"/5" : "—"}</div></div>
+      <div class="log-field"><label>Sueño</label><div class="v">${escapeHtml(entry.sueno||"—")}</div></div>
+      <div class="log-field"><label>Alimentación</label><div class="v">${escapeHtml(entry.comida||"—")}</div></div>
+    </div>
+    ${entry.notas ? `<div class="log-notes"><label style="font-size:10px;text-transform:uppercase;color:var(--text-dim);font-weight:700">Notas</label><div class="v">${nl2br(entry.notas)}</div></div>` : ""}
+    <div style="padding:0 16px 14px; text-align:right">
+      <button class="secondary-btn" onclick="deleteLog('${entry.id}')">Eliminar registro</button>
+    </div>
+  </div>`;
+}
+
+function saveNewLog(){
+  const dateInput = document.getElementById("newLogDate").value;
+  const routine = document.getElementById("newLogRoutine").value;
+  const energiaDot = document.querySelector('#scaleEnergia .scale-dot.active');
+  const fatigaDot = document.querySelector('#scaleFatiga .scale-dot.active');
+  const sueno = document.getElementById("newLogSueno").value.trim();
+  const comida = document.getElementById("newLogComida").value.trim();
+  const notas = document.getElementById("newLogNotas").value.trim();
+
+  if(!dateInput){ alert("Elegí una fecha."); return; }
+
+  const d = new Date(dateInput + "T12:00:00");
+  const dateFormatted = d.toLocaleDateString('es-AR', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
+
+  STATE.logs.daily.push({
+    id: uid("log"),
+    date: dateInput,
+    dateFormatted,
+    routine,
+    energia: energiaDot ? energiaDot.dataset.val : null,
+    fatiga: fatigaDot ? fatigaDot.dataset.val : null,
+    sueno, comida, notas
+  });
+  saveState();
+  renderRegistro();
+}
+
+function deleteLog(id){
+  if(!confirm("¿Eliminar este registro?")) return;
+  STATE.logs.daily = STATE.logs.daily.filter(l=>l.id!==id);
+  saveState();
+  renderRegistro();
+}
+
+// ============================================================
+// CONCLUSIONES SEMANALES
+// ============================================================
+function renderSemanal(){
+  const container = document.getElementById("view-semanal");
+  const totalLogs = STATE.logs.daily.length;
+  const avgEnergia = totalLogs ? (STATE.logs.daily.reduce((s,l)=>s+(parseInt(l.energia)||0),0)/(STATE.logs.daily.filter(l=>l.energia).length || 1)).toFixed(1) : "—";
+  const avgFatiga = totalLogs ? (STATE.logs.daily.reduce((s,l)=>s+(parseInt(l.fatiga)||0),0)/(STATE.logs.daily.filter(l=>l.fatiga).length || 1)).toFixed(1) : "—";
+
+  let html = `
+  <div class="panel">
+    <div class="panel-head"><h2>Nueva conclusión semanal</h2></div>
+    <div class="panel-body">
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Semana del</label>
+          <input type="date" id="newWeekStart">
+        </div>
+        <div class="form-field">
+          <label>Al</label>
+          <input type="date" id="newWeekEnd">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Progreso observado</label><textarea id="weekProgreso" placeholder="Ej: subí peso en peso muerto, mejor estabilidad en hollow hold..."></textarea></div>
+        <div class="form-field"><label>Estancamiento / dificultades</label><textarea id="weekEstancamiento" placeholder="Ej: misma carga en press de banca hace 2 semanas..."></textarea></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Cadencia (¿se respetó la frecuencia planeada?)</label><textarea id="weekCadencia" placeholder="Ej: 3 de 4 sesiones planeadas, faltó una por descanso extra..."></textarea></div>
+        <div class="form-field"><label>Ajustes para la próxima semana</label><textarea id="weekAjustes" placeholder="Ej: aumentar reps en sentadillas, bajar peso en extensión de tríceps..."></textarea></div>
+      </div>
+      <button class="primary-btn" onclick="saveWeekly()">Guardar conclusión</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Resumen automático (según registros diarios)</h2></div>
+    <div class="panel-body">
+      <div class="week-stat-row">
+        <div class="week-stat"><div class="num">${totalLogs}</div><div class="lbl">Registros totales</div></div>
+        <div class="week-stat"><div class="num">${avgEnergia}</div><div class="lbl">Energía promedio</div></div>
+        <div class="week-stat"><div class="num">${avgFatiga}</div><div class="lbl">Fatiga promedio</div></div>
+      </div>
+      <p style="font-size:12.5px; color:var(--text-dim)">Este resumen se calcula solo con los datos que cargaste en "Registro diario". Cargá registros seguido para que sea útil.</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Historial de conclusiones</h2>
+      <span class="count">${STATE.logs.weekly.length} semanas</span>
+    </div>
+    <div class="panel-body">
+      ${STATE.logs.weekly.length === 0 ?
+        `<div class="empty-state"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></div>Todavía no hay conclusiones semanales guardadas.</div>` :
+        STATE.logs.weekly.slice().reverse().map(weekToHtml).join("")
+      }
+    </div>
+  </div>`;
+  container.innerHTML = html;
+}
+
+function weekToHtml(w){
+  return `
+  <div class="week-card">
+    <div class="week-card-head">
+      <span>${w.startFormatted} → ${w.endFormatted}</span>
+      <button class="secondary-btn" onclick="deleteWeek('${w.id}')">Eliminar</button>
+    </div>
+    <div class="week-card-body">
+      ${w.progreso ? `<p><b>Progreso:</b> ${nl2br(w.progreso)}</p>` : ""}
+      ${w.estancamiento ? `<p><b>Estancamiento:</b> ${nl2br(w.estancamiento)}</p>` : ""}
+      ${w.cadencia ? `<p><b>Cadencia:</b> ${nl2br(w.cadencia)}</p>` : ""}
+      ${w.ajustes ? `<p><b>Ajustes próxima semana:</b> ${nl2br(w.ajustes)}</p>` : ""}
+    </div>
+  </div>`;
+}
+
+function saveWeekly(){
+  const start = document.getElementById("newWeekStart").value;
+  const end = document.getElementById("newWeekEnd").value;
+  if(!start || !end){ alert("Completá ambas fechas."); return; }
+  const sF = new Date(start+"T12:00:00").toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+  const eF = new Date(end+"T12:00:00").toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+  STATE.logs.weekly.push({
+    id: uid("week"),
+    start, end, startFormatted: sF, endFormatted: eF,
+    progreso: document.getElementById("weekProgreso").value.trim(),
+    estancamiento: document.getElementById("weekEstancamiento").value.trim(),
+    cadencia: document.getElementById("weekCadencia").value.trim(),
+    ajustes: document.getElementById("weekAjustes").value.trim()
+  });
+  saveState();
+  renderSemanal();
+}
+function deleteWeek(id){
+  if(!confirm("¿Eliminar esta conclusión semanal?")) return;
+  STATE.logs.weekly = STATE.logs.weekly.filter(w=>w.id!==id);
+  saveState();
+  renderSemanal();
+}
+
+// ============================================================
+// MURO — foto de portada + avatar, guardadas como imagen directa
+// (no como enlace), comprimidas al subir para no inflar el storage.
+// ============================================================
+function compressImage(file, maxWidth, quality){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onerror = ()=> reject(reader.error);
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onerror = ()=> reject(new Error("No se pudo leer la imagen"));
+      img.onload = ()=>{
+        const scale = Math.min(1, maxWidth / img.width);
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        resolve({ dataUrl: canvas.toDataURL("image/jpeg", quality), width: w, height: h,
+                  naturalWidth: img.width, naturalHeight: img.height });
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderMuro(){
+  const m = STATE.muro || {cover:null, avatar:null, coverAspect:null};
+  const container = document.getElementById("view-muro");
+  container.innerHTML = `
+  <div class="panel">
+    <div class="panel-head muro-panel-head">
+      <h2><span class="muro-panel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5-4 4-3-3-6 6"/></svg></span>Muro</h2>
+      <label class="muro-compress-toggle" id="muroCompressToggle" title="Subir sin comprimir: guarda el archivo original (pesa más). Por defecto se comprime con calidad alta.">
+        <input type="checkbox" id="muroRawUpload">
+        <span class="muro-compress-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M6 12l6-6 6 6"/><path d="M5 21h14"/></svg></span>
+        <span class="muro-compress-text">Sin comprimir</span>
+      </label>
+    </div>
+    <div class="panel-body" style="padding:0">
+      <div class="muro-cover ${m.cover ? "has-img" : ""}" id="muroCover">
+        <div class="muro-cover-media">
+          ${m.cover ? `<img src="${m.cover}" alt="Portada">` : `<div class="muro-cover-empty"><span class="muro-cover-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5-4 4-3-3-6 6"/></svg></span><span class="muro-cover-empty-text">Subí una foto de portada</span></div>`}
+        </div>
+        <div class="muro-avatar-wrap">
+          <div class="muro-avatar ${m.avatar ? "has-img" : ""}" id="muroAvatar">
+            ${m.avatar ? `<img src="${m.avatar}" alt="Avatar">` : `<span>+</span>`}
+          </div>
+        </div>
+        <div class="muro-cover-actions">
+          <button class="muro-btn" id="btnUploadCover">Cambiar portada</button>
+          <button class="muro-btn" id="btnUploadAvatar">Cambiar foto de perfil</button>
+        </div>
+        <input type="file" id="coverFileInput" accept="image/*" style="display:none">
+        <input type="file" id="avatarFileInput" accept="image/*" style="display:none">
+      </div>
+    </div>
+  </div>
+  <div class="muro-modal" id="muroModal">
+    <img id="muroModalImg" src="" alt="Portada completa">
+  </div>`;
+
+  document.getElementById("btnUploadCover").addEventListener("click", ()=> document.getElementById("coverFileInput").click());
+  document.getElementById("btnUploadAvatar").addEventListener("click", ()=> document.getElementById("avatarFileInput").click());
+
+  const compressToggle = document.getElementById("muroCompressToggle");
+  const compressInput = document.getElementById("muroRawUpload");
+  compressToggle.addEventListener("click", ()=>{
+    // el click en el <input> ya alternó su estado antes de burbujear hasta acá
+    compressToggle.classList.toggle("active", compressInput.checked);
+    compressToggle.classList.remove("muro-toggle-pulse");
+    void compressToggle.offsetWidth; // fuerza reflow para reiniciar la animación
+    compressToggle.classList.add("muro-toggle-pulse");
+  });
+  // animación de entrada al abrir/cargar el Muro (distinta de la del click)
+  requestAnimationFrame(()=>{
+    compressToggle.classList.add("muro-toggle-enter");
+  });
+
+  function readRaw(file){
+    return new Promise((resolve,reject)=>{
+      const r = new FileReader();
+      r.onload = ()=> resolve({ dataUrl: r.result, naturalWidth: null, naturalHeight: null });
+      r.onerror = ()=> reject(r.error);
+      r.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById("coverFileInput").addEventListener("change", async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const raw = document.getElementById("muroRawUpload").checked;
+    try{
+      const res = raw ? await readRaw(file) : await compressImage(file, 1600, 0.85);
+      STATE.muro.cover = res.dataUrl;
+      STATE.muro.coverAspect = res.naturalWidth ? { w: res.naturalWidth, h: res.naturalHeight } : null;
+      saveState();
+      renderMuro();
+    }catch(err){ alert("No se pudo procesar la imagen."); }
+  });
+  document.getElementById("avatarFileInput").addEventListener("change", async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const raw = document.getElementById("muroRawUpload").checked;
+    try{
+      const res = raw ? await readRaw(file) : await compressImage(file, 500, 0.85);
+      STATE.muro.avatar = res.dataUrl;
+      saveState();
+      renderMuro();
+    }catch(err){ alert("No se pudo procesar la imagen."); }
+  });
+
+  const coverEl = document.getElementById("muroCover");
+  const modal = document.getElementById("muroModal");
+  coverEl.addEventListener("click", (e)=>{
+    if(e.target.closest(".muro-btn") || e.target.closest(".muro-avatar") || e.target.closest(".muro-compress-toggle")) return;
+    if(!STATE.muro.cover) return;
+    document.getElementById("muroModalImg").src = STATE.muro.cover;
+    modal.classList.add("open");
+  });
+  modal.addEventListener("click", ()=> modal.classList.remove("open"));
+}
+
+// ============================================================
+// NAVEGACIÓN DE TABS
+// ============================================================
+// Recuerda en qué scroll (posición vertical, dentro de esa pestaña) quedaste
+// la última vez, para que al volver a una pestaña sigas donde la dejaste en
+// vez de arrancar siempre desde arriba. Vive solo en memoria de la sesión
+// actual (no se guarda en el JSON) — es una comodidad de navegación, no un dato.
+const _scrollPositions = {};
+let _currentView = "rutinaA"; // coincide con la vista activa por defecto en el HTML
+
+function showView(viewKey){
+  if(_currentView){
+    _scrollPositions[_currentView] = window.scrollY;
+  }
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(`view-${viewKey}`).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.tab-btn[data-view="${viewKey}"]`).classList.add('active');
+  _currentView = viewKey;
+  // Restaurar el scroll guardado de esta pestaña. Se espera al siguiente frame
+  // para que el navegador ya haya recalculado el alto (la vista pasó de
+  // display:none a block recién ahora, así que antes el scrollTo no tendría
+  // dónde ir).
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      window.scrollTo(0, _scrollPositions[viewKey] || 0);
+    });
+  });
+  if(viewKey === "muro"){
+    const toggle = document.getElementById("muroCompressToggle");
+    if(toggle){
+      toggle.classList.remove("muro-toggle-enter");
+      void toggle.offsetWidth; // reflow para poder repetir la animación cada vez que se abre
+      toggle.classList.add("muro-toggle-enter");
+    }
+  }
+}
+
+// ============================================================
+// IMPORT / EXPORT
+// ============================================================
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(STATE, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `bitacora_entrenamiento_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function renderAll(){
+  document.getElementById("startDate").textContent = STATE.meta.startDate;
+  document.getElementById("cycleName").textContent = STATE.meta.cycleName;
+  document.getElementById("lastUpdate").textContent = STATE.meta.lastUpdate || "—";
+  renderMuro();
+  renderRoutine("rutinaA");
+  renderRoutine("rutinaB");
+  renderCalentamiento();
+  renderTecnica();
+  renderRegistro();
+  renderSemanal();
+}
+
+document.addEventListener("DOMContentLoaded", async ()=>{
+  STATE = await loadState();
+  if(!STATE.logs) STATE.logs = JSON.parse(JSON.stringify(EMPTY_LOGS));
+  if(!STATE.muro) STATE.muro = {cover:null, avatar:null, coverAspect:null};
+  if(STATE.tracker === undefined) STATE.tracker = null;
+  renderAll();
+  initDriveAuth();
+
+  document.getElementById("tabs").addEventListener("click", (e)=>{
+    const btn = e.target.closest(".tab-btn");
+    if(!btn) return;
+    showView(btn.dataset.view);
+  });
+
+  document.getElementById("startDate").addEventListener("blur", (e)=>{
+    STATE.meta.startDate = e.target.textContent.trim();
+    saveState();
+  });
+  document.getElementById("cycleName").addEventListener("blur", (e)=>{
+    STATE.meta.cycleName = e.target.textContent.trim();
+    saveState();
+  });
+
+  document.getElementById("importFile").addEventListener("change", function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      try{
+        const imported = JSON.parse(evt.target.result);
+        if(!confirm("Esto va a reemplazar todos los datos actuales con la copia importada. ¿Continuar?")) return;
+        STATE = imported;
+        if(!STATE.logs) STATE.logs = JSON.parse(JSON.stringify(EMPTY_LOGS));
+        if(!STATE.muro) STATE.muro = {cover:null, avatar:null, coverAspect:null};
+        if(STATE.tracker === undefined) STATE.tracker = null;
+        saveState(true);
+        renderAll();
+        flashSaved();
+      }catch(err){
+        alert("No se pudo leer el archivo. Verificá que sea una copia exportada desde esta misma bitácora.");
+      }
+    };
+    reader.readAsText(file);
+  });
+});
+
+</script>
+</body>
+</html>
