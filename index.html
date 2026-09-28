@@ -2499,7 +2499,6 @@ function initDriveAuth(){
     client_id: DRIVE_CLIENT_ID,
     scope: DRIVE_SCOPE,
     ux_mode: "popup",
-    redirect_uri: DRIVE_REDIRECT_URI,
     callback: async (resp)=>{
       if(resp.error){
         console.error("Error de autenticación Drive:", resp);
@@ -2508,7 +2507,7 @@ function initDriveAuth(){
       }
       setDriveStatus("☁️ Conectando…", "warn");
       try{
-        const data = await driveWorkerCall("exchange", { code: resp.code, redirectUri: DRIVE_REDIRECT_URI });
+        const data = await driveWorkerCall("exchange", { code: resp.code, redirectUri: "postmessage" });
         driveAccessToken = data.access_token;
         driveTokenExpiresAt = Date.now() + (data.expires_in ? data.expires_in*1000 : 3500*1000);
         driveSessionId = data.session_id;
@@ -2525,7 +2524,9 @@ function initDriveAuth(){
           setDriveStatus("☁️ Reintentando conexión…", "warn");
           driveCodeClient.requestCode();
         } else {
-          setDriveStatus("☁️ Error al conectar — probá de nuevo", "err");
+          var motivo = "";
+          try{ motivo = (e && (e.detail || e.message)) ? String(typeof e.detail === "string" ? e.detail : (e.detail ? JSON.stringify(e.detail) : e.message)).slice(0,90) : ""; }catch(_){}
+          setDriveStatus("☁️ Error al conectar" + (motivo ? " (" + motivo + ")" : "") + " — probá de nuevo", "err");
         }
       }
     },
