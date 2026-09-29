@@ -860,6 +860,33 @@
   /* ===== FOOTER BAR — se oculta automáticamente y aparece solo al pasar
      el cursor por el borde inferior (mismo comportamiento que la barra de
      tareas de Windows en modo "ocultar automáticamente") ===== */
+  .file-origin-warning{
+    margin-top:10px; width:100%;
+    background: var(--gold-vivid-soft, rgba(240,160,32,0.12));
+    border:1px solid var(--gold-vivid, #F0A020);
+    color: var(--text);
+    font-size:12px; line-height:1.4;
+    padding:8px 12px; border-radius:10px;
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  }
+  .file-origin-warning a{ color: var(--teal); font-weight:700; text-decoration:none; white-space:nowrap; }
+  .file-origin-warning a:hover{ text-decoration:underline; }
+
+  .export-reminder-bar{
+    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    background: var(--surface-2); border:1px solid var(--line-soft);
+    border-radius:12px; padding:9px 16px; margin:0 24px 10px;
+    font-size:12.5px; color: var(--text-soft);
+  }
+  .export-reminder-bar button{
+    font-family: var(--font-body); font-size:11.5px; font-weight:700;
+    padding:5px 12px; border-radius:16px; border:1px solid var(--line-soft);
+    background: var(--surface-3); color: var(--text); cursor:pointer;
+  }
+  .export-reminder-bar button:hover{ filter:brightness(1.2); }
+  .export-reminder-bar button.ghost{ background:transparent; border-color:transparent; color: var(--text-dim); }
+  #lastBackupHint{ opacity:0.7; }
+
   .floatbar{
     position:fixed; bottom:0; left:0; right:0;
     background: #0E1612; color: var(--text-soft);
@@ -1064,6 +1091,12 @@
     position:relative; z-index:1;
     width:100%; height:100%; object-fit:cover; display:block;
   }
+  .muro-cover-media video{
+    position:relative; z-index:1;
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  .muro-avatar video{ width:100%; height:100%; object-fit:cover; }
+  .muro-cover-empty{ cursor:pointer; }
   .muro-cover-empty{
     position:absolute; inset:0; z-index:1;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px;
@@ -1817,7 +1850,10 @@
       Inicio: <b contenteditable="true" id="startDate">25 May 2026</b><br>
       Última actualización: <b id="lastUpdate">—</b><br>
       Ciclo actual: <b contenteditable="true" id="cycleName">Fuerza + Core</b>
-      <div class="drive-sync-widget" id="driveSyncWidget">
+      <div class="file-origin-warning" id="fileOriginWarning" style="display:none">
+      ⚠️ Estás usando el archivo local: Google Drive no puede conectar acá y tus datos quedan aparte de la versión online. <a href="#" onclick="dismissFileOriginWarning();return false;">Entendido</a>
+    </div>
+    <div class="drive-sync-widget" id="driveSyncWidget">
         <span class="drive-sync-status" id="driveSyncStatus">☁️ Google Drive: sin conectar</span>
         <button class="drive-sync-btn" id="driveConnectBtn" onclick="connectDrive()">Conectar</button>
         <button class="drive-sync-btn secondary" id="driveSyncNowBtn" onclick="manualSyncDrive()" style="display:none">Sincronizar ahora</button>
@@ -1851,8 +1887,16 @@
   <div class="view" id="view-semanal"></div>
 </div>
 
+<div class="export-reminder-bar" id="exportReminderBar" style="display:none">
+  <span id="exportReminderText"></span>
+  <div style="display:flex; gap:8px">
+    <button onclick="exportJSON()">Exportar ahora</button>
+    <button onclick="dismissExportReminder()" class="ghost">Más tarde</button>
+  </div>
+</div>
+
 <div class="floatbar">
-  <div class="left">Los cambios se guardan automáticamente en este navegador.</div>
+  <div class="left">Los cambios se guardan automáticamente en este navegador. <span id="lastBackupHint"></span></div>
   <div class="right">
     <button onclick="window.print()">Imprimir / Exportar PDF</button>
     <button onclick="exportJSON()">Exportar copia (.json)</button>
@@ -1897,6 +1941,10 @@
 
 <div class="timer-modal-overlay" id="phaseSoundModalOverlay" style="z-index:240">
   <div class="timer-modal" id="phaseSoundModal"></div>
+</div>
+
+<div class="timer-modal-overlay" id="backupRestoreModalOverlay" style="z-index:245">
+  <div class="timer-modal settings-modal" id="backupRestoreModal"></div>
 </div>
 
 <div class="fullscreen-timer-overlay" id="fullscreenTimerOverlay"></div>
@@ -2035,15 +2083,80 @@ const STORAGE_KEY = "bitacora_entrenamiento_v2"; // clave legada de localStorage
 const IDB_NAME = "bitacoraDB";
 const IDB_STORE = "kv";
 const IDB_KEY = "state";
+const IDB_BACKUP_STORE = "backups"; // copias rotativas automáticas de STATE
+const BACKUP_MAX = 10; // cuántas copias se conservan (rotan las más viejas)
 let STATE = null;
 
 // ---------- IndexedDB helpers ----------
 function idbOpen(){
   return new Promise((resolve, reject)=>{
-    const req = indexedDB.open(IDB_NAME, 1);
-    req.onupgradeneeded = ()=>{
-      req.result.createObjectStore(IDB_STORE);
+    const req = indexedDB.open(IDB_NAME, 2);
+    req.onupgradeneeded = (ev)=>{
+      const db = req.result;
+      if(!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE);
+      if(!db.objectStoreNames.contains(IDB_BACKUP_STORE)) db.createObjectStore(IDB_BACKUP_STORE, { keyPath: "ts" });
     };
+    req.onsuccess = ()=> resolve(req.result);
+    req.onerror = ()=> reject(req.error);
+  });
+}
+// ---------- Backups rotativos (red de seguridad local) ----------
+// Cada saveState "no silencioso" (guardado real del usuario) deja una copia
+// aparte con fecha, sin pisar las anteriores. Se conservan las últimas
+// BACKUP_MAX. Sirven para restaurar si el estado principal se corrompe,
+// se borra o si el navegador limpia datos del sitio a medias.
+let _backupSeq = 0; // desempate cuando dos guardados caen en el mismo milisegundo
+let _backupQueue = Promise.resolve(); // serializa idbSaveBackup: evita que dos
+// llamadas casi simultáneas lean la lista de backups al mismo tiempo y la
+// rotación (borrar los más viejos) se pise entre sí.
+function idbSaveBackup(state){
+  // El clonado tiene que pasar YA, en el mismo instante síncrono del llamado:
+  // si esperáramos a que la cola nos dé el turno, el usuario podría haber
+  // seguido escribiendo y STATE ya no sería el de este guardado.
+  const snapshotData = JSON.parse(JSON.stringify(state));
+  const ts = Date.now() * 1000 + (++_backupSeq % 1000);
+  _backupQueue = _backupQueue.then(()=> idbSaveBackupInner(ts, snapshotData)).catch(e=>{ console.error(e); });
+  return _backupQueue;
+}
+async function idbSaveBackupInner(ts, snapshotData){
+  try{
+    const db = await idbOpen();
+    const snapshot = { ts: ts, data: snapshotData };
+    await new Promise((resolve, reject)=>{
+      const tx = db.transaction(IDB_BACKUP_STORE, "readwrite");
+      tx.objectStore(IDB_BACKUP_STORE).put(snapshot);
+      tx.oncomplete = resolve;
+      tx.onerror = ()=> reject(tx.error);
+    });
+    // Rotar: conservar solo las BACKUP_MAX más recientes. Se espera a que el
+    // borrado termine antes de continuar, para que una llamada siguiente no
+    // lea la lista a mitad de la rotación.
+    const all = await idbListBackups();
+    if(all.length > BACKUP_MAX){
+      const toDelete = all.slice(0, all.length - BACKUP_MAX); // más viejas primero
+      await new Promise((resolve, reject)=>{
+        const tx2 = db.transaction(IDB_BACKUP_STORE, "readwrite");
+        toDelete.forEach(b=> tx2.objectStore(IDB_BACKUP_STORE).delete(b.ts));
+        tx2.oncomplete = resolve;
+        tx2.onerror = ()=> reject(tx2.error);
+      });
+    }
+  }catch(e){ console.error("Error guardando backup local", e); }
+}
+async function idbListBackups(){
+  const db = await idbOpen();
+  return new Promise((resolve, reject)=>{
+    const tx = db.transaction(IDB_BACKUP_STORE, "readonly");
+    const req = tx.objectStore(IDB_BACKUP_STORE).getAll();
+    req.onsuccess = ()=> resolve((req.result || []).sort((a,b)=> a.ts - b.ts));
+    req.onerror = ()=> reject(req.error);
+  });
+}
+async function idbGetBackup(ts){
+  const db = await idbOpen();
+  return new Promise((resolve, reject)=>{
+    const tx = db.transaction(IDB_BACKUP_STORE, "readonly");
+    const req = tx.objectStore(IDB_BACKUP_STORE).get(ts);
     req.onsuccess = ()=> resolve(req.result);
     req.onerror = ()=> reject(req.error);
   });
@@ -2315,6 +2428,11 @@ function mergeMissingDefaults(state){
 async function saveState(silent){
   STATE.meta.lastUpdate = nowStr();
   STATE.meta.lastUpdateTs = Date.now();
+  // El snapshot para el backup se toma ACÁ, antes de cualquier await: si dos
+  // guardados se disparan casi juntos, cada uno debe respaldar el estado que
+  // tenía en su propio instante, no el que quede en STATE cuando a cada uno
+  // le toque el turno tras esperar IndexedDB.
+  const backupSnapshot = (!silent) ? JSON.parse(JSON.stringify(STATE)) : null;
   try{
     await idbSet(IDB_KEY, STATE);
   }catch(e){
@@ -2323,7 +2441,11 @@ async function saveState(silent){
     return;
   }
   document.getElementById("lastUpdate").textContent = STATE.meta.lastUpdate;
-  if(!silent) flashSaved();
+  if(!silent){
+    flashSaved();
+    await idbSaveBackup(backupSnapshot); // copia rotativa: no depende de Drive ni de exportar a mano
+    markExportReminder();
+  }
   scheduleDrivePush();
 }
 
@@ -2499,6 +2621,7 @@ function initDriveAuth(){
     client_id: DRIVE_CLIENT_ID,
     scope: DRIVE_SCOPE,
     ux_mode: "popup",
+    redirect_uri: DRIVE_REDIRECT_URI,
     callback: async (resp)=>{
       if(resp.error){
         console.error("Error de autenticación Drive:", resp);
@@ -2507,7 +2630,7 @@ function initDriveAuth(){
       }
       setDriveStatus("☁️ Conectando…", "warn");
       try{
-        const data = await driveWorkerCall("exchange", { code: resp.code, redirectUri: "postmessage" });
+        const data = await driveWorkerCall("exchange", { code: resp.code, redirectUri: DRIVE_REDIRECT_URI });
         driveAccessToken = data.access_token;
         driveTokenExpiresAt = Date.now() + (data.expires_in ? data.expires_in*1000 : 3500*1000);
         driveSessionId = data.session_id;
@@ -2524,9 +2647,7 @@ function initDriveAuth(){
           setDriveStatus("☁️ Reintentando conexión…", "warn");
           driveCodeClient.requestCode();
         } else {
-          var motivo = "";
-          try{ motivo = (e && (e.detail || e.message)) ? String(typeof e.detail === "string" ? e.detail : (e.detail ? JSON.stringify(e.detail) : e.message)).slice(0,90) : ""; }catch(_){}
-          setDriveStatus("☁️ Error al conectar" + (motivo ? " (" + motivo + ")" : "") + " — probá de nuevo", "err");
+          setDriveStatus("☁️ Error al conectar — probá de nuevo", "err");
         }
       }
     },
@@ -2691,6 +2812,7 @@ async function syncPullAndMerge(askIfNewer){
         `Hay una versión más reciente en Google Drive (última edición: ${remoteWhen}).\n\n¿Reemplazar los datos de este dispositivo con esa versión?`
       );
       if(proceed){
+        if(STATE) await idbSaveBackup(STATE); // red de seguridad: lo local se guarda aparte antes de pisarlo
         STATE = remote;
         if(!STATE.logs) STATE.logs = JSON.parse(JSON.stringify(EMPTY_LOGS));
         if(!STATE.muro) STATE.muro = {cover:null, avatar:null, coverAspect:null};
@@ -3867,9 +3989,21 @@ document.addEventListener("click", (e)=>{
 });
 
 // ---- Abrir / cerrar panel ----
+function lastExportHintText(){
+  try{
+    const last = Number(localStorage.getItem("btc_lastExport") || 0);
+    if(!last) return "Todavía no exportaste ninguna copia en este navegador.";
+    const days = Math.floor((Date.now() - last) / 86400000);
+    if(days <= 0) return "Última copia exportada: hoy.";
+    if(days === 1) return "Última copia exportada: hace 1 día.";
+    return `Última copia exportada: hace ${days} días.`;
+  }catch(e){ return ""; }
+}
 function openSettingsModal(){
   ensureSettings();
   renderSettingsModal();
+  const hint = document.getElementById("lastExportHint");
+  if(hint) hint.textContent = lastExportHintText();
   document.getElementById("settingsModalOverlay").classList.add("open");
 }
 function closeSettingsModal(){
@@ -3987,6 +4121,49 @@ function settingsImport(){
 function settingsExport(){
   closeSettingsDropdowns();
   exportJSON();
+}
+
+// ---- Restaurar copia de seguridad (backups rotativos locales) ----
+async function openBackupRestoreModal(){
+  const list = await idbListBackups();
+  const modal = document.getElementById("backupRestoreModal");
+  const rows = list.slice().reverse().map(function(b){
+    const d = new Date(b.ts);
+    const when = d.toLocaleDateString("es-AR", {day:"2-digit", month:"2-digit", year:"numeric"}) +
+                 " " + d.toLocaleTimeString("es-AR", {hour:"2-digit", minute:"2-digit"});
+    return `<div class="settings-row">
+      <span class="settings-row-label">${when}</span>
+      <button class="muro-btn" onclick="restoreBackup(${b.ts})">Restaurar esta</button>
+    </div>`;
+  }).join("");
+  modal.innerHTML = `
+    <div class="settings-section-head"><h1>Restaurar copia de seguridad</h1>
+      <button class="masthead-menu-btn" onclick="closeBackupRestoreModal()" aria-label="Cerrar">✕</button>
+    </div>
+    <p class="settings-desc">Estas copias se guardan solas en este navegador cada vez que hacés un cambio. Elegí una para volver a ese momento. Lo que tenés ahora se guarda aparte antes de restaurar, por si te arrepentís.</p>
+    ${list.length ? rows : `<p class="settings-desc">Todavía no hay copias de seguridad en este navegador.</p>`}
+  `;
+  document.getElementById("backupRestoreModalOverlay").classList.add("open");
+}
+function closeBackupRestoreModal(){
+  document.getElementById("backupRestoreModalOverlay").classList.remove("open");
+}
+async function restoreBackup(ts){
+  const b = await idbGetBackup(ts);
+  if(!b){ alert("No se pudo encontrar esa copia."); return; }
+  const when = new Date(ts).toLocaleString("es-AR");
+  if(!confirm(`¿Restaurar la copia del ${when}?\n\nLo que tenés guardado ahora se va a conservar aparte, por si necesitás volver.`)) return;
+  if(STATE) await idbSaveBackup(STATE); // no perder lo actual al restaurar una copia vieja
+  STATE = JSON.parse(JSON.stringify(b.data));
+  if(!STATE.logs) STATE.logs = JSON.parse(JSON.stringify(EMPTY_LOGS));
+  if(!STATE.muro) STATE.muro = {cover:null, avatar:null, coverAspect:null};
+  if(STATE.tracker === undefined) STATE.tracker = null;
+  ensureSettings();
+  await idbSet(IDB_KEY, STATE);
+  closeBackupRestoreModal();
+  closeSettingsModal();
+  renderAll();
+  flashSaved();
 }
 
 // ---- Sonido ----
@@ -4227,6 +4404,10 @@ function renderAccountSection(s, T){
     <div class="settings-device-actions">
       <button class="muro-btn" onclick="settingsImport()">${T.importPresets}</button>
       <button class="muro-btn" onclick="settingsExport()">${T.exportPresets}</button>
+    </div>
+    <p class="settings-desc" id="lastExportHint"></p>
+    <div class="settings-device-actions">
+      <button class="muro-btn" onclick="openBackupRestoreModal()">Restaurar copia de seguridad</button>
     </div>
   </div>`;
 }
@@ -4887,11 +5068,11 @@ function renderMuro(){
     <div class="panel-body" style="padding:0">
       <div class="muro-cover ${m.cover ? "has-img" : ""}" id="muroCover">
         <div class="muro-cover-media">
-          ${m.cover ? `<img src="${m.cover}" alt="Portada">` : `<div class="muro-cover-empty"><span class="muro-cover-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5-4 4-3-3-6 6"/></svg></span><span class="muro-cover-empty-text">Subí una foto de portada</span></div>`}
+          ${m.coverType === "video" ? `<video src="${m.cover}" muted loop autoplay playsinline></video>` : (m.cover ? `<img src="${m.cover}" alt="Portada">` : `<div class="muro-cover-empty" id="muroCoverEmpty" role="button" tabindex="0" aria-label="Subir foto o video de portada" title="Subí una foto o video de portada"><span class="muro-cover-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5-4 4-3-3-6 6"/></svg></span><span class="muro-cover-empty-text">Subí una foto o video de portada</span></div>`)}
         </div>
         <div class="muro-avatar-wrap">
-          <div class="muro-avatar ${m.avatar ? "has-img" : ""}" id="muroAvatar">
-            ${m.avatar ? `<img src="${m.avatar}" alt="Avatar">` : `<span>+</span>`}
+          <div class="muro-avatar ${m.avatar ? "has-img" : ""}" id="muroAvatar" role="button" tabindex="0" aria-label="Cambiar foto de perfil" title="Cambiar foto de perfil">
+            ${m.avatarType === "video" ? `<video src="${m.avatar}" muted loop autoplay playsinline></video>` : (m.avatar ? `<img src="${m.avatar}" alt="Avatar">` : `<span>+</span>`)}
           </div>
         </div>
         <div class="muro-cover-actions">
@@ -4899,17 +5080,33 @@ function renderMuro(){
           ${m.cover ? `<button class="muro-btn muro-btn-danger" id="btnDeleteCover">Eliminar portada</button>` : ""}
           <button class="muro-btn" id="btnUploadAvatar">Cambiar foto de perfil</button>
         </div>
-        <input type="file" id="coverFileInput" accept="image/*" style="display:none">
-        <input type="file" id="avatarFileInput" accept="image/*" style="display:none">
+        <input type="file" id="coverFileInput" accept="image/*,video/*" style="display:none">
+        <input type="file" id="avatarFileInput" accept="image/*,video/*" style="display:none">
       </div>
     </div>
   </div>
   <div class="muro-modal" id="muroModal">
     <img id="muroModalImg" src="" alt="Portada completa">
+    <video id="muroModalVideo" src="" controls autoplay loop style="display:none; max-width:92vw; max-height:88vh;"></video>
   </div>`;
 
   document.getElementById("btnUploadCover").addEventListener("click", ()=> document.getElementById("coverFileInput").click());
   document.getElementById("btnUploadAvatar").addEventListener("click", ()=> document.getElementById("avatarFileInput").click());
+  // Click directo sobre el círculo (vacío o con imagen/video) abre el mismo selector
+  // que "Cambiar foto de perfil" — atajo tipo Instagram, sin pasar por el botón.
+  document.getElementById("muroAvatar").addEventListener("click", ()=> document.getElementById("avatarFileInput").click());
+  document.getElementById("muroAvatar").addEventListener("keydown", (e)=>{
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); document.getElementById("avatarFileInput").click(); }
+  });
+  // Click en la zona de portada vacía abre el selector; si ya hay foto/video, el
+  // click en esa zona sigue abriendo el visor a pantalla completa (ver más abajo).
+  const coverEmptyZone = document.getElementById("muroCoverEmpty");
+  if(coverEmptyZone){
+    coverEmptyZone.addEventListener("click", (e)=>{ e.stopPropagation(); document.getElementById("coverFileInput").click(); });
+    coverEmptyZone.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); document.getElementById("coverFileInput").click(); }
+    });
+  }
   const btnDeleteCover = document.getElementById("btnDeleteCover");
   if(btnDeleteCover){
     btnDeleteCover.addEventListener("click", (e)=>{
@@ -4948,36 +5145,57 @@ function renderMuro(){
   document.getElementById("coverFileInput").addEventListener("change", async (e)=>{
     const file = e.target.files[0];
     if(!file) return;
+    const isVideo = file.type.startsWith("video/");
     const raw = document.getElementById("muroRawUpload").checked;
     try{
-      const res = raw ? await readRaw(file) : await compressImage(file, 1600, 0.85);
+      // Los videos no pasan por el canvas de compresión (compressImage es solo
+      // para imágenes): se leen directo como el archivo original.
+      const res = (isVideo || raw) ? await readRaw(file) : await compressImage(file, 1600, 0.85);
       STATE.muro.cover = res.dataUrl;
+      STATE.muro.coverType = isVideo ? "video" : "image";
       STATE.muro.coverAspect = res.naturalWidth ? { w: res.naturalWidth, h: res.naturalHeight } : null;
       saveState();
       renderMuro();
-    }catch(err){ alert("No se pudo procesar la imagen."); }
+    }catch(err){ alert(isVideo ? "No se pudo procesar el video." : "No se pudo procesar la imagen."); }
   });
   document.getElementById("avatarFileInput").addEventListener("change", async (e)=>{
     const file = e.target.files[0];
     if(!file) return;
+    const isVideo = file.type.startsWith("video/");
     const raw = document.getElementById("muroRawUpload").checked;
     try{
-      const res = raw ? await readRaw(file) : await compressImage(file, 500, 0.85);
+      const res = (isVideo || raw) ? await readRaw(file) : await compressImage(file, 500, 0.85);
       STATE.muro.avatar = res.dataUrl;
+      STATE.muro.avatarType = isVideo ? "video" : "image";
       saveState();
       renderMuro();
-    }catch(err){ alert("No se pudo procesar la imagen."); }
+    }catch(err){ alert(isVideo ? "No se pudo procesar el video." : "No se pudo procesar la imagen."); }
   });
 
   const coverEl = document.getElementById("muroCover");
   const modal = document.getElementById("muroModal");
   coverEl.addEventListener("click", (e)=>{
-    if(e.target.closest(".muro-btn") || e.target.closest(".muro-avatar") || e.target.closest(".muro-compress-toggle")) return;
+    if(e.target.closest(".muro-btn") || e.target.closest(".muro-avatar") || e.target.closest(".muro-compress-toggle") || e.target.closest("#muroCoverEmpty")) return;
     if(!STATE.muro.cover) return;
-    document.getElementById("muroModalImg").src = STATE.muro.cover;
+    const imgEl = document.getElementById("muroModalImg");
+    const vidEl = document.getElementById("muroModalVideo");
+    if(STATE.muro.coverType === "video"){
+      imgEl.style.display = "none";
+      vidEl.style.display = "block";
+      vidEl.src = STATE.muro.cover;
+    } else {
+      vidEl.style.display = "none";
+      vidEl.pause();
+      imgEl.style.display = "block";
+      imgEl.src = STATE.muro.cover;
+    }
     modal.classList.add("open");
   });
-  modal.addEventListener("click", ()=> modal.classList.remove("open"));
+  modal.addEventListener("click", ()=>{
+    modal.classList.remove("open");
+    const vidEl = document.getElementById("muroModalVideo");
+    if(vidEl) vidEl.pause();
+  });
 }
 
 // ============================================================
@@ -5088,6 +5306,8 @@ function exportJSON(){
   a.download = `bitacora_entrenamiento_${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
+  try{ localStorage.setItem("btc_lastExport", String(Date.now())); }catch(e){}
+  dismissExportReminder();
 }
 
 // ============================================================
@@ -6364,8 +6584,46 @@ function renderTimerRunningHtml(){
   `;
 }
 
+function dismissFileOriginWarning(){
+  const el = document.getElementById("fileOriginWarning");
+  if(el) el.style.display = "none";
+}
+// Recordatorio de exportar: si pasaron 3+ días desde la última exportación
+// manual (.json), lo avisamos al guardar. No bloquea nada, solo informa.
+const EXPORT_REMINDER_DAYS = 3;
+function markExportReminder(){
+  try{
+    const last = Number(localStorage.getItem("btc_lastExport") || 0);
+    if(!last) return; // nunca exportó: no lo apuramos en cada guardado, ver checkExportReminder al abrir
+    const days = (Date.now() - last) / 86400000;
+    if(days >= EXPORT_REMINDER_DAYS) showExportReminder(Math.floor(days));
+  }catch(e){}
+}
+function showExportReminder(days){
+  const bar = document.getElementById("exportReminderBar");
+  if(!bar) return;
+  bar.textContent = `Hace ${days} días que no exportás una copia (.json) de respaldo.`;
+  bar.style.display = "flex";
+}
+function dismissExportReminder(){
+  const el = document.getElementById("exportReminderBar");
+  if(el) el.style.display = "none";
+}
+function checkExportReminderOnLoad(){
+  try{
+    const last = Number(localStorage.getItem("btc_lastExport") || 0);
+    if(!last){ showExportReminder("varios"); return; }
+    const days = (Date.now() - last) / 86400000;
+    if(days >= EXPORT_REMINDER_DAYS) showExportReminder(Math.floor(days));
+  }catch(e){}
+}
+
 document.addEventListener("DOMContentLoaded", async ()=>{
   initPlexusBackground();
+  if(location.protocol === "file:"){
+    const w = document.getElementById("fileOriginWarning");
+    if(w) w.style.display = "flex";
+  }
   STATE = await loadState();
   if(!STATE.logs) STATE.logs = JSON.parse(JSON.stringify(EMPTY_LOGS));
   if(!STATE.muro) STATE.muro = {cover:null, avatar:null, coverAspect:null};
@@ -6383,6 +6641,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   updateAddExFab(_currentView || "rutinaA");
   updateMastheadVolumeUI();
   initDriveAuth();
+  checkExportReminderOnLoad();
 
   document.getElementById("timerModalOverlay").addEventListener("click", (e)=>{
     if(e.target.id === "timerModalOverlay") closeTimerModal();
@@ -6398,6 +6657,10 @@ document.addEventListener("DOMContentLoaded", async ()=>{
 
   document.getElementById("phaseSoundModalOverlay").addEventListener("click", (e)=>{
     if(e.target.id === "phaseSoundModalOverlay") closePhaseSoundPicker();
+  });
+
+  document.getElementById("backupRestoreModalOverlay").addEventListener("click", (e)=>{
+    if(e.target.id === "backupRestoreModalOverlay") closeBackupRestoreModal();
   });
 
   document.getElementById("tabs").addEventListener("click", (e)=>{
@@ -6419,10 +6682,11 @@ document.addEventListener("DOMContentLoaded", async ()=>{
     const file = e.target.files[0];
     if(!file) return;
     const reader = new FileReader();
-    reader.onload = function(evt){
+    reader.onload = async function(evt){
       try{
         const imported = JSON.parse(evt.target.result);
         if(!confirm("Esto va a reemplazar todos los datos actuales con la copia importada. ¿Continuar?")) return;
+        if(STATE) await idbSaveBackup(STATE); // red de seguridad: guarda lo que había antes de pisarlo
         STATE = imported;
         if(!STATE.logs) STATE.logs = JSON.parse(JSON.stringify(EMPTY_LOGS));
         if(!STATE.muro) STATE.muro = {cover:null, avatar:null, coverAspect:null};
