@@ -863,10 +863,11 @@
   .file-origin-warning a:hover{ text-decoration:underline; }
 
   .export-reminder-bar{
-    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;
+    width:fit-content; max-width:calc(100% - 48px);
     background: var(--surface-2); border:1px solid var(--line-soft);
-    border-radius:12px; padding:9px 16px; margin:0 24px 10px;
-    font-size:12.5px; color: var(--text-soft);
+    border-radius:999px; padding:8px 18px; margin:40px auto 16px;
+    font-size:12.5px; color: var(--text-soft); text-align:center;
   }
   .export-reminder-bar button{
     font-family: var(--font-body); font-size:11.5px; font-weight:700;
@@ -876,6 +877,66 @@
   .export-reminder-bar button:hover{ filter:brightness(1.2); }
   .export-reminder-bar button.ghost{ background:transparent; border-color:transparent; color: var(--text-dim); }
   #lastBackupHint{ opacity:0.7; }
+
+  .fatiga-wrap{ display:flex; flex-direction:column; gap:6px; }
+  .scale-row.fatiga-scale{ align-items:flex-end; gap:6px; margin-top:4px; min-height:64px; }
+  .fatiga-scale .scale-dot{
+    width:30px; height:var(--h); border-radius:7px 7px 4px 4px;
+    align-items:flex-end; justify-content:center; padding-bottom:3px;
+    background: var(--surface-3); border:1px solid var(--line-soft); color: var(--text-dim);
+    font-weight:700; transition: background .18s, box-shadow .18s, transform .12s, border-color .18s;
+  }
+  .fatiga-scale .scale-dot:hover{ transform: translateY(-2px); border-color: var(--c); }
+  .fatiga-scale .scale-dot.filled,
+  .fatiga-scale .scale-dot.active{
+    background: linear-gradient(180deg, color-mix(in srgb, var(--c) 72%, #ffffff) 0%, var(--c) 100%);
+    border-color: var(--c); color:#1a0f0a;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--c) 45%, transparent);
+  }
+  .fatiga-scale .scale-dot.active{ box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--c), 0 0 14px color-mix(in srgb, var(--c) 55%, transparent); }
+  .fatiga-caption{ font-size:11.5px; font-weight:700; color: var(--text-dim); min-height:16px; }
+  .fatiga-mini{ display:inline-flex; align-items:flex-end; gap:2px; margin-right:8px; vertical-align:middle; }
+  .fatiga-mini i{ display:block; width:5px; height:var(--h); border-radius:2px; background: var(--surface-3); border:1px solid var(--line-soft); }
+  .fatiga-mini i.on{ background: var(--c); border-color: var(--c); }
+
+  .log-edited-tag{
+    font-size:10px; text-transform:uppercase; letter-spacing:0.06em; font-weight:700;
+    color: var(--text-dim); border:1px solid var(--line-soft);
+    padding:2px 8px; border-radius:20px; margin-left:8px; vertical-align:middle;
+  }
+  .log-entry.editing{ border-color: var(--coral); }
+  .log-edit-body{ padding:14px 16px 16px; }
+  .log-edit-actions{ display:flex; justify-content:flex-end; gap:10px; }
+  .reg-toast{
+    position:fixed; left:20px; bottom:56px; z-index:120;
+    display:flex; align-items:stretch; max-width:min(330px, calc(100vw - 110px));
+    background: var(--surface); border:1px solid var(--coral); border-radius:12px;
+    box-shadow: 0 8px 26px rgba(0,0,0,0.45);
+    opacity:0; transform: translateY(12px); pointer-events:none;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .reg-toast.show{ opacity:1; transform:none; pointer-events:auto; }
+  .reg-toast-main{
+    flex:1; display:flex; flex-direction:column; gap:2px; text-align:left;
+    background:transparent; border:none; color: var(--text); cursor:pointer;
+    padding:10px 6px 10px 14px; font-family: var(--font-body); border-radius:12px 0 0 12px;
+  }
+  .reg-toast-main:hover{ background: rgba(255,255,255,0.04); }
+  .reg-toast-title{ font-size:12.5px; font-weight:700; color: var(--coral); }
+  .reg-toast-sub{ font-size:11.5px; color: var(--text-soft); }
+  .reg-toast-x{
+    background:transparent; border:none; color: var(--text-dim); cursor:pointer;
+    font-size:18px; line-height:1; padding:0 12px; border-radius:0 12px 12px 0;
+  }
+  .reg-toast-x:hover{ color: var(--text); }
+  .reg-draft-modal{ padding:22px; width:min(420px, 100%); }
+  .reg-draft-title{ font-family: var(--font-display); font-size:20px; font-weight:700; color: var(--text); margin-bottom:8px; }
+  .reg-draft-text{ font-size:13px; color: var(--text-soft); margin:0 0 10px; line-height:1.5; }
+  .reg-draft-summary{
+    font-size:12.5px; color: var(--text); background: var(--surface-3);
+    border:1px solid var(--line-soft); border-radius:10px; padding:8px 12px; display:inline-block;
+  }
+  .reg-draft-actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; margin-top:18px; }
 
   .floatbar{
     position:fixed; bottom:0; left:0; right:0;

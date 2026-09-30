@@ -873,10 +873,11 @@
   .file-origin-warning a:hover{ text-decoration:underline; }
 
   .export-reminder-bar{
-    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;
+    width:fit-content; max-width:calc(100% - 48px);
     background: var(--surface-2); border:1px solid var(--line-soft);
-    border-radius:12px; padding:9px 16px; margin:0 24px 10px;
-    font-size:12.5px; color: var(--text-soft);
+    border-radius:999px; padding:8px 18px; margin:40px auto 16px;
+    font-size:12.5px; color: var(--text-soft); text-align:center;
   }
   .export-reminder-bar button{
     font-family: var(--font-body); font-size:11.5px; font-weight:700;
@@ -886,6 +887,66 @@
   .export-reminder-bar button:hover{ filter:brightness(1.2); }
   .export-reminder-bar button.ghost{ background:transparent; border-color:transparent; color: var(--text-dim); }
   #lastBackupHint{ opacity:0.7; }
+
+  .fatiga-wrap{ display:flex; flex-direction:column; gap:6px; }
+  .scale-row.fatiga-scale{ align-items:flex-end; gap:6px; margin-top:4px; min-height:64px; }
+  .fatiga-scale .scale-dot{
+    width:30px; height:var(--h); border-radius:7px 7px 4px 4px;
+    align-items:flex-end; justify-content:center; padding-bottom:3px;
+    background: var(--surface-3); border:1px solid var(--line-soft); color: var(--text-dim);
+    font-weight:700; transition: background .18s, box-shadow .18s, transform .12s, border-color .18s;
+  }
+  .fatiga-scale .scale-dot:hover{ transform: translateY(-2px); border-color: var(--c); }
+  .fatiga-scale .scale-dot.filled,
+  .fatiga-scale .scale-dot.active{
+    background: linear-gradient(180deg, color-mix(in srgb, var(--c) 72%, #ffffff) 0%, var(--c) 100%);
+    border-color: var(--c); color:#1a0f0a;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--c) 45%, transparent);
+  }
+  .fatiga-scale .scale-dot.active{ box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--c), 0 0 14px color-mix(in srgb, var(--c) 55%, transparent); }
+  .fatiga-caption{ font-size:11.5px; font-weight:700; color: var(--text-dim); min-height:16px; }
+  .fatiga-mini{ display:inline-flex; align-items:flex-end; gap:2px; margin-right:8px; vertical-align:middle; }
+  .fatiga-mini i{ display:block; width:5px; height:var(--h); border-radius:2px; background: var(--surface-3); border:1px solid var(--line-soft); }
+  .fatiga-mini i.on{ background: var(--c); border-color: var(--c); }
+
+  .log-edited-tag{
+    font-size:10px; text-transform:uppercase; letter-spacing:0.06em; font-weight:700;
+    color: var(--text-dim); border:1px solid var(--line-soft);
+    padding:2px 8px; border-radius:20px; margin-left:8px; vertical-align:middle;
+  }
+  .log-entry.editing{ border-color: var(--coral); }
+  .log-edit-body{ padding:14px 16px 16px; }
+  .log-edit-actions{ display:flex; justify-content:flex-end; gap:10px; }
+  .reg-toast{
+    position:fixed; left:20px; bottom:56px; z-index:120;
+    display:flex; align-items:stretch; max-width:min(330px, calc(100vw - 110px));
+    background: var(--surface); border:1px solid var(--coral); border-radius:12px;
+    box-shadow: 0 8px 26px rgba(0,0,0,0.45);
+    opacity:0; transform: translateY(12px); pointer-events:none;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .reg-toast.show{ opacity:1; transform:none; pointer-events:auto; }
+  .reg-toast-main{
+    flex:1; display:flex; flex-direction:column; gap:2px; text-align:left;
+    background:transparent; border:none; color: var(--text); cursor:pointer;
+    padding:10px 6px 10px 14px; font-family: var(--font-body); border-radius:12px 0 0 12px;
+  }
+  .reg-toast-main:hover{ background: rgba(255,255,255,0.04); }
+  .reg-toast-title{ font-size:12.5px; font-weight:700; color: var(--coral); }
+  .reg-toast-sub{ font-size:11.5px; color: var(--text-soft); }
+  .reg-toast-x{
+    background:transparent; border:none; color: var(--text-dim); cursor:pointer;
+    font-size:18px; line-height:1; padding:0 12px; border-radius:0 12px 12px 0;
+  }
+  .reg-toast-x:hover{ color: var(--text); }
+  .reg-draft-modal{ padding:22px; width:min(420px, 100%); }
+  .reg-draft-title{ font-family: var(--font-display); font-size:20px; font-weight:700; color: var(--text); margin-bottom:8px; }
+  .reg-draft-text{ font-size:13px; color: var(--text-soft); margin:0 0 10px; line-height:1.5; }
+  .reg-draft-summary{
+    font-size:12.5px; color: var(--text); background: var(--surface-3);
+    border:1px solid var(--line-soft); border-radius:10px; padding:8px 12px; display:inline-block;
+  }
+  .reg-draft-actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; margin-top:18px; }
 
   .floatbar{
     position:fixed; bottom:0; left:0; right:0;
@@ -1937,6 +1998,12 @@
 
 <div class="timer-modal-overlay" id="settingsModalOverlay" style="z-index:235">
   <div class="timer-modal settings-modal" id="settingsModal"></div>
+</div>
+
+<div class="reg-toast" id="regToast" role="status" aria-live="polite"></div>
+
+<div class="timer-modal-overlay" id="regDraftOverlay" style="z-index:250">
+  <div class="timer-modal reg-draft-modal" id="regDraftModal"></div>
 </div>
 
 <div class="timer-modal-overlay" id="phaseSoundModalOverlay" style="z-index:240">
@@ -3810,7 +3877,12 @@ const SETTINGS_I18N = {
     cancel: "Cancelar", accept: "Aceptar", try: "Probar",
     fullscreenToggle: "Pantalla completa en el temporizador",
     fullscreenDesc: "Muestra un botón para expandir el temporizador de cada tarjeta a pantalla completa, con el fondo pintado según el color de cada fase.",
-    fsExit: "Salir de pantalla completa"
+    fsExit: "Salir de pantalla completa",
+    registroTitle: "Registro diario", autosave: "Autoguardado del registro",
+    autosaveDesc: "Si dejás un registro a medio llenar, te pregunta si querés guardarlo o descartarlo. Si está apagado, el borrador se conserva igual en este dispositivo.",
+    autosaveLeave: "Al salir de la pestaña Registro", autosaveClose: "Al cerrar o recargar la app",
+    autosaveCloseDesc: "Con F5 o Ctrl+R te consulta antes de recargar. Al cerrar la pestaña o con el botón de recargar del navegador no se puede mostrar una consulta propia: el borrador queda guardado y te pregunta apenas volvés a abrir la app.",
+    autosaveIdle: "Tras un rato de inactividad", autosaveIdleMin: "Minutos de inactividad"
   },
   en: {
     title: "Settings", account: "Account", email: "Email",
@@ -3836,7 +3908,12 @@ const SETTINGS_I18N = {
     cancel: "Cancel", accept: "Accept", try: "Try",
     fullscreenToggle: "Fullscreen in the timer",
     fullscreenDesc: "Shows a button to expand each card's timer to fullscreen, with the background colored per phase.",
-    fsExit: "Exit fullscreen"
+    fsExit: "Exit fullscreen",
+    registroTitle: "Daily log", autosave: "Log autosave",
+    autosaveDesc: "If you leave a log half-filled, it asks whether to save or discard it. When off, the draft is still kept on this device.",
+    autosaveLeave: "When leaving the Log tab", autosaveClose: "When closing or reloading the app",
+    autosaveCloseDesc: "With F5 or Ctrl+R it asks before reloading. When closing the tab or using the browser reload button a custom prompt is not possible: the draft is kept and it asks as soon as you reopen the app.",
+    autosaveIdle: "After a period of inactivity", autosaveIdleMin: "Minutes of inactivity"
   }
 };
 function defaultSettings(){
@@ -3849,6 +3926,7 @@ function defaultSettings(){
   return {
     idioma: (function(){ try{ return localStorage.getItem("btc_idioma") || "es"; }catch(e){ return "es"; } })(),
     cuenta: { accounts: [], activeIndex: -1 },
+    registro: { autosave: false, onLeaveTab: true, onClose: true, onIdle: true, idleMin: 10 },
     sonido: { modo: "simple", finalCount: 3, skipLastRest: true, fullscreenTimerEnabled: true, colores, coloresGlobal, phaseSound, finalCountSound: { family:"beep", variant:"short" } }
   };
 }
@@ -3882,6 +3960,7 @@ function ensureSettings(){
   sonido.finalCountSound = Object.assign({}, d.sonido.finalCountSound, (STATE.settings.sonido||{}).finalCountSound || {});
   delete sonido.beeps;
   STATE.settings.sonido = sonido;
+  STATE.settings.registro = Object.assign({}, d.registro, STATE.settings.registro || {});
   applyPhaseColors();
 }
 function st(){ return SETTINGS_I18N[(STATE.settings && STATE.settings.idioma) || "es"]; }
@@ -4486,6 +4565,47 @@ function renderSoundSection(s, T){
     </div>
   </div>`;
 }
+function renderRegistroSection(r, T){
+  const sub = (key, label) => `
+    <div class="settings-row">
+      <span class="settings-row-label">${label}</span>
+      <button class="settings-toggle ${r[key]?'on':''}" onclick="settingsToggleRegistro('${key}')" aria-label="${label}"></button>
+    </div>`;
+  return `
+  <div class="settings-section">
+    <div class="settings-section-head"><h2>${T.registroTitle}</h2></div>
+    <div class="settings-row" style="align-items:flex-start">
+      <span class="settings-row-label" style="max-width:260px">${T.autosave}<br><span style="font-size:10.5px; color:var(--text-dim); font-weight:400">${T.autosaveDesc}</span></span>
+      <button class="settings-toggle ${r.autosave?'on':''}" onclick="settingsToggleRegistro('autosave')" aria-label="${T.autosave}"></button>
+    </div>
+    <div style="opacity:${r.autosave?1:0.45}; pointer-events:${r.autosave?'auto':'none'}; padding-left:12px">
+      ${sub('onLeaveTab', T.autosaveLeave)}
+      <div class="settings-row" style="align-items:flex-start">
+        <span class="settings-row-label" style="max-width:250px">${T.autosaveClose}<br><span style="font-size:10.5px; color:var(--text-dim); font-weight:400">${T.autosaveCloseDesc}</span></span>
+        <button class="settings-toggle ${r.onClose?'on':''}" onclick="settingsToggleRegistro('onClose')" aria-label="${T.autosaveClose}"></button>
+      </div>
+      ${sub('onIdle', T.autosaveIdle)}
+      <div class="settings-row">
+        <span class="settings-row-label">${T.autosaveIdleMin}</span>
+        <select onchange="settingsSetRegistroIdle(this.value)" style="background:var(--surface-3); color:var(--text); border:1px solid var(--line-soft); border-radius:8px; padding:4px 8px; font-size:12px">
+          ${[5,10,15,30,60].map(m=>`<option value="${m}" ${Number(r.idleMin)===m?'selected':''}>${m}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+  </div>`;
+}
+function settingsToggleRegistro(key){
+  ensureSettings();
+  STATE.settings.registro[key] = !STATE.settings.registro[key];
+  saveState(true);
+  renderSettingsModal();
+}
+function settingsSetRegistroIdle(v){
+  ensureSettings();
+  STATE.settings.registro.idleMin = Math.max(1, parseInt(v, 10) || 10);
+  saveState(true);
+  renderSettingsModal();
+}
 function renderSettingsModal(){
   ensureSettings();
   const T = st();
@@ -4501,6 +4621,7 @@ function renderSettingsModal(){
       </div>
     </div>
     ${renderAccountSection(STATE.settings, T)}
+    ${renderRegistroSection(STATE.settings.registro, T)}
     ${renderSoundSection(STATE.settings.sonido, T)}
   `;
 }
@@ -4795,6 +4916,55 @@ function renderTrackerPanel(){
   </div>`;
 }
 
+// ---- Escala de fatiga: barras de intensidad con gradiente ----
+const FATIGA_LEVELS = [
+  {n:1, label:"Muy leve",  c:"#3fb9a6"},
+  {n:2, label:"Leve",      c:"#8fcf5a"},
+  {n:3, label:"Moderada",  c:"#f2c94c"},
+  {n:4, label:"Alta",      c:"#f2994a"},
+  {n:5, label:"Muy alta",  c:"#e5533d"}
+];
+function fatigaScaleHtml(id, cur){
+  const v = cur ? parseInt(cur, 10) : 0;
+  const bars = FATIGA_LEVELS.map(L=>`<div class="scale-dot fatiga-bar ${v === L.n ? "active" : ""} ${L.n <= v ? "filled" : ""}" data-val="${L.n}" style="--c:${L.c}; --h:${18 + L.n * 9}px" title="${L.n} · ${L.label}">${L.n}</div>`).join("");
+  return `<div class="fatiga-wrap"><div class="scale-row fatiga-scale" id="${id}">${bars}</div><div class="fatiga-caption" id="${id}-cap"></div></div>`;
+}
+function paintFatiga(id){
+  const root = document.getElementById(id);
+  if(!root) return;
+  const act = root.querySelector(".scale-dot.active");
+  const v = act ? parseInt(act.dataset.val, 10) : 0;
+  root.querySelectorAll(".scale-dot").forEach(d=>{
+    d.classList.toggle("filled", parseInt(d.dataset.val, 10) <= v);
+  });
+  const cap = document.getElementById(id + "-cap");
+  if(cap){
+    const L = FATIGA_LEVELS[v - 1];
+    cap.textContent = v ? `${v}/5 · ${L.label}` : "Sin marcar";
+    cap.style.color = v ? L.c : "";
+  }
+}
+function attachFatigaHandlers(id){
+  const root = document.getElementById(id);
+  if(!root) return;
+  root.querySelectorAll(".scale-dot").forEach(d=>{
+    d.addEventListener("click", ()=>{
+      const was = d.classList.contains("active");
+      root.querySelectorAll(".scale-dot").forEach(x=>x.classList.remove("active"));
+      if(!was) d.classList.add("active"); // tocar de nuevo el mismo valor lo quita
+      paintFatiga(id);
+    });
+  });
+  paintFatiga(id);
+}
+function fatigaMiniHtml(cur){
+  const v = cur ? parseInt(cur, 10) : 0;
+  if(!v) return "—";
+  const L = FATIGA_LEVELS[v - 1];
+  const bars = FATIGA_LEVELS.map(x=>`<i class="${x.n <= v ? "on" : ""}" style="--c:${x.c}; --h:${5 + x.n * 3}px"></i>`).join("");
+  return `<span class="fatiga-mini">${bars}</span><span style="color:${L.c}; font-weight:700">${v}/5</span>`;
+}
+
 function renderRegistro(){
   const container = document.getElementById("view-registro");
   let html = `
@@ -4822,7 +4992,7 @@ function renderRegistro(){
         </div>
         <div class="form-field">
           <label>Fatiga / dolor muscular (1-5)</label>
-          <div class="scale-row" id="scaleFatiga">${[1,2,3,4,5].map(n=>`<div class="scale-dot" data-val="${n}">${n}</div>`).join("")}</div>
+          ${fatigaScaleHtml("scaleFatiga", null)}
         </div>
         <div class="form-field">
           <label>Sueño (horas)</label>
@@ -4861,60 +5031,349 @@ function renderRegistro(){
       d.classList.add('active');
     });
   });
-  document.querySelectorAll('#scaleFatiga .scale-dot').forEach(d=>{
-    d.addEventListener('click', ()=>{
-      document.querySelectorAll('#scaleFatiga .scale-dot').forEach(x=>x.classList.remove('active'));
-      d.classList.add('active');
-    });
-  });
+  attachFatigaHandlers("scaleFatiga");
+  initRegistroForm();
+  attachEditLogHandlers();
 }
 
 function entryToHtml(entry){
+  if(entry.id === _editingLogId) return editLogHtml(entry);
   const typeLabel = {A:"Rutina A", B:"Rutina B", Descanso:"Descanso", Otro:"Otra actividad"}[entry.routine] || entry.routine;
   return `
   <div class="log-entry">
     <div class="log-entry-head">
-      <span class="log-date">${entry.dateFormatted}</span>
+      <span class="log-date">${entry.dateFormatted}${editedTagHtml(entry)}</span>
       <span class="log-type-badge">${typeLabel}</span>
     </div>
     <div class="log-grid">
       <div class="log-field"><label>Energía</label><div class="v">${entry.energia ? entry.energia+"/5" : "—"}</div></div>
-      <div class="log-field"><label>Fatiga</label><div class="v">${entry.fatiga ? entry.fatiga+"/5" : "—"}</div></div>
+      <div class="log-field"><label>Fatiga</label><div class="v">${fatigaMiniHtml(entry.fatiga)}</div></div>
       <div class="log-field"><label>Sueño</label><div class="v">${escapeHtml(entry.sueno||"—")}</div></div>
       <div class="log-field"><label>Alimentación</label><div class="v">${escapeHtml(entry.comida||"—")}</div></div>
     </div>
     ${entry.notas ? `<div class="log-notes"><label style="font-size:10px;text-transform:uppercase;color:var(--text-dim);font-weight:700">Notas</label><div class="v">${nl2br(entry.notas)}</div></div>` : ""}
     <div style="padding:0 16px 14px; text-align:right">
+      <button class="secondary-btn" onclick="startEditLog('${entry.id}')" style="margin-right:8px">Editar</button>
       <button class="secondary-btn" onclick="deleteLog('${entry.id}')">Eliminar registro</button>
     </div>
   </div>`;
 }
 
-function saveNewLog(){
-  const dateInput = document.getElementById("newLogDate").value;
-  const routine = document.getElementById("newLogRoutine").value;
-  const energiaDot = document.querySelector('#scaleEnergia .scale-dot.active');
-  const fatigaDot = document.querySelector('#scaleFatiga .scale-dot.active');
-  const sueno = document.getElementById("newLogSueno").value.trim();
-  const comida = document.getElementById("newLogComida").value.trim();
-  const notas = document.getElementById("newLogNotas").value.trim();
+// ============================================================
+// REGISTRO DIARIO: borrador, autoguardado con consulta y edición
+// ============================================================
+const REG_DRAFT_KEY = "btc_registroDraft";
+let _editingLogId = null;
+let _regPromptOpen = false;
+let _regPromptDraft = null;
+let _regPromptCb = null;
+let _regLastInput = Date.now();
+let _regIdlePrompted = false;
+let _regBypassGuard = false;
+let _regSavePromise = null;
 
-  if(!dateInput){ alert("Elegí una fecha."); return; }
+function regCfg(){
+  const r = (typeof STATE !== "undefined" && STATE && STATE.settings && STATE.settings.registro) || {};
+  return Object.assign({ autosave:false, onLeaveTab:true, onClose:true, onIdle:true, idleMin:10 }, r);
+}
+function readRegistroForm(noTrim){
+  const dateEl = document.getElementById("newLogDate");
+  if(!dateEl) return null;
+  const t = v => noTrim ? v : v.trim();
+  const en = document.querySelector('#scaleEnergia .scale-dot.active');
+  const fa = document.querySelector('#scaleFatiga .scale-dot.active');
+  return {
+    date: dateEl.value,
+    routine: document.getElementById("newLogRoutine").value,
+    energia: en ? en.dataset.val : null,
+    fatiga: fa ? fa.dataset.val : null,
+    sueno: t(document.getElementById("newLogSueno").value),
+    comida: t(document.getElementById("newLogComida").value),
+    notas: t(document.getElementById("newLogNotas").value)
+  };
+}
+function registroDraftHasContent(d){
+  return !!(d && (d.energia || d.fatiga || d.sueno || d.comida || d.notas));
+}
+function loadRegistroDraft(){
+  try{ const raw = localStorage.getItem(REG_DRAFT_KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
+}
+function clearRegistroDraft(){ try{ localStorage.removeItem(REG_DRAFT_KEY); }catch(e){} }
+function saveRegistroDraft(){
+  _regLastInput = Date.now();
+  _regIdlePrompted = false;
+  hideRegToast();
+  const d = readRegistroForm(true);
+  if(!d) return;
+  try{
+    if(registroDraftHasContent(d)) localStorage.setItem(REG_DRAFT_KEY, JSON.stringify(d));
+    else localStorage.removeItem(REG_DRAFT_KEY);
+  }catch(e){}
+}
+function applyRegistroDraft(d){
+  if(!d) return;
+  const set = (id, v) => { const el = document.getElementById(id); if(el && v != null) el.value = v; };
+  set("newLogDate", d.date); set("newLogRoutine", d.routine);
+  set("newLogSueno", d.sueno); set("newLogComida", d.comida); set("newLogNotas", d.notas);
+  [["scaleEnergia", d.energia], ["scaleFatiga", d.fatiga]].forEach(([id, v])=>{
+    if(!v) return;
+    const dot = document.querySelector(`#${id} .scale-dot[data-val="${v}"]`);
+    if(dot) dot.classList.add("active");
+  });
+  paintFatiga("scaleFatiga");
+}
+function initRegistroForm(){
+  applyRegistroDraft(loadRegistroDraft());
+  ["newLogDate","newLogRoutine","newLogSueno","newLogComida","newLogNotas"].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener("input", saveRegistroDraft);
+    el.addEventListener("change", saveRegistroDraft);
+  });
+  document.querySelectorAll('#scaleEnergia .scale-dot, #scaleFatiga .scale-dot').forEach(d=>{
+    d.addEventListener("click", saveRegistroDraft);
+  });
+}
 
-  const d = new Date(dateInput + "T12:00:00");
+function commitLog(f){
+  const d = new Date(f.date + "T12:00:00");
   const dateFormatted = d.toLocaleDateString('es-AR', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
-
   STATE.logs.daily.push({
     id: uid("log"),
-    date: dateInput,
+    date: f.date,
     dateFormatted,
-    routine,
-    energia: energiaDot ? energiaDot.dataset.val : null,
-    fatiga: fatigaDot ? fatigaDot.dataset.val : null,
-    sueno, comida, notas
+    routine: f.routine,
+    energia: f.energia || null,
+    fatiga: f.fatiga || null,
+    sueno: f.sueno || "", comida: f.comida || "", notas: f.notas || ""
   });
+  clearRegistroDraft();
+  hideRegToast();
+  return saveState();
+}
+function saveNewLog(){
+  const f = readRegistroForm();
+  if(!f) return;
+  if(!f.date){ alert("Elegí una fecha."); return; }
+  commitLog(f);
+  renderRegistro();
+}
+
+// ---- Consulta "guardar / descartar / seguir editando" ----
+function promptRegistroDraft(reason, onDone){
+  if(_regPromptOpen) return;
+  const d = readRegistroForm() || loadRegistroDraft();
+  if(!registroDraftHasContent(d)){ if(onDone) onDone("none"); return; }
+  _regPromptOpen = true;
+  _regPromptDraft = d;
+  _regPromptCb = onDone || null;
+  const routineLabel = {A:"Rutina A", B:"Rutina B", Descanso:"Descanso", Otro:"Otra actividad"}[d.routine] || d.routine;
+  let fecha = d.date;
+  try{ fecha = new Date(d.date + "T12:00:00").toLocaleDateString('es-AR', {weekday:'short', day:'numeric', month:'short'}); }catch(e){}
+  const msgs = {
+    leave: "Estás por salir de la pestaña Registro y hay un registro sin guardar.",
+    reload: "Estás por recargar la app y hay un registro sin guardar.",
+    restore: "Quedó un registro sin guardar de la última vez que usaste la app."
+  };
+  document.getElementById("regDraftModal").innerHTML = `
+    <div class="reg-draft-title">Registro sin guardar</div>
+    <p class="reg-draft-text">${msgs[reason] || msgs.leave}</p>
+    <div class="reg-draft-summary">${escapeHtml(fecha)} · ${escapeHtml(routineLabel)}</div>
+    <div class="reg-draft-actions">
+      <button class="secondary-btn" onclick="regDraftChoose('keep')">Seguir editando</button>
+      <button class="secondary-btn" onclick="regDraftChoose('discard')">Descartar</button>
+      <button class="primary-btn" onclick="regDraftChoose('save')">Guardar</button>
+    </div>`;
+  document.getElementById("regDraftOverlay").classList.add("open");
+}
+function regDraftChoose(choice){
+  const d = _regPromptDraft;
+  document.getElementById("regDraftOverlay").classList.remove("open");
+  _regPromptOpen = false;
+  _regPromptDraft = null;
+  hideRegToast();
+  _regSavePromise = null;
+  if(choice === "save" && d && d.date){
+    _regSavePromise = commitLog(d);
+    renderRegistro();
+  } else if(choice === "discard"){
+    clearRegistroDraft();
+    renderRegistro();
+  } else {
+    choice = "keep";
+    _regLastInput = Date.now();
+    _regIdlePrompted = false;
+  }
+  const cb = _regPromptCb;
+  _regPromptCb = null;
+  if(cb) cb(choice);
+}
+
+// ---- Disparador 1: al salir de la pestaña Registro ----
+function regLeaveGuard(target){
+  if(_regBypassGuard) return false;
+  if(_currentView !== "registro" || target === "registro") return false;
+  const c = regCfg();
+  if(!c.autosave || !c.onLeaveTab) return false;
+  if(!registroDraftHasContent(readRegistroForm())) return false;
+  promptRegistroDraft("leave", choice=>{
+    if(choice === "keep") return;
+    _regBypassGuard = true;
+    try{ showView(target); } finally { _regBypassGuard = false; }
+  });
+  return true;
+}
+// ---- Disparador 2: cerrar / recargar ----
+// El navegador no permite botones propios al cerrar la pestaña ni con su botón de
+// recargar. Lo que sí se puede: (a) interceptar F5 / Ctrl+R / Cmd+R y mostrar la
+// consulta propia; (b) guardar el borrador en cada tecla (ya se hace) y preguntar
+// apenas se reabre la app. No se usa el aviso genérico del navegador.
+function regReloadKey(e){
+  const k = (e.key || "").toLowerCase();
+  const isReload = k === "f5" || ((e.ctrlKey || e.metaKey) && k === "r");
+  if(!isReload) return;
+  const c = regCfg();
+  if(!c.autosave || !c.onClose || _regPromptOpen) return;
+  if(!registroDraftHasContent(readRegistroForm())) return;
+  e.preventDefault();
+  promptRegistroDraft("reload", choice=>{
+    if(choice === "keep") return;
+    Promise.resolve(_regSavePromise).catch(()=>{}).then(()=>location.reload());
+  });
+}
+
+// ---- Disparador 3: inactividad -> aviso flotante clickeable, no invasivo ----
+function regDraftSummary(d){
+  const routineLabel = {A:"Rutina A", B:"Rutina B", Descanso:"Descanso", Otro:"Otra actividad"}[d.routine] || d.routine;
+  let fecha = d.date || "";
+  try{ fecha = new Date(d.date + "T12:00:00").toLocaleDateString('es-AR', {weekday:'short', day:'numeric', month:'short'}); }catch(e){}
+  return `${fecha} · ${routineLabel}`;
+}
+function showRegToast(){
+  const el = document.getElementById("regToast");
+  const d = readRegistroForm() || loadRegistroDraft();
+  if(!el || !registroDraftHasContent(d)) return;
+  el.innerHTML = `
+    <button class="reg-toast-main" onclick="regToastGo()">
+      <span class="reg-toast-title">Registro sin guardar</span>
+      <span class="reg-toast-sub">${escapeHtml(regDraftSummary(d))} · tocá para volver</span>
+    </button>
+    <button class="reg-toast-x" onclick="hideRegToast()" aria-label="Cerrar aviso" title="Cerrar aviso">×</button>`;
+  el.classList.add("show");
+}
+function hideRegToast(){
+  const el = document.getElementById("regToast");
+  if(el) el.classList.remove("show");
+}
+function regToastGo(){
+  hideRegToast();
+  if(_currentView !== "registro") showView("registro");
+  setTimeout(()=>{
+    const notas = document.getElementById("newLogNotas");
+    const panel = notas ? notas.closest(".panel") : null;
+    if(panel) panel.scrollIntoView({behavior:"smooth", block:"start"});
+    if(notas) setTimeout(()=>{ try{ notas.focus({preventScroll:true}); }catch(e){} }, 350);
+  }, 60);
+}
+function initRegistroAutosave(){
+  document.addEventListener("keydown", regReloadKey, true);
+  setInterval(()=>{
+    const c = regCfg();
+    if(_currentView === "registro") hideRegToast();
+    if(!c.autosave || !c.onIdle || _regPromptOpen || _regIdlePrompted) return;
+    if(_currentView === "registro") return; // ya estás ahí: no hace falta avisar
+    if(!registroDraftHasContent(readRegistroForm())) return;
+    if(Date.now() - _regLastInput < Number(c.idleMin) * 60000) return;
+    _regIdlePrompted = true;
+    showRegToast();
+  }, 20000);
+  // Al abrir: si quedó un borrador de la sesión anterior, consultar.
+  _regLastInput = Date.now();
+  const c0 = regCfg();
+  if(c0.autosave && c0.onClose && registroDraftHasContent(loadRegistroDraft())){
+    promptRegistroDraft("restore", choice=>{ if(choice === "keep") showView("registro"); });
+  }
+}
+
+// ---- Edición de registros guardados ----
+function editedTagHtml(entry){
+  if(!entry.editedAt) return "";
+  let f = "";
+  try{ f = new Date(entry.editedAt).toLocaleDateString('es-AR', {day:'numeric', month:'short'}); }catch(e){}
+  return `<span class="log-edited-tag" title="Última edición">editado${f ? " · " + escapeHtml(f) : ""}</span>`;
+}
+function editLogHtml(e){
+  const opt = (v, l) => `<option value="${v}" ${e.routine === v ? "selected" : ""}>${l}</option>`;
+  const dots = cur => [1,2,3,4,5].map(n=>`<div class="scale-dot ${String(cur) === String(n) ? "active" : ""}" data-val="${n}">${n}</div>`).join("");
+  return `
+  <div class="log-entry editing">
+    <div class="log-entry-head">
+      <span class="log-date">Editando registro</span>
+    </div>
+    <div class="log-edit-body">
+      <div class="form-grid">
+        <div class="form-field"><label>Fecha</label><input type="date" id="editLogDate" value="${escapeHtml(e.date || "")}"></div>
+        <div class="form-field"><label>Rutina realizada</label>
+          <select id="editLogRoutine">
+            ${opt("A", "Rutina A — Fuerza y acondicionamiento")}
+            ${opt("B", "Rutina B — Cardio + Core")}
+            ${opt("Descanso", "Día de descanso")}
+            ${opt("Otro", "Otra actividad")}
+          </select>
+        </div>
+        <div class="form-field"><label>Energía (1-5)</label><div class="scale-row" id="scaleEditEnergia">${dots(e.energia)}</div></div>
+        <div class="form-field"><label>Fatiga / dolor muscular (1-5)</label>${fatigaScaleHtml("scaleEditFatiga", e.fatiga)}</div>
+        <div class="form-field"><label>Sueño (horas)</label><input type="text" id="editLogSueno" value="${escapeHtml(e.sueno || "")}"></div>
+        <div class="form-field"><label>Alimentación del día</label><input type="text" id="editLogComida" value="${escapeHtml(e.comida || "")}"></div>
+      </div>
+      <div class="form-field" style="margin-bottom:14px"><label>Notas</label><textarea id="editLogNotas">${escapeHtml(e.notas || "")}</textarea></div>
+      <div class="log-edit-actions">
+        <button class="secondary-btn" onclick="cancelEditLog()">Cancelar</button>
+        <button class="primary-btn" onclick="saveEditLog('${e.id}')">Guardar cambios</button>
+      </div>
+    </div>
+  </div>`;
+}
+function attachEditLogHandlers(){
+  document.querySelectorAll("#scaleEditEnergia .scale-dot").forEach(d=>{
+    d.addEventListener("click", ()=>{
+      document.querySelectorAll("#scaleEditEnergia .scale-dot").forEach(x=>x.classList.remove("active"));
+      d.classList.add("active");
+    });
+  });
+  attachFatigaHandlers("scaleEditFatiga");
+}
+function startEditLog(id){
+  _editingLogId = id;
+  renderRegistro();
+  const el = document.querySelector(".log-entry.editing");
+  if(el) el.scrollIntoView({block:"center", behavior:"smooth"});
+}
+function cancelEditLog(){
+  _editingLogId = null;
+  renderRegistro();
+}
+function saveEditLog(id){
+  const entry = STATE.logs.daily.find(l=>l.id === id);
+  if(!entry){ _editingLogId = null; renderRegistro(); return; }
+  const date = document.getElementById("editLogDate").value;
+  if(!date){ alert("Elegí una fecha."); return; }
+  const en = document.querySelector('#scaleEditEnergia .scale-dot.active');
+  const fa = document.querySelector('#scaleEditFatiga .scale-dot.active');
+  const d = new Date(date + "T12:00:00");
+  entry.date = date;
+  entry.dateFormatted = d.toLocaleDateString('es-AR', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
+  entry.routine = document.getElementById("editLogRoutine").value;
+  entry.energia = en ? en.dataset.val : null;
+  entry.fatiga = fa ? fa.dataset.val : null;
+  entry.sueno = document.getElementById("editLogSueno").value.trim();
+  entry.comida = document.getElementById("editLogComida").value.trim();
+  entry.notas = document.getElementById("editLogNotas").value.trim();
+  entry.editedAt = new Date().toISOString();
+  _editingLogId = null;
   saveState();
   renderRegistro();
+  if(typeof renderSemanal === "function") renderSemanal();
 }
 
 function deleteLog(id){
@@ -5272,6 +5731,7 @@ function restoreScrollFor(viewKey){
 
 function showView(viewKey){
   if(!VISTAS_VALIDAS.includes(viewKey)) viewKey = "rutinaA";
+  if(regLeaveGuard(viewKey)) return;
   if(_currentView){
     _scrollPositions[_currentView] = window.scrollY;
     ensureUiState().scroll[_currentView] = Math.round(window.scrollY);
@@ -6631,6 +7091,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   if(!STATE.timerPresets) STATE.timerPresets = [];
   ensureSettings();
   renderAll();
+  setTimeout(initRegistroAutosave, 700);
   // Volver a la pestaña y al punto de scroll donde se cerró la app por última vez
   {
     const ui = ensureUiState();
