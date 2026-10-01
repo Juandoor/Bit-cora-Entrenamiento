@@ -572,6 +572,45 @@ const DEFAULT_DATA = {
     ]
   },
   "tecnica": {
+    "estandar": {
+          "cards": [
+                {
+                      "id": "potencia_sets_reps",
+                      "titulo": "1) Sets y repeticiones ideales para potencia",
+                      "contenido": "Potencia = fuerza × velocidad. El objetivo del set NO es cansarte, es mover la carga lo más rápido posible con técnica limpia.\n• Repeticiones: 1–5 por set (ideal 3–5 con carga; 3–6 en saltos y lanzamientos).\n• Sets: 3–6 por ejercicio (hasta 8 en saltos de bajo volumen).\n• Intención: fase concéntrica lo más explosiva posible; bajada controlada (~1–2 s) salvo ejercicios balísticos.\n• Descanso entre sets: 2–5 min (recuperación del sistema ATP-PC). Si descansás menos, la velocidad cae y deja de ser potencia.\n• Cercanía al fallo: lejos. Terminá cada set con 3–5 repeticiones en reserva (RIR). Nunca al fallo.\n• Volumen: pocos ejercicios (1–3 por sesión) y al comienzo, cuando todavía estás fresco, después del calentamiento."
+                },
+                {
+                      "id": "potencia_peso",
+                      "titulo": "2) ¿Qué peso elegir según el ejercicio? (% del 1RM)",
+                      "contenido": "La carga que maximiza la potencia depende del ejercicio. Rangos orientativos de la literatura (varían por persona y nivel):\n• Saltos y pliometría: peso corporal (0%). Con chaleco/mancuernas livianas, hasta ~30% del 1RM de sentadilla.\n• Lanzamientos y swings (kettlebell/mancuerna): 30–45% del 1RM del movimiento equivalente.\n• Press de pecho / empujes: ~30–50% del 1RM (el pico de potencia aparece con cargas más bajas en tren superior).\n• Sentadilla, zancadas, peso muerto rápido: ~40–70% del 1RM.\n• Derivados olímpicos (cargadas, arranques): 60–85% del 1RM.\n• Regla práctica sin barra ni 1RM medido: elegí un peso con el que podrías hacer ~10–12 repeticiones, y hacé solo 3–5 a máxima velocidad. Si la barra/mancuerna se mueve lenta desde la primera rep, es demasiado pesada para potencia.\n• Si el peso te obliga a frenar o a perder técnica, bajá la carga: en potencia la velocidad manda sobre el kilaje."
+                },
+                {
+                      "id": "potencia_curva_fv",
+                      "titulo": "3) Curva fuerza–velocidad",
+                      "contenido": "A más carga, menos velocidad; a menos carga, más velocidad. La potencia (fuerza × velocidad) es baja en los extremos (carga máxima: fuerza alta pero velocidad casi cero; carga nula: velocidad alta pero fuerza casi cero) y alcanza su pico en una zona intermedia.\n• Cerca del extremo de fuerza (≥80% 1RM): entrena fuerza máxima y aceleración con carga.\n• Zona media (~30–70% 1RM según ejercicio): pico de potencia mecánica.\n• Extremo de velocidad (<30% 1RM, saltos, balísticos): entrena velocidad y tasa de desarrollo de fuerza.\n• Un programa completo combina varios puntos de la curva (por ejemplo: un ejercicio pesado de fuerza + uno de carga media + saltos). Si tu punto débil es la fuerza, priorizá cargas altas; si es la velocidad, cargas bajas y balísticos."
+                },
+                {
+                      "id": "potencia_curva_fuerza",
+                      "titulo": "4) Curva de fuerza del ejercicio (dónde es más fácil o difícil)",
+                      "contenido": "Cada ejercicio tiene una curva de resistencia distinta según el rango de movimiento:\n• Ascendente (más fácil arriba, difícil abajo): sentadilla, press, zancadas. Podés acelerar mucho en la parte final; elegí una carga que supere el punto difícil (sticking point) sin frenarte.\n• Descendente (difícil arriba, fácil abajo): dominadas, remos, elevaciones laterales. Se exige más al inicio del recorrido.\n• En campana (difícil en el medio): curl de bíceps con mancuerna. El tramo medio es el límite del peso.\n• Con mancuernas la gravedad es constante, pero el brazo de palanca cambia con el ángulo: la parte «pesada» depende de dónde queda la mancuerna respecto a la articulación.\n• Para potencia: elegí el peso por el tramo MÁS difícil del recorrido y mantené la intención de acelerar hasta el final del movimiento (evitá frenar al llegar arriba, sobre todo en ejercicios ascendentes). Con carga muy liviana, buscá que el movimiento termine en salto o lanzamiento para no frenar."
+                },
+                {
+                      "id": "potencia_1rm",
+                      "titulo": "5) 1RM: cómo estimarlo y cómo usarlo",
+                      "contenido": "El 1RM es el máximo peso que podés mover una sola vez con buena técnica. Sin barra ni cargas máximas, podés estimarlo con un set submáximo (idealmente 3–5 repeticiones):\n• Epley: 1RM ≈ peso × (1 + repeticiones ÷ 30)\n• Brzycki: 1RM ≈ peso × 36 ÷ (37 − repeticiones)\nEquivalencias aproximadas (% del 1RM ↔ repeticiones máximas posibles): 95% ≈ 2 · 90% ≈ 4 · 85% ≈ 6 · 80% ≈ 8 · 75% ≈ 10 · 70% ≈ 12 · 65% ≈ 15.\n• Son estimaciones: se vuelven imprecisas por encima de ~10 repeticiones y varían según ejercicio y persona.\n• Mejor medir el 1RM de ejercicios con mancuernas por separado: el número no es transferible entre ejercicios.\n• Con mancuernas fijas (13,5 / 9,5 / 5,5 kg) probablemente no puedas ajustar el %; en ese caso ajustá la dificultad con tempo, rango de movimiento, unilateralidad o altura de salto."
+                },
+                {
+                      "id": "potencia_fatiga_set",
+                      "titulo": "6) Nivel de fatiga dentro de un set (cuándo cortar)",
+                      "contenido": "Lo clave en potencia es no fatigarse: la velocidad es la señal.\n• Pérdida de velocidad (VL) recomendada para cortar el set: potencia 10–20%; fuerza 20–30%; hipertrofia 30–40% o más.\n• Sin sensor de velocidad, usá señales simples: la repetición se siente más lenta, cambió la técnica, el salto es más bajo (si cae más de ~10% en altura, cortá el set).\n• Repeticiones en reserva (RIR) según objetivo: potencia 3–5 · fuerza máxima 1–3 · hipertrofia 0–3.\n• Si tenés que «pelear» una repetición, ya pasaste el punto de potencia: cortá el set.\n• Entre sets, recuperá lo suficiente: 2–5 min. Descansos cortos acumulan fatiga y convierten el trabajo en resistencia, no en potencia."
+                },
+                {
+                      "id": "potencia_vs_hipertrofia",
+                      "titulo": "7) Cómo elegir el peso según el objetivo (comparación)",
+                      "contenido": "Mismo ejercicio, distinto objetivo → distinto peso y distinta cercanía al fallo:\n• Potencia: 3–5 reps rápidas · carga liviana a media · 3–5 RIR · pérdida de velocidad 10–20%.\n• Fuerza máxima: 1–5 reps · 85–95% 1RM · 1–3 RIR · pérdida de velocidad 20–30%.\n• Hipertrofia: 6–12 reps (hasta 20–30 con cargas livianas llevadas cerca del fallo) · ~65–80% 1RM · 0–3 RIR.\n• Resistencia muscular: 15+ reps · carga liviana · cerca del fallo.\nEjemplo para hipertrofia con un set de 12 repeticiones: elegí un peso con el que completes las 12 y te queden 1–3 repeticiones más posibles (fallo técnico hacia la 13ª–15ª). Si el fallo llega en la 8ª–10ª repetición, ese peso corresponde a sets de 8–10, no de 12.\nNota: estos valores son rangos de referencia basados en la literatura de entrenamiento de fuerza y potencia (estudios de carga óptima de potencia, de pérdida de velocidad y de RIR); sirven como punto de partida y conviene ajustarlos con tu propio registro."
+                }
+          ]
+    },
     "prioridad": {
       "titulo": "Hollow Hold — Ejercicio prioritario",
       "puntos": [

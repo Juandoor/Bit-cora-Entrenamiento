@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bitácora de Entrenamiento</title>
+<meta name="application-name" content="Bitácora">
+<meta name="apple-mobile-web-app-title" content="Bitácora">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0E14'/%3E%3Crect x='10' y='29' width='44' height='6' rx='3' fill='%23FF6B5B'/%3E%3Crect x='6' y='20' width='9' height='24' rx='3' fill='%232DD4BF'/%3E%3Crect x='49' y='20' width='9' height='24' rx='3' fill='%232DD4BF'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0E14'/%3E%3Crect x='10' y='29' width='44' height='6' rx='3' fill='%23FF6B5B'/%3E%3Crect x='6' y='20' width='9' height='24' rx='3' fill='%232DD4BF'/%3E%3Crect x='49' y='20' width='9' height='24' rx='3' fill='%232DD4BF'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
@@ -411,13 +415,16 @@
 
   .tabs{
     max-width: 1040px; margin: 20px auto 0;
-    display:flex; gap:4px; flex-wrap:wrap;
+    display:flex; gap:2px; flex-wrap:nowrap;
+    overflow-x:auto; scrollbar-width:none;
   }
+  .tabs::-webkit-scrollbar{ display:none; }
   .tab-btn{
     font-family: var(--font-body);
-    font-size: 13px;
     font-weight: 600;
-    padding: 10px 16px;
+    padding: 10px 8px;
+    font-size: 12px;
+    white-space: nowrap; flex: 0 0 auto;
     border-radius: 7px 7px 0 0;
     border:none;
     background: transparent;
@@ -532,6 +539,7 @@
   .fase-divider.correctivo .dot{ background: var(--sage); }
   .fase-divider.fuerza .dot{ background: var(--coral); }
   .fase-divider.hipertrofia .dot{ background: var(--violet); }
+  .fase-divider.potencia .dot{ background: #B7D94A; }
   .fase-divider.pliometria .dot{ background: var(--gold); }
   .fase-divider.cardio .dot{ background: #6BA3D6; }
   .fase-divider.isometricos .dot{ background: var(--brick); }
@@ -1059,7 +1067,7 @@
     .masthead{ padding: 16px 24px 0; }
     .masthead h1{ font-size: clamp(21px, 3.4vw, 28px); margin-bottom: 2px; }
     .tabs{ margin: 12px auto 0; }
-    .tab-btn{ padding: 8px 14px; font-size:12.5px; }
+    .tab-btn{ padding: 8px 8px; font-size:12px; }
     .wrap{ padding: 16px 24px 0; }
     .panel{ margin-bottom: 14px; }
     .panel-head{ padding: 10px 18px; }
@@ -1904,8 +1912,8 @@
 <header class="masthead">
   <div class="masthead-row">
     <div>
-      <div class="sub">Bitácora personal · Editable</div>
-      <h1 contenteditable="true" data-placeholder="Tu nombre o título del plan">Plan de Entrenamiento</h1>
+      <div class="sub">Registro personal · Editable</div>
+      <h1 contenteditable="true" data-placeholder="Tu nombre o título del plan">Bitácora de Entrenamiento</h1>
     </div>
     <div class="meta">
       Inicio: <b contenteditable="true" id="startDate">25 May 2026</b><br>
@@ -1928,6 +1936,7 @@
     <button class="tab-btn" data-view="rutinaB">Rutina B</button>
     <button class="tab-btn" data-view="calentamiento">Calentamiento / Enfriamiento</button>
     <button class="tab-btn" data-view="tecnica">Técnica y prioridades</button>
+    <button class="tab-btn" data-view="estandar">Estándar de repeticiones</button>
     <button class="tab-btn" data-view="registro">Registro diario</button>
     <button class="tab-btn" data-view="semanal">Conclusiones semanales</button>
   </nav>
@@ -1944,6 +1953,7 @@
   <div class="view" id="view-rutinaB"></div>
   <div class="view" id="view-calentamiento"></div>
   <div class="view" id="view-tecnica"></div>
+  <div class="view" id="view-estandar"></div>
   <div class="view" id="view-registro"></div>
   <div class="view" id="view-semanal"></div>
 </div>
@@ -2262,6 +2272,7 @@ const FASE_LABELS = {
   fuerza_general: "Fuerza",
   fuerza: "Fuerza pesada",
   hipertrofia: "Hipertrofia",
+  potencia: "Potencia",
   pliometria: "Pliometría / potencia",
   cardio: "Cardio",
   isometricos: "Isométricos",
@@ -2269,13 +2280,14 @@ const FASE_LABELS = {
   estiramiento: "Estiramientos",
   accesorio: "Accesorio liviano"
 };
-const FASE_ORDER = ["activacion","correctivo","fuerza_general","fuerza","hipertrofia","pliometria","cardio","isometricos","flexibilidad","estiramiento","accesorio"];
+const FASE_ORDER = ["activacion","correctivo","fuerza_general","fuerza","hipertrofia","potencia","pliometria","cardio","isometricos","flexibilidad","estiramiento","accesorio"];
 const FASE_COLOR = {
   activacion:   "#4FA3A3",
   correctivo:   "#8FA86B",
   fuerza_general: "#F08B5B",
   fuerza:       "#E8714A",
   hipertrofia:  "#A98FD6",
+  potencia:     "#B7D94A",
   pliometria:   "#D9A24B",
   cardio:       "#6BA3D6",
   isometricos:  "#D14F3D",
@@ -2290,6 +2302,7 @@ const FASE_BG_SOFT = {
   fuerza_general: "rgba(240,139,91,0.14)",
   fuerza:       "var(--coral-soft)",
   hipertrofia:  "var(--violet-soft)",
+  potencia:     "rgba(183,217,74,0.14)",
   pliometria:   "var(--gold-vivid-soft)",
   cardio:       "rgba(107,163,214,0.14)",
   isometricos:  "var(--brick-soft)",
@@ -2306,6 +2319,7 @@ const FASE_ICON_PATHS = {
   fuerza_general: '<path d="M6.5 17c-1.4-1.8-1.6-4.6.3-6.2 1.6-1.3 2-3 1.3-4.6" /><path d="M8.1 6.2c1.6-.6 3.3-.2 4.3 1.1.9 1.2.9 2.6.1 3.7 1.6-.2 3 .5 3.7 1.9.8 1.6.3 3.5-1.1 4.6" /><path d="M6.5 17c1 1.6 2.8 2.4 4.6 2 2.1-.5 3.4-2.2 3.6-4.2" />',
   fuerza:       '<line x1="4" y1="12" x2="20" y2="12"/><rect x="1.6" y="9" width="3" height="6" rx="1"/><rect x="19.4" y="9" width="3" height="6" rx="1"/><rect x="6.2" y="10.3" width="2.2" height="3.4" rx="0.6"/><rect x="15.6" y="10.3" width="2.2" height="3.4" rx="0.6"/>',
   hipertrofia:  '<path d="M6 15.5 12 9.5l6 6"/><path d="M6 20 12 14l6 6"/>',
+  potencia:     '<path d="M12 2.8v5M12 16.2v5M2.8 12h5M16.2 12h5"/><path d="M5.6 5.6l3.2 3.2M15.2 15.2l3.2 3.2M18.4 5.6l-3.2 3.2M8.8 15.2l-3.2 3.2"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
   pliometria:   '<path d="M13 2 4.5 14h5.8l-1.1 8L21.5 10h-5.8z" fill="currentColor" stroke="none"/>',
   cardio:       '<path d="M12 20.3S3.8 15.4 3.8 9.7C3.8 6.6 6.1 4.5 8.8 4.5c1.8 0 3.2 1 4.2 2.5 1-1.5 2.4-2.5 4.2-2.5 2.7 0 5 2.1 5 5.2 0 5.7-8.2 10.6-8.2 10.6Z"/>',
   isometricos:  '<path d="M6.5 3h11M6.5 21h11M7.5 3c0 5 4.5 6 4.5 9s-4.5 4-4.5 9M16.5 3c0 5-4.5 6-4.5 9s4.5 4 4.5 9"/>',
@@ -2493,6 +2507,13 @@ function mergeMissingDefaults(state){
   return state;
 }
 async function saveState(silent){
+  if(silent === "ui"){
+    // Solo estado de interfaz (pestaña/desplazamiento): se guarda en este dispositivo,
+    // pero NO cambia lastUpdateTs ni se sube a Drive. Así, mirar la app en un
+    // dispositivo no pisa los cambios reales hechos en otro.
+    try{ await idbSet(IDB_KEY, STATE); }catch(e){ console.error("Error guardando UI", e); }
+    return;
+  }
   STATE.meta.lastUpdate = nowStr();
   STATE.meta.lastUpdateTs = Date.now();
   // El snapshot para el backup se toma ACÁ, antes de cualquier await: si dos
@@ -2585,7 +2606,7 @@ const DRIVE_CLIENT_ID = "196367232149-jc4vrhs5vfrqcsb1egr1hsn3jusfdhjc.apps.goog
 const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
 const DRIVE_FILENAME = "bitacora_entrenamiento_sync.json";
 const DRIVE_AUTH_WORKER_URL = "https://bitacora-drive-auth.juanmandagaran58.workers.dev";
-const DRIVE_REDIRECT_URI = "https://juandoor.github.io/Bit-cora-Entrenamiento/";
+const DRIVE_REDIRECT_URI = "postmessage"; // en ux_mode "popup" Google exige este valor en el canje del código
 const DRIVE_SESSION_KEY = "bitacora_drive_session_v2"; // guarda { session_id }, NUNCA el refresh_token
 
 let driveCodeClient = null;
@@ -2595,6 +2616,9 @@ let driveSessionId = null;     // identifica, ante el Worker, la sesión guardad
 let driveFileId = null;        // id del archivo en Drive (se busca/crea una vez)
 let drivePushTimer = null;
 let driveSyncing = false;
+let driveLastModified = null;   // modifiedTime de Drive que ya conocemos (propio push o último pull)
+let drivePushPending = false;   // hay un guardado local esperando subirse
+let drivePollTimer = null;
 let driveRefreshTimer = null;  // renovación proactiva antes de que venza el access_token
 
 function setDriveStatus(text, kind){
@@ -2679,16 +2703,12 @@ async function driveRefreshAccessToken(){
   }
 }
 
-function initDriveAuth(){
-  if(!window.google || !google.accounts || !google.accounts.oauth2){
-    setTimeout(initDriveAuth, 400);
-    return;
-  }
-  driveCodeClient = google.accounts.oauth2.initCodeClient({
+let driveRetriedConsent = false;
+function makeDriveCodeClient(promptMode){
+  const cfg = {
     client_id: DRIVE_CLIENT_ID,
     scope: DRIVE_SCOPE,
     ux_mode: "popup",
-    redirect_uri: DRIVE_REDIRECT_URI,
     callback: async (resp)=>{
       if(resp.error){
         console.error("Error de autenticación Drive:", resp);
@@ -2698,6 +2718,7 @@ function initDriveAuth(){
       setDriveStatus("☁️ Conectando…", "warn");
       try{
         const data = await driveWorkerCall("exchange", { code: resp.code, redirectUri: DRIVE_REDIRECT_URI });
+        driveRetriedConsent = false;
         driveAccessToken = data.access_token;
         driveTokenExpiresAt = Date.now() + (data.expires_in ? data.expires_in*1000 : 3500*1000);
         driveSessionId = data.session_id;
@@ -2707,19 +2728,91 @@ function initDriveAuth(){
         await syncPullAndMerge(true);
       }catch(e){
         console.error("Error al canjear el código de Drive:", e);
-        if(e.status === 409){
-          // Google no devolvió refresh_token esta vez (puede pasar si ya
-          // había uno vigente sin revocar). Reintentamos una vez pidiendo
-          // consentimiento explícito, que fuerza a Google a emitir uno.
+        if(e.status === 409 && !driveRetriedConsent){
+          // Google no devolvió refresh_token (ya había uno vigente). Reintentamos
+          // UNA vez forzando la pantalla de consentimiento, que obliga a emitir uno.
+          driveRetriedConsent = true;
           setDriveStatus("☁️ Reintentando conexión…", "warn");
+          driveCodeClient = makeDriveCodeClient("consent");
           driveCodeClient.requestCode();
         } else {
-          setDriveStatus("☁️ Error al conectar — probá de nuevo", "err");
+          const motivo = [e.message, e.detail && (typeof e.detail === "string" ? e.detail : JSON.stringify(e.detail))].filter(Boolean).join(": ").slice(0, 120);
+          setDriveStatus("☁️ Error al conectar (" + (motivo || "sin detalle") + ")", "err");
         }
       }
     },
-  });
+    error_callback: (err)=>{
+      // Popup bloqueado o cerrado antes de terminar: antes quedaba mudo.
+      const t = err && err.type;
+      setDriveStatus(t === "popup_closed" ? "☁️ Ventana cerrada — tocá \"Conectar\"" : "☁️ No se pudo abrir la ventana de Google (" + (t || "error") + ") — permití las ventanas emergentes", "err");
+    },
+  };
+  if(promptMode) cfg.prompt = promptMode;
+  return google.accounts.oauth2.initCodeClient(cfg);
+}
 
+// ---------- Sincronización en vivo entre dispositivos ----------
+// Cada ~30 s (y al volver a la pestaña) se consulta SOLO la fecha de modificación
+// del archivo en Drive (una consulta liviana). Si otro dispositivo guardó algo más
+// nuevo, se trae y se aplica, salvo que estés editando, con un temporizador
+// corriendo o con un guardado propio pendiente: en ese caso espera al próximo ciclo.
+// El sondeo nunca sube datos: solo trae.
+function driveSafeToApplyRemote(enSync){
+  const a = document.activeElement;
+  if(a && (a.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))) return false;
+  if(typeof timerRun !== "undefined" && timerRun) return false;
+  if(typeof cardSeqRun !== "undefined" && cardSeqRun) return false;
+  if(drivePushPending || (driveSyncing && !enSync)) return false;
+  if(document.querySelector(".timer-modal-overlay.open, .fullscreen-timer-overlay.open")) return false;
+  return true;
+}
+async function drivePollRemote(){
+  if(!driveSessionId || driveSyncing || document.visibilityState !== "visible") return;
+  if(!driveSafeToApplyRemote()) return;
+  try{
+    if(!(await ensureDriveToken())) return;
+    if(!driveFileId) driveFileId = await driveFindFile();
+    if(!driveFileId) return;
+    const mres = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?fields=modifiedTime`, { headers: driveAuthHeaders() });
+    if(!mres.ok) return;
+    const mt = (await mres.json()).modifiedTime;
+    if(!mt || mt === driveLastModified) return;
+    if(!driveSafeToApplyRemote()) return;
+    driveSyncing = true;
+    try{
+      const remote = await driveDownloadFile(driveFileId);
+      const remoteTs = (remote && remote.meta && remote.meta.lastUpdateTs) || 0;
+      const localTs = (STATE && STATE.meta && STATE.meta.lastUpdateTs) || 0;
+      if(remoteTs > localTs && driveSafeToApplyRemote(true)){
+        await idbSaveBackup(STATE);
+        const keepUi = STATE.ui, keepSettings = STATE.settings;
+        STATE = remote;
+        if(keepUi) STATE.ui = keepUi;
+        if(keepSettings) STATE.settings = keepSettings;
+        if(!STATE.logs) STATE.logs = JSON.parse(JSON.stringify(EMPTY_LOGS));
+        if(!STATE.muro) STATE.muro = {cover:null, avatar:null, coverAspect:null};
+        if(STATE.tracker === undefined) STATE.tracker = null;
+        await idbSet(IDB_KEY, STATE);
+        renderAll();
+        setDriveStatus("☁️ Sincronizado ✓ (cambios de otro dispositivo)", "ok");
+      }
+      driveLastModified = mt;
+    } finally { driveSyncing = false; }
+  }catch(e){ console.error("Sondeo de Drive:", e); }
+}
+function startDrivePolling(){
+  clearInterval(drivePollTimer);
+  drivePollTimer = setInterval(drivePollRemote, 30000);
+}
+document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState === "visible") setTimeout(drivePollRemote, 600); });
+window.addEventListener("focus", ()=>{ setTimeout(drivePollRemote, 600); });
+
+function initDriveAuth(){
+  if(!window.google || !google.accounts || !google.accounts.oauth2){
+    setTimeout(initDriveAuth, 400);
+    return;
+  }
+  driveCodeClient = makeDriveCodeClient("");
   // Si ya había una sesión guardada de una conexión anterior, intentamos
   // renovar el access_token contra el backend apenas arranca la app —
   // esto SÍ es confiable (a diferencia del prompt:"" silencioso de antes)
@@ -2727,6 +2820,7 @@ function initDriveAuth(){
   // simple POST a nuestro propio servidor con el refresh_token que ya
   // quedó guardado ahí desde la primera conexión.
   loadDriveSession();
+  startDrivePolling();
   if(driveSessionId){
     setDriveStatus("☁️ Conectando…", "warn");
     driveRefreshAccessToken().then((ok)=>{ if(ok) syncPullAndMerge(false); });
@@ -2802,23 +2896,25 @@ async function driveCreateFile(content){
     `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n` +
     `--${boundary}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(content)}\r\n` +
     `--${boundary}--`;
-  const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id", {
+  const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,modifiedTime", {
     method: "POST",
     headers: { ...driveAuthHeaders(), "Content-Type": `multipart/related; boundary=${boundary}` },
     body
   });
   if(!res.ok) throw new Error("No se pudo crear el archivo en Drive (" + res.status + ")");
   const data = await res.json();
+  if(data.modifiedTime) driveLastModified = data.modifiedTime;
   return data.id;
 }
 
 async function driveUpdateFile(fileId, content){
-  const res = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
+  const res = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media&fields=id,modifiedTime`, {
     method: "PATCH",
     headers: { ...driveAuthHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify(content)
   });
   if(!res.ok) throw new Error("No se pudo actualizar el archivo en Drive (" + res.status + ")");
+  try{ const d = await res.json(); if(d && d.modifiedTime) driveLastModified = d.modifiedTime; }catch(e){}
 }
 
 async function ensureDriveToken(){
@@ -2833,10 +2929,11 @@ async function ensureDriveToken(){
 function scheduleDrivePush(){
   if(!driveSessionId) return; // no conectado, no hay nada que empujar
   clearTimeout(drivePushTimer);
+  drivePushPending = true;
   drivePushTimer = setTimeout(()=>{ pushToDrive().catch(e=>{
     console.error(e);
     setDriveStatus("☁️ Error al sincronizar", "err");
-  }); }, 1800);
+  }).finally(()=>{ drivePushPending = false; }); }, 1800);
 }
 
 async function pushToDrive(){
@@ -4676,6 +4773,16 @@ function saveSimpleList(key, container, selector){
   saveState();
 }
 
+function renderEstandar(){
+  const container = document.getElementById("view-estandar");
+  if(!container) return;
+  const cards = (STATE.tecnica && STATE.tecnica.estandar && STATE.tecnica.estandar.cards) || [];
+  container.innerHTML = cards.map((cd,i)=>`
+  ${tecnicaCollapsibleOpen("est_"+cd.id, `<h2 contenteditable="true" data-key="tecnica.estandar.cards.${i}.titulo">${escapeHtml(cd.titulo)}</h2>`)}
+      <div class="callout" contenteditable="true" data-key="tecnica.estandar.cards.${i}.contenido">${nl2br(cd.contenido)}</div>
+  ${TECNICA_COLLAPSIBLE_CLOSE}`).join("\n");
+  attachTecnicaEditableTitles(container);
+}
 function renderTecnica(){
   const t = STATE.tecnica;
   const container = document.getElementById("view-tecnica");
@@ -5666,7 +5773,7 @@ function renderMuro(){
 // app: al abrirla vuelve a la misma pestaña y al mismo punto donde la dejaste.
 const _scrollPositions = {};          // copia en memoria de la sesión (más fresca que STATE)
 let _currentView = "rutinaA";         // se corrige al arrancar con STATE.ui.vista
-const VISTAS_VALIDAS = ["muro","rutinaA","rutinaB","calentamiento","tecnica","registro","semanal"];
+const VISTAS_VALIDAS = ["muro","rutinaA","rutinaB","calentamiento","tecnica","estandar","registro","semanal"];
 
 function ensureUiState(){
   if(!STATE.ui || typeof STATE.ui !== "object") STATE.ui = {};
@@ -5677,7 +5784,7 @@ function persistUiState(){
   const ui = ensureUiState();
   ui.vista = _currentView;
   ui.scroll[_currentView] = Math.round(window.scrollY);
-  saveState(true);
+  saveState("ui");
 }
 
 let _addExFabRoutine = null;
@@ -5743,7 +5850,7 @@ function showView(viewKey){
   _currentView = viewKey;
   ensureUiState().vista = viewKey;
   restoreScrollFor(viewKey);
-  saveState(true);
+  saveState("ui");
   if(viewKey === "muro"){
     const toggle = document.getElementById("muroCompressToggle");
     if(toggle){
@@ -5782,6 +5889,7 @@ function renderAll(){
   renderRoutine("rutinaB");
   renderCalentamiento();
   renderTecnica();
+  renderEstandar();
   renderRegistro();
   renderSemanal();
 }
