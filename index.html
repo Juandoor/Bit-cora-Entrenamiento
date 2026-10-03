@@ -821,6 +821,14 @@
   }
   .form-field textarea{ resize:vertical; min-height:60px; }
   .form-field input::placeholder, .form-field textarea::placeholder{ color: var(--text-dim); }
+  /* Campo de fecha editable dígito a dígito */
+  .date-text-wrap{ position:relative; display:flex; align-items:stretch; gap:6px; }
+  .date-text-wrap .date-text{ flex:1; min-width:0; font-variant-numeric: tabular-nums; letter-spacing:.3px; }
+  .date-text-wrap .date-text.invalid{ border-color: var(--coral, #FF6B5B); box-shadow: 0 0 0 2px rgba(255,107,91,.25); }
+  .date-cal-btn{ flex:0 0 auto; width:38px; display:grid; place-items:center; background: var(--surface-2, #161B24); color: var(--text-dim); border:1px solid var(--line-soft); border-radius:8px; cursor:pointer; transition: color .15s, border-color .15s; }
+  .date-cal-btn:hover{ color: var(--text); border-color: var(--coral, #FF6B5B); }
+  .date-cal-btn svg{ width:18px; height:18px; }
+  .date-text-wrap .date-hidden{ position:absolute; right:0; bottom:0; width:1px; height:1px; opacity:0; pointer-events:none; border:0; padding:0; }
 
   .primary-btn{
     background: var(--coral); color:#1a0f0a; border:none;
@@ -925,6 +933,85 @@
   .log-entry.editing{ border-color: var(--coral); }
   .log-edit-body{ padding:14px 16px 16px; }
   .log-edit-actions{ display:flex; justify-content:flex-end; gap:10px; }
+
+  /* ===== Centro de notificaciones (vidrio translúcido) ===== */
+  .notif-center{ position:fixed; left:20px; bottom:56px; z-index:125; font-family: var(--font-body); }
+  .notif-launcher{
+    position:relative; width:46px; height:46px; border-radius:50%; cursor:pointer;
+    display:grid; place-items:center; color: var(--text);
+    background: rgba(30,43,37,0.72); border:1px solid rgba(255,255,255,0.16);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,138,76,0.18), 0 0 18px rgba(255,95,162,0.18);
+    transition: transform .15s ease, box-shadow .2s ease;
+  }
+  .notif-launcher:hover{ transform: translateY(-2px); }
+  .notif-launcher svg{ width:21px; height:21px; }
+  .notif-launcher.has-items{ box-shadow: 0 8px 22px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,138,76,0.5), 0 0 22px rgba(255,95,162,0.35); }
+  .notif-badge{
+    position:absolute; top:-4px; right:-4px; min-width:19px; height:19px; padding:0 5px; border-radius:10px;
+    display:grid; place-items:center; font-size:11px; font-weight:800; color:#fff;
+    background: linear-gradient(135deg,#FF8A4C,#FF5FA2); border:2px solid #0E1612;
+  }
+  .notif-launcher.pulse .notif-badge{ animation: notifPulse 1.4s ease-in-out 3; }
+  @keyframes notifPulse{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.28);} }
+  .notif-panel, .notif-popup{
+    position:absolute; left:0; bottom:58px; width:min(350px, calc(100vw - 110px));
+    border-radius:20px; color: var(--text);
+    background: linear-gradient(160deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03)), rgba(14,22,18,0.62);
+    border:1px solid rgba(255,255,255,0.16);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5); backdrop-filter: blur(22px) saturate(1.5);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.14);
+    overflow:hidden; animation: notifIn .22s ease;
+  }
+  @keyframes notifIn{ from{ opacity:0; transform: translateY(10px) scale(.98);} to{ opacity:1; transform:none;} }
+  .notif-panel::before, .notif-popup::before{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:.55;
+    background: radial-gradient(120% 70% at 0% 0%, rgba(255,138,76,0.30), transparent 60%),
+                radial-gradient(100% 70% at 100% 10%, rgba(255,95,162,0.22), transparent 60%),
+                radial-gradient(120% 80% at 50% 120%, rgba(76,201,240,0.24), transparent 60%);
+  }
+  .notif-panel > *, .notif-popup > *{ position:relative; }
+  .notif-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px 8px; }
+  .notif-head h3{ margin:0; font-family: var(--font-body); font-size:14px; font-weight:800; letter-spacing:.2px; }
+  .notif-head button{ background:transparent; border:none; color: var(--text-soft); font-size:11.5px; font-weight:700; cursor:pointer; padding:4px 8px; border-radius:8px; }
+  .notif-head button:hover{ color: var(--text); background: rgba(255,255,255,0.08); }
+  .notif-body{ max-height: min(56vh, 420px); overflow-y:auto; padding:0 10px 12px; scrollbar-width:thin; }
+  .notif-empty{ padding:18px 8px 22px; text-align:center; font-size:12.5px; color: var(--text-soft); }
+  .notif-cat-head{
+    width:100%; display:flex; align-items:center; gap:8px; margin:8px 0 6px; padding:4px 6px;
+    background:transparent; border:none; color: var(--text-soft); cursor:pointer; text-align:left;
+    font-family: var(--font-body); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px;
+  }
+  .notif-cat-head .cnt{ margin-left:auto; padding:1px 8px; border-radius:10px; background: rgba(255,255,255,0.10); color: var(--text); }
+  .notif-cat-head .chev{ width:12px; height:12px; transition: transform .2s ease; }
+  .notif-cat-head.closed .chev{ transform: rotate(-90deg); }
+  .notif-item{
+    display:flex; gap:11px; align-items:flex-start; padding:10px; margin-bottom:8px; border-radius:15px;
+    background: rgba(14,22,18,0.55); border:1px solid rgba(255,255,255,0.10);
+  }
+  .notif-ico{
+    flex:0 0 auto; width:38px; height:38px; border-radius:12px; display:grid; place-items:center; color:#fff;
+    background: linear-gradient(145deg, var(--nc), color-mix(in srgb, var(--nc) 55%, #000));
+    box-shadow: 0 6px 14px color-mix(in srgb, var(--nc) 38%, transparent);
+  }
+  .notif-ico svg{ width:20px; height:20px; }
+  .notif-txt{ flex:1; min-width:0; }
+  .notif-title{ font-size:13px; font-weight:800; color: var(--text); }
+  .notif-sub{ font-size:12px; color: var(--text-soft); margin-top:2px; line-height:1.4; }
+  .notif-actions{ display:flex; gap:8px; margin-top:8px; }
+  .notif-act{
+    font-family: var(--font-body); font-size:11.5px; font-weight:800; padding:5px 12px; border-radius:14px; cursor:pointer;
+    color:#fff; border:none; background: linear-gradient(135deg, var(--nc), color-mix(in srgb, var(--nc) 60%, #FF5FA2));
+  }
+  .notif-act:hover{ filter:brightness(1.12); }
+  .notif-x{ flex:0 0 auto; background:transparent; border:none; color: var(--text-dim); font-size:18px; line-height:1; cursor:pointer; padding:0 2px; }
+  .notif-x:hover{ color: var(--text); }
+  .notif-item.clickable{ cursor:pointer; transition: background .15s ease, border-color .15s ease; }
+  .notif-item.clickable:hover{ background: rgba(14,22,18,0.8); border-color: color-mix(in srgb, var(--nc) 60%, transparent); }
+  .notif-popup{ padding:10px; }
+  .notif-popup .notif-item{ margin:0; background: rgba(14,22,18,0.4); }
+  .notif-popup-main{ cursor:pointer; }
+  @media print{ .notif-center{ display:none !important; } }
   .reg-toast{
     position:fixed; left:20px; bottom:56px; z-index:120;
     display:flex; align-items:stretch; max-width:min(330px, calc(100vw - 110px));
@@ -2010,7 +2097,8 @@
   <div class="timer-modal settings-modal" id="settingsModal"></div>
 </div>
 
-<div class="reg-toast" id="regToast" role="status" aria-live="polite"></div>
+<div class="reg-toast" id="regToast" role="status" aria-live="polite" style="display:none"></div>
+<div class="notif-center" id="notifCenter"></div>
 
 <div class="timer-modal-overlay" id="regDraftOverlay" style="z-index:250">
   <div class="timer-modal reg-draft-modal" id="regDraftModal"></div>
@@ -4895,10 +4983,78 @@ function trackerPercent(){
   return Math.round((done / t.days.length) * 100);
 }
 
+// ---- Campo de fecha editable dígito a dígito (dd/mm/aaaa) ----
+// El <input type="date"> nativo solo deja borrar día/mes/año completos. Este campo
+// es de texto, así que se puede poner el cursor dentro de un número y borrar de a
+// un dígito. El valor real sigue viviendo en un <input type="date"> oculto con el
+// mismo id (formato ISO aaaa-mm-dd), por lo que el resto del código no cambia.
+function dateIsoToText(iso){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : "";
+}
+function dateTextToIso(txt){
+  const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec((txt || "").trim());
+  if(!m) return "";
+  const d = +m[1], mo = +m[2], y = +m[3];
+  if(y < 2000 || y > 2100 || mo < 1 || mo > 12 || d < 1) return "";
+  const dt = new Date(y, mo - 1, d);
+  if(dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return "";
+  return `${y}-${String(mo).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+}
+function dateTextFieldHtml(id, iso){
+  return `<div class="date-text-wrap">
+    <input type="text" inputmode="numeric" autocomplete="off" maxlength="10" class="date-text" id="${id}Txt" placeholder="dd/mm/aaaa" value="${dateIsoToText(iso)}"
+      oninput="dateTextInput('${id}', event)" onkeydown="dateTextKey(event)" onblur="dateTextBlur('${id}')">
+    <button type="button" class="date-cal-btn" onclick="dateTextOpenPicker('${id}')" title="Abrir calendario" aria-label="Abrir calendario">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+    </button>
+    <input type="date" class="date-hidden" id="${id}" value="${iso || ""}" tabindex="-1" aria-hidden="true" onchange="dateTextFromPicker('${id}')">
+  </div>`;
+}
+function dateTextInput(id, ev){
+  const txt = document.getElementById(id + "Txt"), hid = document.getElementById(id);
+  if(!txt || !hid) return;
+  let v = txt.value.replace(/[^\d\/]/g, "");
+  // Pone la barra sola al completar día y mes, pero solo cuando se está escribiendo al final
+  const typing = ev && ev.inputType && ev.inputType.startsWith("insert");
+  if(typing && txt.selectionStart === txt.value.length && (/^\d{2}$/.test(v) || /^\d{1,2}\/\d{2}$/.test(v))) v += "/";
+  if(v !== txt.value) txt.value = v;
+  const iso = dateTextToIso(v);
+  hid.value = iso;
+  txt.classList.toggle("invalid", v.trim() !== "" && !iso && v.length >= 8);
+}
+function dateTextKey(ev){
+  // La barra "/" se salta: Backspace/Delete junto a una barra mueve el cursor en vez de quedar trabado
+  const t = ev.target; if(t.selectionStart !== t.selectionEnd) return;
+  const p = t.selectionStart;
+  if(ev.key === "Backspace" && t.value[p-1] === "/"){ ev.preventDefault(); t.setSelectionRange(p-1, p-1); }
+  else if(ev.key === "Delete" && t.value[p] === "/"){ ev.preventDefault(); t.setSelectionRange(p+1, p+1); }
+}
+function dateTextBlur(id){
+  const txt = document.getElementById(id + "Txt"), hid = document.getElementById(id);
+  if(txt && hid && hid.value) txt.value = dateIsoToText(hid.value); // normaliza 5/3/2026 → 05/03/2026
+  if(txt) txt.classList.toggle("invalid", !!txt.value.trim() && !(hid && hid.value));
+}
+function dateTextFromPicker(id){
+  const txt = document.getElementById(id + "Txt"), hid = document.getElementById(id);
+  if(txt && hid){ txt.value = dateIsoToText(hid.value); txt.classList.remove("invalid"); }
+}
+function dateTextOpenPicker(id){
+  const hid = document.getElementById(id);
+  if(!hid) return;
+  try{ hid.showPicker ? hid.showPicker() : hid.click(); }catch(e){ hid.focus(); }
+}
+
 function createOrUpdateTracker(){
   const nombreEl = document.getElementById("trackerNombre");
   const semanasEl = document.getElementById("trackerSemanas");
   const startEl = document.getElementById("trackerStart");
+  const startTxt = document.getElementById("trackerStartTxt");
+  if(startTxt && startTxt.value.trim() && !startEl.value){
+    alert("La fecha de inicio no es válida. Escribila como dd/mm/aaaa (por ejemplo 27/06/2026).");
+    startTxt.focus();
+    return;
+  }
   const nombre = (nombreEl.value || "").trim() || "Ciclo de entrenamiento";
   const semanas = Math.max(1, parseInt(semanasEl.value) || 1);
   const startDate = startEl.value || new Date().toISOString().slice(0,10);
@@ -4955,7 +5111,7 @@ function renderTrackerPanel(){
         </div>
         <div class="form-field">
           <label>Fecha de inicio</label>
-          <input type="date" id="trackerStart" value="${new Date().toISOString().slice(0,10)}">
+          ${dateTextFieldHtml("trackerStart", new Date().toISOString().slice(0,10))}
         </div>
       </div>
       <button class="primary-btn" onclick="createOrUpdateTracker()">Crear tracker</button>
@@ -5010,7 +5166,7 @@ function renderTrackerPanel(){
           </div>
           <div class="form-field">
             <label>Fecha de inicio</label>
-            <input type="date" id="trackerStart" value="${t.startDate}">
+            ${dateTextFieldHtml("trackerStart", t.startDate)}
           </div>
         </div>
         <button class="primary-btn" onclick="if(confirm('Esto recalcula los días del tracker según la nueva configuración. Las marcas manuales en fechas que ya no coincidan se pierden. ¿Continuar?')) createOrUpdateTracker()">Actualizar tracker</button>
@@ -5357,23 +5513,16 @@ function regDraftSummary(d){
   return `${fecha} · ${routineLabel}`;
 }
 function showRegToast(){
-  const el = document.getElementById("regToast");
   const d = readRegistroForm() || loadRegistroDraft();
-  if(!el || !registroDraftHasContent(d)) return;
-  el.innerHTML = `
-    <button class="reg-toast-main" onclick="regToastGo()">
-      <span class="reg-toast-title">Registro sin guardar</span>
-      <span class="reg-toast-sub">${escapeHtml(regDraftSummary(d))} · tocá para volver</span>
-    </button>
-    <button class="reg-toast-x" onclick="hideRegToast()" aria-label="Cerrar aviso" title="Cerrar aviso">×</button>`;
-  el.classList.add("show");
+  if(!registroDraftHasContent(d)) return;
+  pushNotif({ id:"reg-draft", cat:"registro", title:"Registro sin guardar",
+    body: regDraftSummary(d) + " · tocá para volver", popup:true,
+    actionLabel:"Ir al registro", action:()=>{ regToastGo(); } });
 }
-function hideRegToast(){
-  const el = document.getElementById("regToast");
-  if(el) el.classList.remove("show");
-}
+function hideRegToast(){ clearNotif("reg-draft"); }
 function regToastGo(){
   hideRegToast();
+  _notifOpen = false; renderNotifCenter();
   if(_currentView !== "registro") showView("registro");
   setTimeout(()=>{
     const notas = document.getElementById("newLogNotas");
@@ -7152,10 +7301,111 @@ function renderTimerRunningHtml(){
   `;
 }
 
-function dismissFileOriginWarning(){
-  const el = document.getElementById("fileOriginWarning");
-  if(el) el.style.display = "none";
+function dismissFileOriginWarning(){ clearNotif("file-origin"); }
+// ============================================================
+// CENTRO DE NOTIFICACIONES: un solo lugar, con categorías, para todos los avisos
+// (respaldo, registro sin guardar, archivo local). Los avisos viejos (barra de
+// exportar, cartel flotante del registro, cartel de archivo local) ahora pasan
+// por acá. Un aviso con popup:true aparece unos segundos sin tapar nada y luego
+// queda guardado en la campana.
+// ============================================================
+const NOTIF_CATS = {
+  respaldo: { label:"Respaldo",        c:"#4CC9F0", icon:'<path d="M12 3.5v11"/><path d="M8 11l4 4 4-4"/><path d="M4.5 16.5v1.5a2.5 2.5 0 002.5 2.5h10a2.5 2.5 0 002.5-2.5v-1.5"/>' },
+  registro: { label:"Registro diario", c:"#FF8A4C", icon:'<path d="M4 20l4.2-1 10.3-10.3a2 2 0 000-2.8l-.4-.4a2 2 0 00-2.8 0L5 15.8 4 20z"/><path d="M13.5 7.5l3 3"/>' },
+  sistema:  { label:"Sistema",         c:"#FF5FA2", icon:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/>' },
+};
+const NOTIFS = [];
+const _notifActions = {};
+const _notifCatClosed = {};
+let _notifOpen = false, _notifPopupId = null, _notifPopupTimer = null, _notifPulse = false;
+
+function pushNotif(n){
+  const i = NOTIFS.findIndex(x=>x.id === n.id);
+  const item = { cat:"sistema", ...n, ts: Date.now() };
+  if(i >= 0) NOTIFS[i] = item; else NOTIFS.push(item);
+  _notifActions[n.id] = n.action || null;
+  if(n.popup && !_notifOpen){
+    _notifPopupId = n.id;
+    clearTimeout(_notifPopupTimer);
+    _notifPopupTimer = setTimeout(()=>{ _notifPopupId = null; renderNotifCenter(); }, 12000);
+  }
+  _notifPulse = true;
+  renderNotifCenter();
+  setTimeout(()=>{ _notifPulse = false; }, 4500);
 }
+function clearNotif(id){
+  const i = NOTIFS.findIndex(x=>x.id === id);
+  if(i < 0) return;
+  NOTIFS.splice(i, 1);
+  delete _notifActions[id];
+  if(_notifPopupId === id) _notifPopupId = null;
+  renderNotifCenter();
+}
+function notifClearAll(){
+  NOTIFS.length = 0; _notifPopupId = null; renderNotifCenter();
+}
+function notifToggle(){
+  _notifOpen = !_notifOpen;
+  _notifPopupId = null; clearTimeout(_notifPopupTimer);
+  renderNotifCenter();
+}
+function notifToggleCat(k){ _notifCatClosed[k] = !_notifCatClosed[k]; renderNotifCenter(); }
+function notifRun(id){
+  const fn = _notifActions[id];
+  _notifOpen = false; _notifPopupId = null; clearTimeout(_notifPopupTimer);
+  renderNotifCenter();
+  if(typeof fn === "function"){ try{ fn(); }catch(e){ console.error(e); } }
+}
+function notifPopupHover(on){
+  clearTimeout(_notifPopupTimer);
+  if(!on && _notifPopupId) _notifPopupTimer = setTimeout(()=>{ _notifPopupId = null; renderNotifCenter(); }, 6000);
+}
+function notifItemHtml(n, inPopup){
+  const cat = NOTIF_CATS[n.cat] || NOTIF_CATS.sistema;
+  const act = n.actionLabel ? `<div class="notif-actions"><button class="notif-act" onclick="event.stopPropagation(); notifRun('${n.id}')">${escapeHtml(n.actionLabel)}</button></div>` : "";
+  const clickable = typeof _notifActions[n.id] === "function";
+  return `<div class="notif-item ${clickable ? "clickable" : ""}" style="--nc:${cat.c}" ${clickable ? `onclick="notifRun('${n.id}')"` : ""}>
+    <div class="notif-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${cat.icon}</svg></div>
+    <div class="notif-txt"><div class="notif-title">${escapeHtml(n.title)}</div><div class="notif-sub">${escapeHtml(n.body || "")}</div>${act}</div>
+    <button class="notif-x" onclick="event.stopPropagation(); clearNotif('${n.id}')" aria-label="Descartar" title="Descartar">×</button>
+  </div>`;
+}
+function renderNotifCenter(){
+  const root = document.getElementById("notifCenter");
+  if(!root) return;
+  const total = NOTIFS.length;
+  let panel = "";
+  if(_notifOpen){
+    const groups = Object.keys(NOTIF_CATS).map(k=>({k, items: NOTIFS.filter(n=>n.cat === k)})).filter(g=>g.items.length);
+    const body = groups.length ? groups.map(g=>{
+      const cat = NOTIF_CATS[g.k], closed = !!_notifCatClosed[g.k];
+      return `<button class="notif-cat-head ${closed ? "closed" : ""}" onclick="notifToggleCat('${g.k}')" style="color:${cat.c}">
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          ${cat.label}<span class="cnt">${g.items.length}</span></button>`
+        + (closed ? "" : g.items.map(n=>notifItemHtml(n)).join(""));
+    }).join("") : `<div class="notif-empty">Sin notificaciones por ahora.</div>`;
+    panel = `<div class="notif-panel" role="dialog" aria-label="Notificaciones">
+      <div class="notif-head"><h3>Notificaciones</h3>${total ? `<button onclick="notifClearAll()">Borrar todo</button>` : ""}</div>
+      <div class="notif-body">${body}</div></div>`;
+  }
+  let popup = "";
+  if(!_notifOpen && _notifPopupId){
+    const n = NOTIFS.find(x=>x.id === _notifPopupId);
+    if(n) popup = `<div class="notif-popup notif-popup-main" role="status" onmouseenter="notifPopupHover(true)" onmouseleave="notifPopupHover(false)" onclick="notifRun('${n.id}')">${notifItemHtml(n, true)}</div>`;
+  }
+  root.innerHTML = `${panel}${popup}
+    <button class="notif-launcher ${total ? "has-items" : ""} ${_notifPulse && total ? "pulse" : ""}" onclick="notifToggle()" aria-label="Notificaciones" title="Notificaciones">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17.5h12l-1.4-2.3V11a4.6 4.6 0 00-9.2 0v4.2L6 17.5z"/><path d="M10 20.3a2.2 2.2 0 004 0"/></svg>
+      ${total ? `<span class="notif-badge">${total}</span>` : ""}
+    </button>`;
+}
+document.addEventListener("click", (e)=>{
+  // composedPath() se calcula al despachar el clic, así que sigue válido aunque el panel se redibuje
+  const path = (e.composedPath && e.composedPath()) || [];
+  const dentro = path.some(el => el && el.id === "notifCenter");
+  if(_notifOpen && !dentro){ _notifOpen = false; renderNotifCenter(); }
+});
+
 // Recordatorio de exportar: si pasaron 3+ días desde la última exportación
 // manual (.json), lo avisamos al guardar. No bloquea nada, solo informa.
 const EXPORT_REMINDER_DAYS = 3;
@@ -7168,15 +7418,11 @@ function markExportReminder(){
   }catch(e){}
 }
 function showExportReminder(days){
-  const bar = document.getElementById("exportReminderBar");
-  if(!bar) return;
-  bar.textContent = `Hace ${days} días que no exportás una copia (.json) de respaldo.`;
-  bar.style.display = "flex";
+  pushNotif({ id:"export-reminder", cat:"respaldo", title:"Copia de respaldo",
+    body:`Hace ${days} días que no exportás una copia (.json) de respaldo.`,
+    actionLabel:"Exportar ahora", action:()=>{ exportJSON(); } });
 }
-function dismissExportReminder(){
-  const el = document.getElementById("exportReminderBar");
-  if(el) el.style.display = "none";
-}
+function dismissExportReminder(){ clearNotif("export-reminder"); }
 function checkExportReminderOnLoad(){
   try{
     const last = Number(localStorage.getItem("btc_lastExport") || 0);
@@ -7189,9 +7435,11 @@ function checkExportReminderOnLoad(){
 document.addEventListener("DOMContentLoaded", async ()=>{
   initPlexusBackground();
   if(location.protocol === "file:"){
-    const w = document.getElementById("fileOriginWarning");
-    if(w) w.style.display = "flex";
+    pushNotif({ id:"file-origin", cat:"sistema", title:"Estás usando el archivo local",
+      body:"Google Drive no puede conectar desde acá y tus datos quedan aparte de la versión online.",
+      actionLabel:"Abrir versión online", action:()=>{ window.open("https://juandoor.github.io/Bit-cora-Entrenamiento/", "_blank", "noopener"); clearNotif("file-origin"); } });
   }
+  renderNotifCenter();
   STATE = await loadState();
   if(!STATE.logs) STATE.logs = JSON.parse(JSON.stringify(EMPTY_LOGS));
   if(!STATE.muro) STATE.muro = {cover:null, avatar:null, coverAspect:null};
