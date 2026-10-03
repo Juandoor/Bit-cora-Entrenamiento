@@ -941,12 +941,12 @@
     display:grid; place-items:center; color: var(--text);
     background: rgba(30,43,37,0.72); border:1px solid rgba(255,255,255,0.16);
     -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
-    box-shadow: 0 8px 22px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,138,76,0.18), 0 0 18px rgba(255,95,162,0.18);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.45);
     transition: transform .15s ease, box-shadow .2s ease;
   }
   .notif-launcher:hover{ transform: translateY(-2px); }
-  .notif-launcher svg{ width:21px; height:21px; }
-  .notif-launcher.has-items{ box-shadow: 0 8px 22px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,138,76,0.5), 0 0 22px rgba(255,95,162,0.35); }
+  .notif-launcher svg{ width:26px; height:26px; }
+  .notif-launcher.has-items{ box-shadow: 0 8px 22px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,138,76,0.5); }
   .notif-badge{
     position:absolute; top:-4px; right:-4px; min-width:19px; height:19px; padding:0 5px; border-radius:10px;
     display:grid; place-items:center; font-size:11px; font-weight:800; color:#fff;
@@ -964,12 +964,6 @@
     overflow:hidden; animation: notifIn .22s ease;
   }
   @keyframes notifIn{ from{ opacity:0; transform: translateY(10px) scale(.98);} to{ opacity:1; transform:none;} }
-  .notif-panel::before, .notif-popup::before{
-    content:""; position:absolute; inset:0; pointer-events:none; opacity:.55;
-    background: radial-gradient(120% 70% at 0% 0%, rgba(255,138,76,0.30), transparent 60%),
-                radial-gradient(100% 70% at 100% 10%, rgba(255,95,162,0.22), transparent 60%),
-                radial-gradient(120% 80% at 50% 120%, rgba(76,201,240,0.24), transparent 60%);
-  }
   .notif-panel > *, .notif-popup > *{ position:relative; }
   .notif-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px 8px; }
   .notif-head h3{ margin:0; font-family: var(--font-body); font-size:14px; font-weight:800; letter-spacing:.2px; }
@@ -992,7 +986,6 @@
   .notif-ico{
     flex:0 0 auto; width:38px; height:38px; border-radius:12px; display:grid; place-items:center; color:#fff;
     background: linear-gradient(145deg, var(--nc), color-mix(in srgb, var(--nc) 55%, #000));
-    box-shadow: 0 6px 14px color-mix(in srgb, var(--nc) 38%, transparent);
   }
   .notif-ico svg{ width:20px; height:20px; }
   .notif-txt{ flex:1; min-width:0; }
@@ -1012,6 +1005,97 @@
   .notif-popup .notif-item{ margin:0; background: rgba(14,22,18,0.4); }
   .notif-popup-main{ cursor:pointer; }
   @media print{ .notif-center{ display:none !important; } }
+
+  /* ===== Carrusel de bienvenida ===== */
+  .onb-overlay{ position:fixed; inset:0; z-index:300; display:none; align-items:center; justify-content:center; padding:18px;
+    background: rgba(6,10,8,0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); font-family: var(--font-body); }
+  .onb-overlay.open{ display:flex; animation: notifIn .25s ease; }
+  .onb-card{ position:relative; width:min(400px, 100%); border-radius:24px; color: var(--text); overflow:hidden;
+    background: linear-gradient(160deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03)), rgba(14,22,18,0.92);
+    border:1px solid rgba(255,255,255,0.16); box-shadow: 0 24px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.14); }
+  .onb-skip{ position:absolute; top:12px; right:14px; z-index:2; background:transparent; border:none; color: var(--text-soft); font-size:12px; font-weight:700; cursor:pointer; padding:4px 8px; border-radius:8px; }
+  .onb-skip:hover{ color: var(--text); background: rgba(255,255,255,0.08); }
+  .onb-viewport{ overflow:hidden; }
+  .onb-track{ display:flex; transition: transform .35s ease; }
+  .onb-slide{ flex:0 0 100%; box-sizing:border-box; padding:46px 26px 18px; text-align:center; min-height:300px; }
+  .onb-ico{ width:68px; height:68px; margin:0 auto 18px; border-radius:20px; display:grid; place-items:center; color:#fff;
+    background: linear-gradient(145deg, var(--oc), color-mix(in srgb, var(--oc) 55%, #000)); }
+  .onb-ico svg{ width:34px; height:34px; }
+  .onb-slide h3{ margin:0 0 10px; font-size:19px; font-weight:800; }
+  .onb-slide p{ margin:0 0 8px; font-size:13.5px; line-height:1.5; color: var(--text-soft); }
+  .onb-slide p b{ color: var(--text); }
+  .onb-foot{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 20px 20px; }
+  .onb-dots{ display:flex; gap:6px; }
+  .onb-dot{ width:7px; height:7px; border-radius:50%; background: rgba(255,255,255,0.22); transition: all .2s ease; }
+  .onb-dot.on{ width:20px; border-radius:4px; background: linear-gradient(135deg,#FF8A4C,#FF5FA2); }
+  .onb-btns{ display:flex; gap:8px; }
+  .onb-btn{ font-family: var(--font-body); font-size:12.5px; font-weight:800; padding:8px 16px; border-radius:16px; cursor:pointer; border:none; color:#fff;
+    background: linear-gradient(135deg,#FF8A4C,#FF5FA2); }
+  .onb-btn.ghost{ background: rgba(255,255,255,0.10); color: var(--text); }
+  .onb-btn:hover{ filter:brightness(1.12); }
+  .onb-btn[hidden]{ display:none; }
+  .onb-arrow{ position:absolute; top:112px; z-index:2; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; cursor:pointer;
+    color: var(--text); background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.14); padding:0; }
+  .onb-arrow svg{ width:18px; height:18px; }
+  .onb-arrow:hover{ background: rgba(255,255,255,0.16); }
+  .onb-arrow.prev{ left:10px; } .onb-arrow.next{ right:10px; }
+  .onb-arrow[hidden]{ display:none; }
+  .onb-dot{ padding:0; border:none; cursor:pointer; }
+  /* ===== Biblioteca (pestaña nueva): lista vertical a la izquierda + detalle estilo "My Courses" ===== */
+  .bib{ --bib-ac:#8B7CF6; --bib-ac2:#C77DDB; display:grid; grid-template-columns: 270px 1fr; gap:18px; align-items:start; }
+  .bib.has-sel{ grid-template-columns: 250px minmax(0,1fr) 270px; }
+  .bib-list{ position:sticky; top:150px; display:flex; flex-direction:column; gap:10px; }
+  .bib-list-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 4px; }
+  .bib-list-head h3{ margin:0; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color: var(--text-soft); font-weight:800; }
+  .bib-add{ width:30px; height:30px; border-radius:50%; border:1px solid rgba(255,255,255,0.16); background: rgba(139,124,246,0.18); color: var(--text); font-size:18px; line-height:1; cursor:pointer; display:grid; place-items:center; padding:0; }
+  .bib-add:hover{ background: rgba(139,124,246,0.34); }
+  .bib-item{ display:flex; align-items:center; gap:11px; text-align:left; width:100%; cursor:pointer; color: var(--text); font-family: inherit;
+    padding:11px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(135deg, rgba(139,124,246,0.14), rgba(199,125,219,0.06)); transition: transform .15s ease, border-color .15s ease, background .15s ease; }
+  .bib-item:hover{ transform: translateX(2px); border-color: rgba(139,124,246,0.5); }
+  .bib-item.active{ border-color: var(--bib-ac); background: linear-gradient(135deg, rgba(139,124,246,0.38), rgba(199,125,219,0.18)); box-shadow: 0 8px 22px rgba(0,0,0,0.35); }
+  .bib-item-ic{ flex:0 0 auto; width:34px; height:34px; border-radius:11px; display:grid; place-items:center; color:#fff; background: linear-gradient(145deg, var(--bib-ac), var(--bib-ac2)); }
+  .bib-item-ic svg{ width:18px; height:18px; }
+  .bib-item-txt{ min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .bib-item-title{ font-size:13px; font-weight:700; line-height:1.25; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .bib-item-src{ font-size:10.5px; color: var(--text-dim); letter-spacing:.04em; }
+  .bib-empty{ border:1px dashed rgba(255,255,255,0.16); border-radius:20px; padding:48px 24px; text-align:center; color: var(--text-dim); font-size:13.5px; min-height:180px; display:flex; align-items:center; justify-content:center; }
+  .bib-main{ min-width:0; display:flex; flex-direction:column; gap:14px; }
+  .bib-main-bar{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .bib-main-bar h3{ margin:0; font-size:22px; font-weight:800; color: var(--bib-ac); }
+  .bib-bar-btns{ display:flex; gap:8px; }
+  .bib-btn{ font-family: inherit; font-size:12px; font-weight:700; color: var(--text); cursor:pointer; padding:7px 14px; border-radius:14px; border:1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.07); }
+  .bib-btn:hover{ background: rgba(255,255,255,0.14); }
+  .bib-btn.danger:hover{ background: rgba(232,113,74,0.3); }
+  .bib-main .tecnica-collapsible.panel{ border-radius:22px; border:1px solid rgba(139,124,246,0.35); background: linear-gradient(135deg, rgba(139,124,246,0.16), rgba(199,125,219,0.07)); box-shadow: 0 14px 34px rgba(0,0,0,0.38); }
+  .bib-main [contenteditable="true"]:empty::before{ content: attr(data-ph); color: var(--text-dim); }
+  .bib-side{ position:sticky; top:150px; display:flex; flex-direction:column; gap:12px; }
+  .bib-side-card{ border-radius:20px; padding:16px; border:1px solid rgba(255,255,255,0.1); background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.025)); }
+  .bib-side-card h4{ margin:0 0 10px; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color: var(--bib-ac); font-weight:800; }
+  .bib-meta-row{ display:flex; justify-content:space-between; gap:10px; padding:7px 0; border-top:1px solid rgba(255,255,255,0.07); font-size:12.5px; }
+  .bib-meta-row:first-of-type{ border-top:none; }
+  .bib-meta-row span:first-child{ color: var(--text-dim); }
+  .bib-meta-row span:last-child{ text-align:right; font-weight:600; min-width:0; overflow-wrap:anywhere; }
+  @media (max-width: 860px){
+    .bib, .bib.has-sel{ grid-template-columns: 1fr; }
+    .bib-list, .bib-side{ position:static; }
+    .bib-list{ flex-direction:row; flex-wrap:wrap; }
+    .bib-list-head{ width:100%; }
+    .bib-item{ width:calc(50% - 5px); }
+  }
+  .bib-group{ margin:4px 4px 0; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color: var(--text-dim); font-weight:700; }
+  .bib-list-head.priv{ margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.1); }
+  .bib-h-ic{ display:inline-grid; vertical-align:-3px; margin-right:6px; }
+  .bib-h-ic svg{ width:14px; height:14px; }
+  .bib-priv-empty{ font-size:12px; line-height:1.5; color: var(--text-dim); padding:12px; border:1px dashed rgba(255,255,255,0.16); border-radius:14px; }
+  .bib-load{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .bib-input{ flex:1 1 220px; min-width:0; font-family: inherit; font-size:12.5px; color: var(--text); padding:8px 12px; border-radius:14px; border:1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.05); }
+  .bib-input:focus{ outline:none; border-color: var(--bib-ac); }
+  .bib-msg{ flex:1 0 100%; font-size:11.5px; color: var(--text-soft); }
+  .bib-msg:empty{ display:none; }
+  .bib-meta-row a{ color: var(--bib-ac); text-decoration:none; }
+  .bib-meta-row a:hover{ text-decoration:underline; }
+  @media print{ .onb-overlay{ display:none !important; } }
   .reg-toast{
     position:fixed; left:20px; bottom:56px; z-index:120;
     display:flex; align-items:stretch; max-width:min(330px, calc(100vw - 110px));
@@ -2024,6 +2108,7 @@
     <button class="tab-btn" data-view="calentamiento">Calentamiento / Enfriamiento</button>
     <button class="tab-btn" data-view="tecnica">Técnica y prioridades</button>
     <button class="tab-btn" data-view="estandar">Estándar de repeticiones</button>
+    <button class="tab-btn" data-view="biblioteca">Biblioteca</button>
     <button class="tab-btn" data-view="registro">Registro diario</button>
     <button class="tab-btn" data-view="semanal">Conclusiones semanales</button>
   </nav>
@@ -2041,6 +2126,7 @@
   <div class="view" id="view-calentamiento"></div>
   <div class="view" id="view-tecnica"></div>
   <div class="view" id="view-estandar"></div>
+  <div class="view" id="view-biblioteca"></div>
   <div class="view" id="view-registro"></div>
   <div class="view" id="view-semanal"></div>
 </div>
@@ -2584,11 +2670,17 @@ function mergeMissingDefaults(state){
     if(state && DEFAULT_DATA.tecnica){
       if(!state.tecnica) state.tecnica = JSON.parse(JSON.stringify(DEFAULT_DATA.tecnica));
       else {
+        const hadBib = "biblioteca" in state.tecnica;
         Object.keys(DEFAULT_DATA.tecnica).forEach(function(key){
           if(!(key in state.tecnica)){
             state.tecnica[key] = JSON.parse(JSON.stringify(DEFAULT_DATA.tecnica[key]));
           }
         });
+        // Migración única: si Juan ya había editado "Fuerza vs. Potencia" en Técnica, esa versión pasa a la Biblioteca
+        if(!hadBib && state.tecnica.fuerzaVsPotencia && state.tecnica.fuerzaVsPotencia.contenido){
+          const bc = (state.tecnica.biblioteca.cards || []).find(x=>x.id === "fuerza_vs_potencia");
+          if(bc && bc.contenido !== state.tecnica.fuerzaVsPotencia.contenido) bc.contenido = state.tecnica.fuerzaVsPotencia.contenido;
+        }
       }
     }
   }catch(e){ console.error("Error completando campos nuevos de tecnica", e); }
@@ -4067,7 +4159,11 @@ const SETTINGS_I18N = {
     autosaveDesc: "Si dejás un registro a medio llenar, te pregunta si querés guardarlo o descartarlo. Si está apagado, el borrador se conserva igual en este dispositivo.",
     autosaveLeave: "Al salir de la pestaña Registro", autosaveClose: "Al cerrar o recargar la app",
     autosaveCloseDesc: "Con F5 o Ctrl+R te consulta antes de recargar. Al cerrar la pestaña o con el botón de recargar del navegador no se puede mostrar una consulta propia: el borrador queda guardado y te pregunta apenas volvés a abrir la app.",
-    autosaveIdle: "Tras un rato de inactividad", autosaveIdleMin: "Minutos de inactividad"
+    autosaveIdle: "Tras un rato de inactividad", autosaveIdleMin: "Minutos de inactividad",
+    notifTitle: "Notificaciones",
+    notifDesc: "Una notificación de alta prioridad vuelve a aparecer aunque la borres con la ×, una vez pasado el tiempo que elijas. Se resuelve sola cuando hacés lo que pide.",
+    notifHigh: "Alta prioridad", notifDelay: "Reaparece tras",
+    notifBackup: "Copia de respaldo", notifReg: "Registro sin guardar", notifLocal: "Archivo local"
   },
   en: {
     title: "Settings", account: "Account", email: "Email",
@@ -4098,7 +4194,11 @@ const SETTINGS_I18N = {
     autosaveDesc: "If you leave a log half-filled, it asks whether to save or discard it. When off, the draft is still kept on this device.",
     autosaveLeave: "When leaving the Log tab", autosaveClose: "When closing or reloading the app",
     autosaveCloseDesc: "With F5 or Ctrl+R it asks before reloading. When closing the tab or using the browser reload button a custom prompt is not possible: the draft is kept and it asks as soon as you reopen the app.",
-    autosaveIdle: "After a period of inactivity", autosaveIdleMin: "Minutes of inactivity"
+    autosaveIdle: "After a period of inactivity", autosaveIdleMin: "Minutes of inactivity",
+    notifTitle: "Notifications",
+    notifDesc: "A high-priority notification comes back even if you dismiss it with the ×, after the time you choose. It resolves itself once you do what it asks.",
+    notifHigh: "High priority", notifDelay: "Reappears after",
+    notifBackup: "Backup copy", notifReg: "Unsaved log", notifLocal: "Local file"
   }
 };
 function defaultSettings(){
@@ -4112,6 +4212,7 @@ function defaultSettings(){
     idioma: (function(){ try{ return localStorage.getItem("btc_idioma") || "es"; }catch(e){ return "es"; } })(),
     cuenta: { accounts: [], activeIndex: -1 },
     registro: { autosave: false, onLeaveTab: true, onClose: true, onIdle: true, idleMin: 10 },
+    notificaciones: { "export-reminder": { high:false, delay:3600000 }, "reg-draft": { high:false, delay:3600000 }, "file-origin": { high:false, delay:3600000 } },
     sonido: { modo: "simple", finalCount: 3, skipLastRest: true, fullscreenTimerEnabled: true, colores, coloresGlobal, phaseSound, finalCountSound: { family:"beep", variant:"short" } }
   };
 }
@@ -4146,6 +4247,9 @@ function ensureSettings(){
   delete sonido.beeps;
   STATE.settings.sonido = sonido;
   STATE.settings.registro = Object.assign({}, d.registro, STATE.settings.registro || {});
+  const nPrev = STATE.settings.notificaciones || {};
+  STATE.settings.notificaciones = {};
+  Object.keys(d.notificaciones).forEach(k=>{ STATE.settings.notificaciones[k] = Object.assign({}, d.notificaciones[k], nPrev[k] || {}); });
   applyPhaseColors();
 }
 function st(){ return SETTINGS_I18N[(STATE.settings && STATE.settings.idioma) || "es"]; }
@@ -4280,6 +4384,7 @@ function settingsSetLanguage(lang){
   try{ localStorage.setItem("btc_idioma", lang); }catch(e){}
   saveState(true);
   renderSettingsModal();
+  renderNotifCenter();
 }
 
 // ---- Cuenta: multi-perfil, igual que cambiar de cuenta en Play Store ----
@@ -4779,6 +4884,43 @@ function renderRegistroSection(r, T){
     </div>
   </div>`;
 }
+function renderNotifSettingsSection(n, T){
+  const types = [["export-reminder", T.notifBackup], ["reg-draft", T.notifReg], ["file-origin", T.notifLocal]];
+  const sel = "background:var(--surface-3); color:var(--text); border:1px solid var(--line-soft); border-radius:8px; padding:4px 8px; font-size:12px";
+  return `
+  <div class="settings-section">
+    <div class="settings-section-head"><h2>${T.notifTitle}</h2></div>
+    <div class="settings-row"><span class="settings-row-label" style="max-width:100%; font-size:11px; color:var(--text-dim); font-weight:400">${T.notifDesc}</span></div>
+    ${types.map(([id, label])=>{
+      const pr = n[id];
+      return `
+    <div class="settings-row">
+      <span class="settings-row-label">${label}<br><span style="font-size:10.5px; color:var(--text-dim); font-weight:400">${T.notifHigh}</span></span>
+      <button class="settings-toggle ${pr.high?'on':''}" onclick="settingsToggleNotifHigh('${id}')" aria-label="${label} — ${T.notifHigh}"></button>
+    </div>
+    <div class="settings-row" style="padding-left:12px; opacity:${pr.high?1:0.45}; pointer-events:${pr.high?'auto':'none'}">
+      <span class="settings-row-label">${T.notifDelay}</span>
+      <select onchange="settingsSetNotifDelay('${id}', this.value)" style="${sel}">
+        ${NOTIF_DELAYS.map(ms=>`<option value="${ms}" ${Number(pr.delay)===ms?'selected':''}>${notifDelayLabel(ms)}</option>`).join("")}
+      </select>
+    </div>`;
+    }).join("")}
+  </div>`;
+}
+function settingsToggleNotifHigh(id){
+  ensureSettings();
+  const pr = STATE.settings.notificaciones[id];
+  pr.high = !pr.high;
+  if(!pr.high) notifSnoozeClear(id);
+  saveState(true);
+  renderSettingsModal();
+}
+function settingsSetNotifDelay(id, v){
+  ensureSettings();
+  STATE.settings.notificaciones[id].delay = Math.max(60000, parseInt(v, 10) || 3600000);
+  saveState(true);
+  renderSettingsModal();
+}
 function settingsToggleRegistro(key){
   ensureSettings();
   STATE.settings.registro[key] = !STATE.settings.registro[key];
@@ -4807,6 +4949,7 @@ function renderSettingsModal(){
     </div>
     ${renderAccountSection(STATE.settings, T)}
     ${renderRegistroSection(STATE.settings.registro, T)}
+    ${renderNotifSettingsSection(STATE.settings.notificaciones, T)}
     ${renderSoundSection(STATE.settings.sonido, T)}
   `;
 }
@@ -4861,6 +5004,258 @@ function saveSimpleList(key, container, selector){
   saveState();
 }
 
+// ============================================================
+// BIBLIOTECA (pestaña nueva, junto a Técnica y prioridades)
+// Dos secciones en la columna izquierda:
+//   · "Biblioteca": contenido general que trae la app (editable por el usuario).
+//   · "Biblioteca Privada": lo que el usuario crea o carga; nunca se mezcla con lo general.
+// Al elegir una tarjeta la interfaz pasa a 3 zonas (lista · detalle · ficha), como "My Courses".
+// Todo se guarda en STATE.tecnica.biblioteca (cuenta del usuario + memoria local del dispositivo);
+// los cambios del usuario jamás tocan data.js, así que no afectan a otros usuarios.
+// ============================================================
+let _bibSel = null, _bibMsg = "";
+const BIB_BOOK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 016.5 3H20v16H6.5A2.5 2.5 0 004 21.5v-16z"/><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/></svg>';
+const BIB_LOCK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>';
+function bibData(){
+  const t = STATE.tecnica;
+  if(!t.biblioteca || typeof t.biblioteca !== "object" || !Array.isArray(t.biblioteca.cards)){
+    t.biblioteca = JSON.parse(JSON.stringify((DEFAULT_DATA.tecnica && DEFAULT_DATA.tecnica.biblioteca) || { cards: [] }));
+  }
+  if(!t.biblioteca.privada || !Array.isArray(t.biblioteca.privada.cards)) t.biblioteca.privada = { cards: [] };
+  return t.biblioteca;
+}
+function bibFind(id){
+  const d = bibData();
+  let i = d.cards.findIndex(c=>c.id === id);
+  if(i >= 0) return { card: d.cards[i], i, priv: false, base: `tecnica.biblioteca.cards.${i}` };
+  i = d.privada.cards.findIndex(c=>c.id === id);
+  if(i >= 0) return { card: d.privada.cards[i], i, priv: true, base: `tecnica.biblioteca.privada.cards.${i}` };
+  return null;
+}
+function bibFmtDate(v){
+  if(!v) return "—";
+  const d = new Date(v);
+  return isNaN(d) ? String(v) : d.toLocaleDateString(nlang() === "en" ? "en-GB" : "es-AR", { day:"numeric", month:"short", year:"numeric" });
+}
+function bibSizeText(cd){
+  if(cd.tamano){
+    const b = Number(cd.tamano);
+    if(b >= 1048576) return (b / 1048576).toFixed(1) + " MB";
+    if(b >= 1024) return Math.round(b / 1024) + " KB";
+    return b + " B";
+  }
+  const n = (cd.contenido || "").length;
+  return n ? n.toLocaleString(nlang() === "en" ? "en-GB" : "es-AR") + nl(" caracteres"," characters") : "—";
+}
+
+// ---- Lectura de la dirección (URL, ruta o archivo): completa SOLO la ficha, nunca el contenido ----
+const BIB_EXT_TIPO = {
+  pdf:"PDF", jpg:"Imagen", jpeg:"Imagen", png:"Imagen", gif:"Imagen", webp:"Imagen", svg:"Imagen", bmp:"Imagen",
+  mp4:"Video", webm:"Video", mov:"Video", mkv:"Video", avi:"Video", mp3:"Audio", wav:"Audio", m4a:"Audio", ogg:"Audio",
+  doc:"Documento", docx:"Documento", odt:"Documento", txt:"Texto", md:"Texto", xls:"Planilla", xlsx:"Planilla", csv:"Planilla", ppt:"Presentación", pptx:"Presentación"
+};
+function bibTypeFrom(ext, mime){
+  ext = (ext || "").toLowerCase();
+  if(BIB_EXT_TIPO[ext]) return BIB_EXT_TIPO[ext];
+  if(mime){
+    if(mime.startsWith("image/")) return "Imagen";
+    if(mime.startsWith("video/")) return "Video";
+    if(mime.startsWith("audio/")) return "Audio";
+    if(mime === "application/pdf") return "PDF";
+  }
+  return "";
+}
+function bibDecode(x){ try{ return decodeURIComponent(x); }catch(e){ return x; } }
+function bibNiceTitle(x){
+  let t = bibDecode(x || "").replace(/\.[a-z0-9]{2,5}$/i, "").replace(/[-_+]+/g, " ").replace(/\s+/g, " ").trim();
+  if(/^(watch|index|home|embed|view|p|reel|reels|status|article|articles|post|posts|wiki|s|search|results)$/i.test(t)) return "";
+  if(/^[0-9a-f-]{16,}$/i.test(t) || /^\d+$/.test(t)) return "";
+  if(/^[A-Za-z0-9_]{6,}$/.test(x) && /\d/.test(x) && /[A-Za-z]/.test(x)) return ""; // códigos tipo ID de video / publicación
+  return t ? t.charAt(0).toUpperCase() + t.slice(1) : "";
+}
+function bibParseAddress(raw){
+  let s = (raw || "").trim().replace(/^["']+|["']+$/g, "");
+  if(!s) return null;
+  const out = { url: s, fuente:"", categoria:"", tipo:"", titulo:"" };
+  const isPath = /^([a-zA-Z]:[\\/]|\\\\|file:)/.test(s) || /^\/(?!\/)/.test(s);
+  if(isPath){
+    const name = bibDecode(s.replace(/^file:\/+/, "").split(/[\\/]/).filter(Boolean).pop() || "");
+    const ext = (name.match(/\.([a-z0-9]{2,5})$/i) || [])[1] || "";
+    out.titulo = bibNiceTitle(name);
+    out.fuente = nl("Archivo local","Local file");
+    out.categoria = nl("Archivo","File");
+    out.tipo = bibTypeFrom(ext);
+    return out;
+  }
+  if(!/^[a-z][a-z0-9+.-]*:\/\//i.test(s)) s = "https://" + s;
+  let u; try{ u = new URL(s); }catch(e){ return null; }
+  if(!/^https?:$/.test(u.protocol) || !u.hostname.includes(".")) return null;
+  out.url = u.href;
+  const host = u.hostname.toLowerCase().replace(/^www\./, "");
+  const parts = host.split(".");
+  const sld = parts.length > 2 && /^(com|co|org|gov|gob|edu|net)$/.test(parts[parts.length - 2]) ? parts[parts.length - 3] : parts[parts.length - 2];
+  const pretty = n => n === "x" ? "X" : (n.charAt(0).toUpperCase() + n.slice(1));
+  out.fuente = pretty(sld);
+  if(/(^|\.)wikipedia\.org$/.test(host)){ out.fuente = "Wikipedia"; out.categoria = nl("Enciclopedia","Encyclopedia"); }
+  else if(/(^|\.)youtube\.com$|^youtu\.be$/.test(host)){ out.fuente = "YouTube"; out.categoria = nl("Red social","Social media"); out.tipo = "Video"; }
+  else if(/(^|\.)vimeo\.com$/.test(host)){ out.fuente = "Vimeo"; out.tipo = "Video"; }
+  else if(/^(docs|drive|sheets|slides)\.google\.com$/.test(host)){ out.fuente = "Google Drive"; out.tipo = nl("Documento","Document"); }
+  else if(/(^|\.)(pubmed\.ncbi|ncbi)\.nlm\.nih\.gov$/.test(host)){ out.fuente = "PubMed"; out.categoria = nl("Artículo científico","Scientific article"); }
+  else if(/^scholar\.google\./.test(host)){ out.fuente = nl("Google Académico","Google Scholar"); out.categoria = nl("Artículo científico","Scientific article"); }
+  else if(/(^|\.)google\.[a-z.]+$/.test(host)){ out.fuente = "Google"; }
+  else if(/^(instagram|facebook|tiktok|x|twitter|threads|reddit|linkedin|pinterest|fb|snapchat|t)$/.test(sld)){ out.categoria = nl("Red social","Social media"); if(sld === "fb") out.fuente = "Facebook"; if(sld === "twitter") out.fuente = "X"; }
+  else if(/^(udemy|coursera|edx|khanacademy|domestika|skillshare|platzi|udacity|futurelearn)$/.test(sld)){ out.categoria = nl("Curso","Course"); }
+  else if(/(^|\.)(gov|gob|edu)(\.[a-z]{2})?$/.test(host) || /\.(gov|gob|edu)\.[a-z]{2}$/.test(host)){ out.categoria = nl("Página oficial","Official site"); }
+  else out.categoria = nl("Web","Web");
+  const segs = u.pathname.split("/").filter(Boolean);
+  const last = segs[segs.length - 1] || "";
+  const ext = (last.match(/\.([a-z0-9]{2,5})$/i) || [])[1] || "";
+  out.titulo = bibNiceTitle(last);
+  const t = bibTypeFrom(ext);
+  if(t) out.tipo = t;
+  if(!out.tipo) out.tipo = nl("Enlace","Link");
+  return out;
+}
+function bibFillCard(cd, p){
+  cd.auto = Array.isArray(cd.auto) ? cd.auto : [];
+  const filled = [];
+  ["fuente","categoria","tipo"].forEach(k=>{
+    if(p[k] && (!cd[k] || cd.auto.includes(k))){ cd[k] = p[k]; if(!cd.auto.includes(k)) cd.auto.push(k); filled.push(k); }
+  });
+  const dflt = ["Nueva tarjeta","New card",""];
+  if(p.titulo && (dflt.includes(cd.titulo) || cd.auto.includes("titulo"))){ cd.titulo = p.titulo; if(!cd.auto.includes("titulo")) cd.auto.push("titulo"); filled.push("titulo"); }
+  cd.modificado = new Date().toISOString();
+  return filled;
+}
+function bibApplyAddress(id, raw){
+  const f = bibFind(id); if(!f) return;
+  const p = bibParseAddress(raw);
+  if(!p){ _bibMsg = nl("No pude reconocer esa dirección. Probá con una URL (https://…) o la ruta de un archivo.", "I couldn't recognize that address. Try a URL (https://…) or a file path."); renderBiblioteca(); return; }
+  f.card.url = p.url;
+  delete f.card.tamano;
+  const filled = bibFillCard(f.card, p);
+  _bibMsg = filled.length ? nl("Ficha completada: ", "Details filled in: ") + filled.join(", ") + "." : nl("Dirección guardada; la ficha ya estaba completa.", "Address saved; the details were already filled in.");
+  saveState();
+  renderBiblioteca();
+}
+function bibApplyFile(id, file){
+  const f = bibFind(id); if(!f || !file) return;
+  const ext = (file.name.match(/\.([a-z0-9]{2,5})$/i) || [])[1] || "";
+  const p = { fuente: nl("Archivo local","Local file"), categoria: nl("Archivo","File"), tipo: bibTypeFrom(ext, file.type), titulo: bibNiceTitle(file.name) };
+  f.card.url = file.name;
+  f.card.tamano = file.size;
+  const filled = bibFillCard(f.card, p);
+  _bibMsg = nl("Ficha completada desde el archivo (solo se leen nombre, tipo y tamaño; el archivo no se guarda).", "Details filled in from the file (only name, type and size are read; the file is not stored).");
+  saveState();
+  renderBiblioteca();
+}
+
+function bibSelect(id){
+  _bibSel = (_bibSel === id) ? null : id;
+  _bibMsg = "";
+  if(_bibSel){
+    const cs = STATE.tecnica.collapseState || (STATE.tecnica.collapseState = {});
+    if(!(("bib_" + _bibSel) in cs)) cs["bib_" + _bibSel] = false; // el texto se despliega al tocar el título
+  }
+  try{ ensureUiState().bibSel = _bibSel; saveState("ui"); }catch(e){}
+  renderBiblioteca();
+}
+function bibAdd(){
+  const now = new Date().toISOString();
+  const cd = { id: uid("priv"), titulo: nl("Nueva tarjeta","New card"), contenido: "", fuente: "", categoria: "", tipo: "", autor: "", etiquetas: "", url: "", creado: now, modificado: now };
+  bibData().privada.cards.push(cd);
+  const cs = STATE.tecnica.collapseState || (STATE.tecnica.collapseState = {});
+  cs["bib_" + cd.id] = true;
+  _bibSel = cd.id; _bibMsg = "";
+  saveState();
+  renderBiblioteca();
+}
+function bibDelete(id){
+  const f = bibFind(id);
+  if(!f || !f.priv) return; // el contenido general se puede editar, no borrar
+  if(!confirm(nl("¿Eliminar la tarjeta \"" + f.card.titulo + "\"?", "Delete the card \"" + f.card.titulo + "\"?"))) return;
+  bibData().privada.cards.splice(f.i, 1);
+  if(_bibSel === id) _bibSel = null;
+  saveState();
+  renderBiblioteca();
+}
+function bibGroupsHtml(cards){
+  const m = new Map();
+  cards.forEach(cd=>{ const k = (cd.fuente || "").trim(); if(!m.has(k)) m.set(k, []); m.get(k).push(cd); });
+  const keys = Array.from(m.keys()).sort((a,b)=> (a === "") - (b === "") || a.localeCompare(b));
+  return keys.map(k=>`<div class="bib-group">${escapeHtml(k || nl("Sin fuente","No source"))}</div>` + m.get(k).map(cd=>`
+      <button class="bib-item ${cd.id === _bibSel ? "active" : ""}" data-bib-id="${cd.id}" onclick="bibSelect('${cd.id}')">
+        <span class="bib-item-ic">${cd.id.startsWith("priv_") ? BIB_LOCK_SVG : BIB_BOOK_SVG}</span>
+        <span class="bib-item-txt"><span class="bib-item-title">${escapeHtml(cd.titulo)}</span><span class="bib-item-src">${escapeHtml(cd.tipo || cd.categoria || "")}</span></span>
+      </button>`).join("")).join("");
+}
+function renderBiblioteca(){
+  const c = document.getElementById("view-biblioteca");
+  if(!c) return;
+  const d = bibData();
+  if(_bibSel && !bibFind(_bibSel)) _bibSel = null;
+  const f = _bibSel ? bibFind(_bibSel) : null;
+  const sel = f ? f.card : null;
+  const list = `
+    <div class="bib-list">
+      <div class="bib-list-head"><h3>${nl("Biblioteca","Library")}</h3></div>
+      ${bibGroupsHtml(d.cards)}
+      <div class="bib-list-head priv"><h3><span class="bib-h-ic">${BIB_LOCK_SVG}</span>${nl("Biblioteca Privada","Private Library")}</h3>
+        <button class="bib-add" onclick="bibAdd()" title="${nl("Nueva tarjeta privada","New private card")}" aria-label="${nl("Nueva tarjeta privada","New private card")}">+</button></div>
+      ${d.privada.cards.length ? bibGroupsHtml(d.privada.cards) : `<div class="bib-priv-empty">${nl("Acá guardás lo tuyo: tocá + para crear o cargar tu primera tarjeta. No se mezcla con la biblioteca general.","Keep your own things here: tap + to create or load your first card. It never mixes with the general library.")}</div>`}
+    </div>`;
+  let main = `<div class="bib-empty">${nl("Elegí una tarjeta de la izquierda para abrirla.","Pick a card on the left to open it.")}</div>`;
+  let side = "";
+  if(sel){
+    const k = f.base, id = sel.id;
+    const urlOk = /^https?:\/\//i.test(sel.url || "");
+    main = `
+    <div class="bib-main">
+      <div class="bib-main-bar"><h3>${f.priv ? nl("Mi biblioteca privada","My private library") : nl("Mi biblioteca","My library")}</h3>
+        <div class="bib-bar-btns">${f.priv ? `<button class="bib-btn danger" onclick="bibDelete('${id}')">${nl("Eliminar","Delete")}</button>` : ""}<button class="bib-btn" onclick="bibSelect('${id}')">${nl("Cerrar","Close")}</button></div></div>
+      <div class="bib-load">
+        <input id="bibAddr" class="bib-input" value="${escapeHtml(sel.url || "")}" placeholder="${nl("Pegá una dirección (URL) o la ruta de un archivo para completar la ficha","Paste an address (URL) or a file path to fill in the details")}"
+          onkeydown="if(event.key==='Enter'){ bibApplyAddress('${id}', this.value); }" onpaste="var el=this; setTimeout(function(){ bibApplyAddress('${id}', el.value); }, 0)">
+        <button class="bib-btn" onclick="bibApplyAddress('${id}', document.getElementById('bibAddr').value)">${nl("Completar ficha","Fill in details")}</button>
+        <button class="bib-btn" onclick="document.getElementById('bibFile').click()">${nl("Elegir archivo","Choose file")}</button>
+        <input type="file" id="bibFile" hidden onchange="bibApplyFile('${id}', this.files[0])">
+        <div class="bib-msg" id="bibMsg">${escapeHtml(_bibMsg)}</div>
+      </div>
+      ${tecnicaCollapsibleOpen("bib_" + id, `<h2 contenteditable="true" data-key="${k}.titulo">${escapeHtml(sel.titulo)}</h2>`)}
+        <div class="callout" style="line-height:1.55;" contenteditable="true" data-ph="${nl("Escribí o pegá el contenido acá…","Write or paste the content here…")}" data-key="${k}.contenido">${nl2br(sel.contenido)}</div>
+      ${TECNICA_COLLAPSIBLE_CLOSE}
+    </div>`;
+    const ed = (field, label) => `<div class="bib-meta-row"><span>${label}</span><span contenteditable="true" data-ph="—" data-key="${k}.${field}">${escapeHtml(sel[field] || "")}</span></div>`;
+    side = `
+    <div class="bib-side"><div class="bib-side-card"><h4>${nl("Ficha","Details")}</h4>
+      ${ed("fuente", nl("Fuente","Source"))}
+      ${ed("categoria", nl("Categoría","Category"))}
+      ${ed("tipo", nl("Tipo","Type"))}
+      ${ed("autor", nl("Autor","Author"))}
+      ${ed("etiquetas", nl("Etiquetas","Tags"))}
+      <div class="bib-meta-row"><span>${nl("Tamaño","Size")}</span><span>${escapeHtml(bibSizeText(sel))}</span></div>
+      <div class="bib-meta-row"><span>${nl("Dirección","Address")}</span><span>${sel.url ? (urlOk ? `<a href="${escapeHtml(sel.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sel.url.replace(/^https?:\/\/(www\.)?/i, "").slice(0, 38))}${sel.url.length > 46 ? "…" : ""}</a>` : escapeHtml(sel.url)) : "—"}</span></div>
+      <div class="bib-meta-row"><span>${nl("Creada","Created")}</span><span>${bibFmtDate(sel.creado)}</span></div>
+      <div class="bib-meta-row"><span>${nl("Modificada","Modified")}</span><span id="bibModified">${bibFmtDate(sel.modificado)}</span></div>
+    </div></div>`;
+  }
+  c.innerHTML = `<div class="bib ${sel ? "has-sel" : ""}">${list}${main}${side}</div>`;
+  // Marca "modificada" y, si el usuario toca un campo que se había completado solo, pasa a ser suyo
+  c.querySelectorAll('[data-key^="tecnica.biblioteca."]').forEach(el=>{
+    el.addEventListener('blur', ()=>{
+      const ff = _bibSel ? bibFind(_bibSel) : null;
+      if(!ff) return;
+      const cd = ff.card, field = el.dataset.key.split(".").pop();
+      cd.modificado = new Date().toISOString();
+      if(Array.isArray(cd.auto)) cd.auto = cd.auto.filter(x=>x !== field);
+      const m = document.getElementById("bibModified"); if(m) m.textContent = bibFmtDate(cd.modificado);
+      const li = c.querySelector(`.bib-item[data-bib-id="${cd.id}"]`);
+      if(li && field === "titulo"){ const t = li.querySelector(".bib-item-title"); if(t) t.textContent = el.innerText.trim(); }
+    });
+  });
+  attachEditableHandlers(c);
+  attachTecnicaEditableTitles(c);
+}
 function renderEstandar(){
   const container = document.getElementById("view-estandar");
   if(!container) return;
@@ -4910,9 +5305,7 @@ function renderTecnica(){
       <div class="callout" contenteditable="true" data-key="tecnica.notaElevacionesFrontales">${escapeHtml(t.notaElevacionesFrontales)}</div>
   ${TECNICA_COLLAPSIBLE_CLOSE}
 
-  ${tecnicaCollapsibleOpen("fuerzaVsPotencia", `<h2>Fuerza vs. Potencia — ¿en qué se diferencian?</h2>`)}
-      <div class="callout" style="line-height:1.55;">${nl2br(t.fuerzaVsPotencia ? t.fuerzaVsPotencia.contenido : "")}</div>
-  ${TECNICA_COLLAPSIBLE_CLOSE}
+  <!-- "Fuerza vs. Potencia" se migró a la pestaña Biblioteca -->
   `;
   attachEditableHandlers(container);
   attachTecnicaEditableTitles(container);
@@ -5332,6 +5725,7 @@ let _regPromptDraft = null;
 let _regPromptCb = null;
 let _regLastInput = Date.now();
 let _regIdlePrompted = false;
+let _regFollowUp = false; // fuiste al registro desde el aviso: si salís sin guardar ni descartar, el aviso vuelve
 let _regBypassGuard = false;
 let _regSavePromise = null;
 
@@ -5411,6 +5805,7 @@ function commitLog(f){
     sueno: f.sueno || "", comida: f.comida || "", notas: f.notas || ""
   });
   clearRegistroDraft();
+  _regFollowUp = false;
   hideRegToast();
   return saveState();
 }
@@ -5515,12 +5910,13 @@ function regDraftSummary(d){
 function showRegToast(){
   const d = readRegistroForm() || loadRegistroDraft();
   if(!registroDraftHasContent(d)) return;
-  pushNotif({ id:"reg-draft", cat:"registro", title:"Registro sin guardar",
-    body: regDraftSummary(d) + " · tocá para volver", popup:true,
-    actionLabel:"Ir al registro", action:()=>{ regToastGo(); } });
+  pushNotif({ id:"reg-draft", cat:"registro", title:{es:"Registro sin guardar", en:"Unsaved log"},
+    body:{ es: regDraftSummary(d) + " · tocá para volver", en: regDraftSummary(d) + " · tap to go back" }, popup:true,
+    actionLabel:{es:"Ir al registro", en:"Go to log"}, action:()=>{ regToastGo(); } });
 }
 function hideRegToast(){ clearNotif("reg-draft"); }
 function regToastGo(){
+  _regFollowUp = true;
   hideRegToast();
   _notifOpen = false; renderNotifCenter();
   if(_currentView !== "registro") showView("registro");
@@ -5535,10 +5931,17 @@ function initRegistroAutosave(){
   document.addEventListener("keydown", regReloadKey, true);
   setInterval(()=>{
     const c = regCfg();
-    if(_currentView === "registro") hideRegToast();
-    if(!c.autosave || !c.onIdle || _regPromptOpen || _regIdlePrompted) return;
-    if(_currentView === "registro") return; // ya estás ahí: no hace falta avisar
-    if(!registroDraftHasContent(readRegistroForm())) return;
+    if(_currentView === "registro"){
+      hideRegToast();
+      // ya estás ahí: no hace falta avisar; la espera para volver a avisar arranca cuando salís
+      if(_regFollowUp){ _regLastInput = Date.now(); _regIdlePrompted = false; }
+      return;
+    }
+    const hasDraft = registroDraftHasContent(readRegistroForm());
+    if(_regFollowUp && !hasDraft) _regFollowUp = false; // se guardó o se descartó
+    const idleOn = c.autosave && c.onIdle;
+    if((!idleOn && !_regFollowUp) || _regPromptOpen || _regIdlePrompted) return;
+    if(!hasDraft) return;
     if(Date.now() - _regLastInput < Number(c.idleMin) * 60000) return;
     _regIdlePrompted = true;
     showRegToast();
@@ -5922,7 +6325,7 @@ function renderMuro(){
 // app: al abrirla vuelve a la misma pestaña y al mismo punto donde la dejaste.
 const _scrollPositions = {};          // copia en memoria de la sesión (más fresca que STATE)
 let _currentView = "rutinaA";         // se corrige al arrancar con STATE.ui.vista
-const VISTAS_VALIDAS = ["muro","rutinaA","rutinaB","calentamiento","tecnica","estandar","registro","semanal"];
+const VISTAS_VALIDAS = ["muro","rutinaA","rutinaB","calentamiento","tecnica","estandar","biblioteca","registro","semanal"];
 
 function ensureUiState(){
   if(!STATE.ui || typeof STATE.ui !== "object") STATE.ui = {};
@@ -6039,6 +6442,8 @@ function renderAll(){
   renderCalentamiento();
   renderTecnica();
   renderEstandar();
+  try{ _bibSel = (STATE.ui && STATE.ui.bibSel) || _bibSel; }catch(e){}
+  renderBiblioteca();
   renderRegistro();
   renderSemanal();
 }
@@ -7302,6 +7707,12 @@ function renderTimerRunningHtml(){
 }
 
 function dismissFileOriginWarning(){ clearNotif("file-origin"); }
+function showFileOriginNotif(){
+  pushNotif({ id:"file-origin", cat:"sistema", title:{es:"Estás usando el archivo local", en:"You're using the local file"},
+    body:{ es:"Google Drive no puede conectar desde acá y tus datos quedan aparte de la versión online.", en:"Google Drive can't connect from here and your data stays separate from the online version." },
+    actionLabel:{es:"Abrir versión online", en:"Open online version"},
+    action:()=>{ window.open("https://juandoor.github.io/Bit-cora-Entrenamiento/", "_blank", "noopener"); clearNotif("file-origin"); } });
+}
 // ============================================================
 // CENTRO DE NOTIFICACIONES: un solo lugar, con categorías, para todos los avisos
 // (respaldo, registro sin guardar, archivo local). Los avisos viejos (barra de
@@ -7310,16 +7721,63 @@ function dismissFileOriginWarning(){ clearNotif("file-origin"); }
 // queda guardado en la campana.
 // ============================================================
 const NOTIF_CATS = {
-  respaldo: { label:"Respaldo",        c:"#4CC9F0", icon:'<path d="M12 3.5v11"/><path d="M8 11l4 4 4-4"/><path d="M4.5 16.5v1.5a2.5 2.5 0 002.5 2.5h10a2.5 2.5 0 002.5-2.5v-1.5"/>' },
-  registro: { label:"Registro diario", c:"#FF8A4C", icon:'<path d="M4 20l4.2-1 10.3-10.3a2 2 0 000-2.8l-.4-.4a2 2 0 00-2.8 0L5 15.8 4 20z"/><path d="M13.5 7.5l3 3"/>' },
-  sistema:  { label:"Sistema",         c:"#FF5FA2", icon:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/>' },
+  respaldo: { label:"Respaldo", labelEn:"Backup", c:"#4CC9F0", icon:'<path d="M12 3.5v11"/><path d="M8 11l4 4 4-4"/><path d="M4.5 16.5v1.5a2.5 2.5 0 002.5 2.5h10a2.5 2.5 0 002.5-2.5v-1.5"/>' },
+  registro: { label:"Registro diario", labelEn:"Daily log", c:"#FF8A4C", icon:'<path d="M4 20l4.2-1 10.3-10.3a2 2 0 000-2.8l-.4-.4a2 2 0 00-2.8 0L5 15.8 4 20z"/><path d="M13.5 7.5l3 3"/>' },
+  sistema:  { label:"Sistema", labelEn:"System", c:"#FF5FA2", icon:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/>' },
 };
+function nlang(){
+  try{ return (typeof STATE !== "undefined" && STATE && STATE.settings && STATE.settings.idioma) || localStorage.getItem("btc_idioma") || "es"; }catch(e){ return "es"; }
+}
+function nl(es, en){ return nlang() === "en" ? en : es; }
+function nx(v){ return (v && typeof v === "object") ? (v[nlang()] || v.es || "") : (v || ""); }
+
+// ---- Prioridad alta: la notificación borrada con la × reaparece pasado el tiempo elegido en Ajustes ----
+const NOTIF_SNOOZE_KEY = "btc_notifSnooze";
+const NOTIF_DELAYS = [60000, 300000, 900000, 1800000, 3600000, 10800000, 21600000, 43200000, 86400000, 259200000, 604800000];
+function notifDelayLabel(ms){
+  const en = nlang() === "en";
+  const m = ms / 60000;
+  if(m < 60) return m + " min";
+  const h = m / 60;
+  if(h < 24) return h + " h";
+  const d = h / 24;
+  if(d < 7) return d + (en ? (d === 1 ? " day" : " days") : (d === 1 ? " día" : " días"));
+  return (d / 7) + (en ? " wk" : " sem");
+}
+function notifPrefs(id){
+  const p = (typeof STATE !== "undefined" && STATE && STATE.settings && STATE.settings.notificaciones) || {};
+  return Object.assign({ high:false, delay:3600000 }, p[id] || {});
+}
+function notifSnoozeLoad(){ try{ return JSON.parse(localStorage.getItem(NOTIF_SNOOZE_KEY) || "{}") || {}; }catch(e){ return {}; } }
+function notifSnoozeSave(m){ try{ localStorage.setItem(NOTIF_SNOOZE_KEY, JSON.stringify(m)); }catch(e){} }
+function notifSnoozeClear(id){ const m = notifSnoozeLoad(); if(id in m){ delete m[id]; notifSnoozeSave(m); } }
+function notifSnoozed(id){ const t = notifSnoozeLoad()[id]; return !!t && t > Date.now(); }
+const NOTIF_BUILDERS = {
+  "export-reminder": ()=>{
+    const last = Number(localStorage.getItem("btc_lastExport") || 0);
+    const days = last ? Math.floor((Date.now() - last) / 86400000) : "varios";
+    if(!last || days >= EXPORT_REMINDER_DAYS) showExportReminder(days);
+  },
+  "reg-draft": ()=>{
+    if(_currentView === "registro") return;
+    if(registroDraftHasContent(readRegistroForm() || loadRegistroDraft())) showRegToast();
+  },
+  "file-origin": ()=>{ if(location.protocol === "file:") showFileOriginNotif(); }
+};
+function notifSnoozeTick(){
+  const m = notifSnoozeLoad(), due = [];
+  Object.keys(m).forEach(id=>{ if(m[id] <= Date.now()){ due.push(id); delete m[id]; } });
+  if(!due.length) return;
+  notifSnoozeSave(m);
+  due.forEach(id=>{ try{ const b = NOTIF_BUILDERS[id]; if(b) b(); }catch(e){ console.error(e); } });
+}
 const NOTIFS = [];
 const _notifActions = {};
 const _notifCatClosed = {};
 let _notifOpen = false, _notifPopupId = null, _notifPopupTimer = null, _notifPulse = false;
 
 function pushNotif(n){
+  if(notifSnoozed(n.id)) return; // borrada con la × y su prioridad alta todavía espera para reaparecer
   const i = NOTIFS.findIndex(x=>x.id === n.id);
   const item = { cat:"sistema", ...n, ts: Date.now() };
   if(i >= 0) NOTIFS[i] = item; else NOTIFS.push(item);
@@ -7334,6 +7792,7 @@ function pushNotif(n){
   setTimeout(()=>{ _notifPulse = false; }, 4500);
 }
 function clearNotif(id){
+  notifSnoozeClear(id); // resuelta (hiciste lo que pedía): ya no tiene que reaparecer
   const i = NOTIFS.findIndex(x=>x.id === id);
   if(i < 0) return;
   NOTIFS.splice(i, 1);
@@ -7341,8 +7800,16 @@ function clearNotif(id){
   if(_notifPopupId === id) _notifPopupId = null;
   renderNotifCenter();
 }
+// Descartar con la ×: se va ahora; si es de prioridad alta, vuelve pasado el tiempo elegido en Ajustes.
+function notifDismiss(id){
+  const i = NOTIFS.findIndex(x=>x.id === id);
+  if(i >= 0){ NOTIFS.splice(i, 1); delete _notifActions[id]; if(_notifPopupId === id) _notifPopupId = null; }
+  const pr = notifPrefs(id);
+  if(pr.high){ const m = notifSnoozeLoad(); m[id] = Date.now() + pr.delay; notifSnoozeSave(m); }
+  renderNotifCenter();
+}
 function notifClearAll(){
-  NOTIFS.length = 0; _notifPopupId = null; renderNotifCenter();
+  NOTIFS.slice().forEach(n=>notifDismiss(n.id));
 }
 function notifToggle(){
   _notifOpen = !_notifOpen;
@@ -7362,12 +7829,12 @@ function notifPopupHover(on){
 }
 function notifItemHtml(n, inPopup){
   const cat = NOTIF_CATS[n.cat] || NOTIF_CATS.sistema;
-  const act = n.actionLabel ? `<div class="notif-actions"><button class="notif-act" onclick="event.stopPropagation(); notifRun('${n.id}')">${escapeHtml(n.actionLabel)}</button></div>` : "";
+  const act = n.actionLabel ? `<div class="notif-actions"><button class="notif-act" onclick="event.stopPropagation(); notifRun('${n.id}')">${escapeHtml(nx(n.actionLabel))}</button></div>` : "";
   const clickable = typeof _notifActions[n.id] === "function";
   return `<div class="notif-item ${clickable ? "clickable" : ""}" style="--nc:${cat.c}" ${clickable ? `onclick="notifRun('${n.id}')"` : ""}>
     <div class="notif-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${cat.icon}</svg></div>
-    <div class="notif-txt"><div class="notif-title">${escapeHtml(n.title)}</div><div class="notif-sub">${escapeHtml(n.body || "")}</div>${act}</div>
-    <button class="notif-x" onclick="event.stopPropagation(); clearNotif('${n.id}')" aria-label="Descartar" title="Descartar">×</button>
+    <div class="notif-txt"><div class="notif-title">${escapeHtml(nx(n.title))}</div><div class="notif-sub">${escapeHtml(nx(n.body))}</div>${act}</div>
+    <button class="notif-x" onclick="event.stopPropagation(); notifDismiss('${n.id}')" aria-label="${nl("Descartar","Dismiss")}" title="${nl("Descartar","Dismiss")}">×</button>
   </div>`;
 }
 function renderNotifCenter(){
@@ -7381,11 +7848,11 @@ function renderNotifCenter(){
       const cat = NOTIF_CATS[g.k], closed = !!_notifCatClosed[g.k];
       return `<button class="notif-cat-head ${closed ? "closed" : ""}" onclick="notifToggleCat('${g.k}')" style="color:${cat.c}">
           <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-          ${cat.label}<span class="cnt">${g.items.length}</span></button>`
+          ${nl(cat.label, cat.labelEn)}<span class="cnt">${g.items.length}</span></button>`
         + (closed ? "" : g.items.map(n=>notifItemHtml(n)).join(""));
-    }).join("") : `<div class="notif-empty">Sin notificaciones por ahora.</div>`;
+    }).join("") : `<div class="notif-empty">${nl("Sin notificaciones por ahora.","No notifications for now.")}</div>`;
     panel = `<div class="notif-panel" role="dialog" aria-label="Notificaciones">
-      <div class="notif-head"><h3>Notificaciones</h3>${total ? `<button onclick="notifClearAll()">Borrar todo</button>` : ""}</div>
+      <div class="notif-head"><h3>${nl("Notificaciones","Notifications")}</h3>${total ? `<button onclick="notifClearAll()">${nl("Borrar todo","Clear all")}</button>` : ""}</div>
       <div class="notif-body">${body}</div></div>`;
   }
   let popup = "";
@@ -7406,6 +7873,100 @@ document.addEventListener("click", (e)=>{
   if(_notifOpen && !dentro){ _notifOpen = false; renderNotifCenter(); }
 });
 
+// ============================================================
+// CARRUSEL DE BIENVENIDA: se muestra una sola vez, al abrir/instalar la app.
+// Explica que los datos quedan en el dispositivo (sin servidor externo),
+// que es opcional y que existe la opción del servidor (Google Drive).
+// ============================================================
+const ONB_KEY = "btc_onboarded";
+const ONB_SLIDES = [
+  { c:"#FF8A4C", icon:'<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7L12 3z"/>',
+    es:{ title:"Bienvenido a tu Bitácora",
+         body:["Es el rincón donde vas a llevar tu entrenamiento a otro nivel: registrá cada sesión, medí tu fatiga y mirá cómo tu progreso se hace visible semana a semana.","Te mostramos en 3 pasos cómo se guardan tus datos."] },
+    en:{ title:"Welcome to your Logbook",
+         body:["This is the corner where you take your training to the next level: log every session, track your fatigue and watch your progress become visible week after week.","We'll show you in 3 steps how your data is stored."] } },
+  { c:"#4CC9F0", icon:'<rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3"/>',
+    es:{ title:"Tus datos quedan en tu dispositivo",
+         body:["La app guarda todo <b>en este dispositivo</b>, sin servidor externo y sin cuenta.","Nadie más accede a tu información y funciona aunque no tengas conexión."] },
+    en:{ title:"Your data stays on your device",
+         body:["The app saves everything <b>on this device</b>, with no external server and no account.","No one else can access your information and it works offline."] } },
+  { c:"#FF5FA2", icon:'<path d="M7 18a4.5 4.5 0 01-.6-8.96A6 6 0 0117.7 8.4 4.1 4.1 0 0117 18H7z"/>',
+    es:{ title:"El servidor es opcional",
+         body:["Si querés, podés conectar <b>Google Drive</b> para sincronizar tus datos entre dispositivos y tener una copia en la nube.","Se activa desde el botón <b>Conectar</b> del encabezado, cuando vos quieras."] },
+    en:{ title:"The server is optional",
+         body:["If you want, you can connect <b>Google Drive</b> to sync your data across devices and keep a cloud copy.","You turn it on from the <b>Connect</b> button in the header, whenever you like."] } },
+  { c:"#7BD88F", icon:'<path d="M12 3.5v11"/><path d="M8 11l4 4 4-4"/><path d="M4.5 16.5v1.5a2.5 2.5 0 002.5 2.5h10a2.5 2.5 0 002.5-2.5v-1.5"/>',
+    es:{ title:"Cuidá tu progreso",
+         body:["Sin servidor, tus datos dependen de este dispositivo: <b>exportá una copia (.json)</b> cada tanto.","Te lo vamos a recordar desde la campana de notificaciones."] },
+    en:{ title:"Protect your progress",
+         body:["Without a server your data depends on this device: <b>export a backup (.json)</b> every now and then.","We'll remind you from the notification bell."] } },
+];
+let _onbIdx = 0;
+function onbRender(){
+  const ov = document.getElementById("onbOverlay");
+  if(!ov) return;
+  ov.querySelector(".onb-track").style.transform = `translateX(-${_onbIdx * 100}%)`;
+  ov.querySelectorAll(".onb-dot").forEach((d,i)=>d.classList.toggle("on", i === _onbIdx));
+  ov.querySelector("[data-onb=prev]").hidden = _onbIdx === 0;
+  ov.querySelector("[data-onb=aprev]").hidden = _onbIdx === 0;
+  ov.querySelector("[data-onb=anext]").hidden = _onbIdx === ONB_SLIDES.length - 1;
+  ov.querySelector("[data-onb=next]").textContent = _onbIdx === ONB_SLIDES.length - 1 ? nl("Empezar","Start") : nl("Siguiente","Next");
+}
+function onbGo(d){
+  const n = _onbIdx + d;
+  if(n >= ONB_SLIDES.length){ onbClose(); return; }
+  _onbIdx = Math.max(0, n); onbRender();
+}
+function onbTo(i){ _onbIdx = Math.max(0, Math.min(ONB_SLIDES.length - 1, i)); onbRender(); }
+function onbKey(e){
+  if(e.key === "ArrowRight") onbGo(1);
+  else if(e.key === "ArrowLeft") onbGo(-1);
+  else if(e.key === "Escape") onbClose();
+}
+function onbClose(){
+  document.removeEventListener("keydown", onbKey);
+  try{ localStorage.setItem(ONB_KEY, "1"); }catch(e){}
+  const ov = document.getElementById("onbOverlay");
+  if(ov) ov.classList.remove("open");
+}
+function openOnboarding(){
+  let ov = document.getElementById("onbOverlay");
+  if(ov) ov.remove(); // se rearma cada vez para tomar el idioma actual
+  {
+    ov = document.createElement("div");
+    ov.id = "onbOverlay"; ov.className = "onb-overlay";
+    ov.setAttribute("role","dialog"); ov.setAttribute("aria-label",nl("Bienvenida","Welcome"));
+    ov.innerHTML = `<div class="onb-card">
+      <button class="onb-skip" onclick="onbClose()">${nl("Omitir","Skip")}</button>
+      <button class="onb-arrow prev" data-onb="aprev" onclick="onbGo(-1)" aria-label="${nl("Anterior","Previous")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="onb-arrow next" data-onb="anext" onclick="onbGo(1)" aria-label="${nl("Siguiente","Next")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      <div class="onb-viewport"><div class="onb-track">${ONB_SLIDES.map(s=>`
+        <div class="onb-slide" style="--oc:${s.c}">
+          <div class="onb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${s.icon}</svg></div>
+          <h3>${s[nlang()].title}</h3>${s[nlang()].body.map(p=>`<p>${p}</p>`).join("")}
+        </div>`).join("")}</div></div>
+      <div class="onb-foot">
+        <div class="onb-dots">${ONB_SLIDES.map((_,i)=>`<button class="onb-dot" onclick="onbTo(${i})" aria-label="${i+1}"></button>`).join("")}</div>
+        <div class="onb-btns"><button class="onb-btn ghost" data-onb="prev" onclick="onbGo(-1)">${nl("Atrás","Back")}</button><button class="onb-btn" data-onb="next" onclick="onbGo(1)">Siguiente</button></div>
+      </div></div>`;
+    document.body.appendChild(ov);
+    let x0 = null;
+    ov.addEventListener("touchstart", e=>{ x0 = e.touches[0].clientX; }, {passive:true});
+    ov.addEventListener("touchend", e=>{
+      if(x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if(Math.abs(dx) > 45) onbGo(dx < 0 ? 1 : -1);
+    });
+  }
+  _onbIdx = 0; onbRender(); ov.classList.add("open");
+  document.removeEventListener("keydown", onbKey);
+  document.addEventListener("keydown", onbKey);
+}
+function checkOnboardingOnLoad(){
+  try{ if(localStorage.getItem(ONB_KEY)) return; }catch(e){}
+  openOnboarding();
+}
+
 // Recordatorio de exportar: si pasaron 3+ días desde la última exportación
 // manual (.json), lo avisamos al guardar. No bloquea nada, solo informa.
 const EXPORT_REMINDER_DAYS = 3;
@@ -7418,9 +7979,9 @@ function markExportReminder(){
   }catch(e){}
 }
 function showExportReminder(days){
-  pushNotif({ id:"export-reminder", cat:"respaldo", title:"Copia de respaldo",
-    body:`Hace ${days} días que no exportás una copia (.json) de respaldo.`,
-    actionLabel:"Exportar ahora", action:()=>{ exportJSON(); } });
+  pushNotif({ id:"export-reminder", cat:"respaldo", title:{es:"Copia de respaldo", en:"Backup copy"},
+    body:{ es:`Hace ${days} días que no exportás una copia (.json) de respaldo.`, en:`It's been ${days === "varios" ? "several" : days} days since you exported a backup copy (.json).` },
+    actionLabel:{es:"Exportar ahora", en:"Export now"}, action:()=>{ exportJSON(); } });
 }
 function dismissExportReminder(){ clearNotif("export-reminder"); }
 function checkExportReminderOnLoad(){
@@ -7434,12 +7995,11 @@ function checkExportReminderOnLoad(){
 
 document.addEventListener("DOMContentLoaded", async ()=>{
   initPlexusBackground();
-  if(location.protocol === "file:"){
-    pushNotif({ id:"file-origin", cat:"sistema", title:"Estás usando el archivo local",
-      body:"Google Drive no puede conectar desde acá y tus datos quedan aparte de la versión online.",
-      actionLabel:"Abrir versión online", action:()=>{ window.open("https://juandoor.github.io/Bit-cora-Entrenamiento/", "_blank", "noopener"); clearNotif("file-origin"); } });
-  }
+  if(location.protocol === "file:") showFileOriginNotif();
   renderNotifCenter();
+  checkOnboardingOnLoad();
+  setInterval(notifSnoozeTick, 5000);
+  setTimeout(notifSnoozeTick, 1500);
   STATE = await loadState();
   if(!STATE.logs) STATE.logs = JSON.parse(JSON.stringify(EMPTY_LOGS));
   if(!STATE.muro) STATE.muro = {cover:null, avatar:null, coverAspect:null};
