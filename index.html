@@ -1652,6 +1652,7 @@
     font-family: var(--font-mono); color: var(--text-soft);
     transition: transform .12s ease, border-color .12s ease;
   }
+  .tracker-day.empty{ visibility:hidden; pointer-events:none; }
   .tracker-day:hover{ transform: translateY(-2px); border-color: var(--teal); }
   .tracker-day .num{ font-size:12.5px; font-weight:700; line-height:1.2; }
   .tracker-day .wd{ font-size:8px; text-transform:uppercase; opacity:0.75; letter-spacing:0.03em; }
@@ -1854,6 +1855,49 @@
     box-shadow: 0 0 0 2px var(--coral), 0 6px 18px rgba(0,0,0,0.35);
     border-color: var(--coral);
   }
+
+  /* ===== ANIMACIÓN DE REUBICACIÓN (al cambiar la fase de una tarjeta) ===== */
+  .reloc-anim .ex-card, .reloc-anim .fase-divider{
+    transition: filter .35s ease, opacity .35s ease, transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s ease, border-color .4s ease;
+  }
+  .reloc-on .ex-card:not(.reloc-moving), .reloc-on .fase-divider{ filter: blur(3.5px); opacity: .45; }
+  .ex-card.reloc-moving{
+    transform: scale(1.03); z-index: 5;
+    box-shadow: 0 0 0 2px var(--coral), 0 18px 40px rgba(0,0,0,0.55);
+    border-color: var(--coral);
+  }
+
+  /* ===== Categorías propias de fase (botón "+" de la leyenda) ===== */
+  .fase-legend-add .fase-icon-badge{
+    color: var(--text-dim); border: 1.5px dashed var(--line);
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  .fase-legend-add:hover{ opacity:1; }
+  .fase-legend-add:hover .fase-icon-badge{ color: var(--coral); border-color: var(--coral); background: var(--coral-soft); }
+  .fase-legend-wrap{ position:relative; display:inline-flex; align-items:center; }
+  .fase-legend-edit{
+    background:none; border:none; padding:0 2px; margin-left:1px; cursor:pointer;
+    color: var(--text-dim); font-size:12px; line-height:1; opacity:0; transition: opacity .15s, color .15s;
+  }
+  .fase-legend-wrap:hover .fase-legend-edit, .fase-legend-edit:focus-visible{ opacity:1; }
+  .fase-legend-edit:hover{ color: var(--coral); }
+  @media (hover:none){ .fase-legend-edit{ opacity:.7; } }
+  .fase-modal{ max-width: 520px; }
+  .fase-modal .fase-legend-label{ text-transform:none; letter-spacing:0; font-size:13.5px; font-weight:400; color: var(--text-soft); }
+  .fase-pick-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap:6px; }
+  .fase-pick-ic{
+    height:44px; border-radius:8px; background: var(--surface-2); border:1.5px solid var(--line-soft);
+    color: var(--text-soft); display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0;
+    transition: border-color .12s, color .12s, transform .12s;
+  }
+  .fase-pick-ic svg{ width:24px; height:24px; }
+  .fase-pick-ic:hover{ border-color: var(--text-dim); transform: translateY(-1px); }
+  .fase-pick-ic.on{ background: var(--surface-3); }
+  .fase-pick-colors{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .fase-pick-sw{ width:26px; height:26px; border-radius:50%; border:2px solid transparent; cursor:pointer; padding:0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.35); }
+  .fase-pick-sw.on{ border-color: var(--text); }
+  .fase-pick-custom{ position:relative; width:26px; height:26px; border-radius:50%; overflow:hidden; cursor:pointer; border:1.5px dashed var(--line); display:inline-block; background: conic-gradient(#f55,#fc5,#5f5,#5cf,#a5f,#f55); }
+  .fase-pick-custom input{ position:absolute; inset:-6px; width:40px; height:40px; opacity:0; cursor:pointer; }
 
   /* ===== BUSCADOR POR PANEL (Rutina A/B, Calentamiento, Técnica) ===== */
   .panel-search{ position:relative; margin-bottom:16px; }
@@ -2071,7 +2115,44 @@
     .view{ display:block !important; }
     body{ background:white; color:#111; }
     .panel, .ex-card{ background:white; border-color:#ccc; }
-  }</style>
+  }
+
+  /* ===== Biblioteca: flechas superpuestas ===== */
+  .bib-wrap{ position:relative; min-height:72vh; }
+  #view-biblioteca .bib-fl-layer.draw ~ *{ }
+  body.fl-drawing{ user-select:none; -webkit-user-select:none; }
+  .bib-fl-layer{ position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; z-index:20; pointer-events:none; touch-action:auto; }
+  .bib-fl-layer .fl-arrow .fl-hit{ pointer-events: none; }
+  .bib-fl-layer.draw{ pointer-events:auto; cursor:crosshair; touch-action:none; }
+  .bib-fl-layer.draw .fl-arrow{ cursor:pointer; }
+  .bib-fl-layer.draw .fl-arrow .fl-hit{ pointer-events: stroke; }
+  .bib-fl-layer .fl-handle{ fill:#fff; stroke:var(--coral); stroke-width:2.5; cursor:grab; pointer-events:all; }
+  .bib-fl-layer .fl-arrow.sel{ filter: drop-shadow(0 0 5px rgba(255,255,255,0.45)); }
+  .fl-bar{ display:flex; align-items:center; flex-wrap:wrap; gap:8px 10px; margin:0 0 12px; }
+  .fl-toggle{ display:inline-flex; align-items:center; gap:7px; font-family:inherit; font-size:12px; font-weight:800; color:var(--text); cursor:pointer; padding:7px 14px; border-radius:999px; border:1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.07); }
+  .fl-toggle svg{ width:15px; height:15px; }
+  .fl-toggle:hover{ background: rgba(255,255,255,0.14); }
+  .fl-toggle.on{ border-color:#8B7CF6; background: rgba(139,124,246,0.3); }
+  .fl-tools{ display:flex; align-items:center; flex-wrap:wrap; gap:6px; padding:5px 10px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); background: linear-gradient(160deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03)); backdrop-filter: blur(10px); }
+  .fl-ic{ width:32px; height:30px; display:grid; place-items:center; border-radius:10px; border:1px solid transparent; background:transparent; color:var(--text-soft); cursor:pointer; }
+  .fl-ic svg{ width:20px; height:20px; }
+  .fl-ic:hover{ background: rgba(255,255,255,0.1); color:var(--text); }
+  .fl-ic.on{ border-color:#8B7CF6; background: rgba(139,124,246,0.28); color:#fff; }
+  .fl-sep{ width:1px; height:20px; background: rgba(255,255,255,0.14); margin:0 2px; }
+  .fl-sw{ width:20px; height:20px; border-radius:50%; border:2px solid rgba(255,255,255,0.25); cursor:pointer; padding:0; }
+  .fl-sw.on{ border-color:#fff; transform:scale(1.15); }
+  .fl-color{ width:24px; height:24px; padding:0; border:none; background:none; cursor:pointer; }
+  .fl-w{ width:28px; height:26px; display:grid; place-items:center; border-radius:8px; border:1px solid transparent; background:transparent; cursor:pointer; }
+  .fl-w span{ display:block; width:16px; background:var(--text-soft); border-radius:3px; }
+  .fl-w.on{ border-color:#8B7CF6; background: rgba(139,124,246,0.28); }
+  .fl-w.on span{ background:#fff; }
+  .fl-del{ font-family:inherit; font-size:12px; font-weight:700; color:var(--text); cursor:pointer; padding:5px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.07); }
+  .fl-del:hover:not(:disabled){ background: rgba(232,113,74,0.3); }
+  .fl-del:disabled{ opacity:.4; cursor:default; }
+  .fl-hint{ flex-basis:100%; font-size:11.5px; color:var(--text-dim); }
+  .fl-hl{ outline:2px solid var(--flc, #FFB454); outline-offset:3px; border-radius:12px; box-shadow:0 0 0 5px color-mix(in srgb, var(--flc, #FFB454) 22%, transparent), 0 0 24px color-mix(in srgb, var(--flc, #FFB454) 45%, transparent); transition: box-shadow .15s, outline-color .15s; }
+  .bib-fl-layer .fl-anch{ opacity:.55; }
+</style>
 </head>
 
 <body>
@@ -2177,6 +2258,10 @@
 
 <div class="timer-modal-overlay" id="addExModalOverlay">
   <div class="timer-modal add-ex-modal" id="addExModal"></div>
+</div>
+
+<div class="timer-modal-overlay" id="faseModalOverlay" style="z-index:236">
+  <div class="timer-modal add-ex-modal fase-modal" id="faseModal"></div>
 </div>
 
 <div class="timer-modal-overlay" id="settingsModalOverlay" style="z-index:235">
@@ -2504,6 +2589,131 @@ const FASE_ICON_PATHS = {
 function faseIconSvg(f){
   const path = FASE_ICON_PATHS[f] || FASE_ICON_PATHS.accesorio;
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+}
+
+// ---------- Categorías propias (botón "+" de la leyenda de fases) ----------
+// Viven en STATE.fasesCustom = [{ id, label, color, icon }] (cuenta del usuario, nunca en data.js).
+// applyCustomFases() las suma a las tablas FASE_* para que leyenda, divisores, desplegables y buscador las usen igual que las de fábrica.
+const FASE_ICON_BASE = Object.assign({}, FASE_ICON_PATHS); // los 12 íconos existentes (intactos)
+const FASE_ICON_EXTRA = {
+  correr:    '<circle cx="15" cy="4.4" r="1.8"/><path d="M12.6 8.3 9.4 10.6l1.3 3.3L7.2 17.6"/><path d="M12.6 8.3l3.2 2.5 3 .1"/><path d="M10.7 13.9l3.2 1.6 1.2 4.8"/><path d="M9.4 10.6 6.2 9.8"/>',
+  bici:      '<circle cx="6" cy="16" r="3.7"/><circle cx="18" cy="16" r="3.7"/><path d="M6 16l3.6-7h5.2l3.2 7"/><path d="M9.6 9 12.2 16H6"/><path d="M13.4 6.3h2.6M14.8 9l-.6-2.7"/>',
+  natacion:  '<circle cx="16.8" cy="6" r="1.8"/><path d="M4.5 11.6l5.6-2.3 3.2 2.1 3.2-1.2"/><path d="M2.5 16c1.5 0 1.5 1.2 3 1.2S7 16 8.5 16s1.5 1.2 3 1.2 1.5-1.2 3-1.2 1.5 1.2 3 1.2 1.5-1.2 3-1.2"/><path d="M2.5 20.2c1.5 0 1.5 1 3 1s1.5-1 3-1 1.5 1 3 1 1.5-1 3-1 1.5 1 3 1 1.5-1 3-1"/>',
+  boxeo:     '<path d="M7 10.2V8.2A4.7 4.7 0 0 1 11.7 3.5h1.9A4.4 4.4 0 0 1 18 7.9v4.6a4 4 0 0 1-2.1 3.5V20H8.6v-3.4C7.3 15.7 7 14.2 7 12.6z"/><path d="M8.6 17.2h7.3M11.2 9.4H15"/>',
+  pesarusa:  '<path d="M8.6 8.3V7a3.4 3.4 0 0 1 6.8 0v1.3"/><path d="M8.3 8.3h7.4c2.5 1.2 4 3.4 4 6 0 3.3-3.5 6-7.7 6s-7.7-2.7-7.7-6c0-2.6 1.5-4.8 4-6z"/><path d="M8.8 14.6h6.4"/>',
+  tiempo:    '<circle cx="12" cy="13.6" r="7"/><path d="M12 13.6V9.6M12 13.6l2.8 1.8M9.6 3h4.8M12 3v3.6M18.9 6.4l1.4-1.4"/>',
+  montana:   '<path d="M2.5 19.5 9 8l3.7 6.3 2.3-3.5 6.1 8.7z"/><path d="M6.8 12.4l2.2 1.9 2-1.3"/>',
+  fuego:     '<path d="M12 21c-3.9 0-6.5-2.6-6.5-6 0-2.6 1.6-4.3 3-5.8.8 1.2 1.1 2 1.7 2.6.2-2.9 1.3-5.5 3.8-7.8.3 3 3.5 5 3.5 9.2 0 4.2-2.6 7.8-5.5 7.8z"/><path d="M12 21c-1.6 0-2.7-1.1-2.7-2.7 0-1.5 1.1-2.3 2-3.2.8 1 2 1.9 2 3.3 0 1.4-.6 2.6-1.3 2.6z"/>',
+  gota:      '<path d="M12 3.2c3.3 4.2 6 7.3 6 10.6a6 6 0 0 1-12 0c0-3.3 2.7-6.4 6-10.6z"/><path d="M9.2 14.3a3 3 0 0 0 2.4 2.7"/>',
+  luna:      '<path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z"/><path d="M16.6 3.4v3M15.1 4.9h3"/>',
+  loto:      '<path d="M12 19c-3.4 0-6.6-2.2-8.2-6 2.8-.3 5 .7 6.2 2.6.3-3.4 1-6.2 2-8.1 1 1.9 1.7 4.7 2 8.1 1.2-1.9 3.4-2.9 6.2-2.6C18.6 16.8 15.4 19 12 19z"/><path d="M12 19v2M8.5 21h7"/>',
+  respirar:  '<path d="M3 9h10.5a2.5 2.5 0 1 0-2.5-2.5"/><path d="M3 13.5h15a2.8 2.8 0 1 1-2.8 2.8"/><path d="M3 18h7"/>',
+  trofeo:    '<path d="M8 4h8v5.5a4 4 0 0 1-8 0z"/><path d="M8 6H4.5c0 3 1.3 4.5 3.7 5M16 6h3.5c0 3-1.3 4.5-3.7 5M12 13.5V17M9.5 17h5v3.5h-5zM8 20.5h8"/>',
+  escudo:    '<path d="M12 3 4.5 6v5.5c0 4.6 3 8 7.5 9.5 4.5-1.5 7.5-4.9 7.5-9.5V6z"/><path d="M8.8 12l2.3 2.3 4.2-4.6"/>',
+  core:      '<circle cx="12" cy="12" r="8.6"/><path d="M12 5.6v12.8M8.2 8.6h7.6M8.2 12h7.6M8.2 15.4h7.6"/>',
+  latido:    '<path d="M2.5 12.5h4l2-5.5 3.5 11 2.5-7.5 1.5 2H21.5"/>',
+  estrella:  '<path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9l-5.2 2.8 1-5.9-4.3-4.1 5.9-.8z"/>',
+  hoja:      '<path d="M5 19c0-8 5-13.5 14.5-14.5C19.5 14 14 19 5 19z"/><path d="M5 19c2.5-4.5 6-7.5 10-9.5"/>',
+  equilibrio:'<circle cx="12" cy="4.3" r="1.9"/><path d="M12 7.2v6.2"/><path d="M12 9.3 6.2 8M12 9.3l5.8-1.3"/><path d="M12 13.4l-3.6 2.6M12 13.4v7.6"/><path d="M8.4 16h2.4"/>',
+  saltar:    '<circle cx="12" cy="4.6" r="1.8"/><path d="M12 7.2v5.2M12 9.2 7.2 6.6M12 9.2l4.8-2.6"/><path d="M12 12.4 8.8 16.8M12 12.4l3.2 4.4"/><path d="M5.5 20.5h13"/>',
+  pesas:     '<rect x="3" y="7" width="3.4" height="10" rx="1"/><rect x="17.6" y="7" width="3.4" height="10" rx="1"/><path d="M6.4 12h11.2M1.5 10v4M22.5 10v4"/>'
+};
+const FASE_ICON_LIBRARY = Object.assign({}, FASE_ICON_BASE, FASE_ICON_EXTRA);
+const FASE_BASE_ORDER = FASE_ORDER.filter(f=>f !== "accesorio");
+const FASE_COLOR_CHOICES = ["#E8714A","#F08B5B","#D9A24B","#B7D94A","#8FA86B","#4FA3A3","#2DD4BF","#6BA3D6","#5B9DFF","#A98FD6","#C77FB0","#D68FA8","#D14F3D","#FFFFFF"];
+let _customFaseIds = [];
+function faseHexSoft(hex){
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || ""); if(!m) return "var(--surface-3)";
+  const n = parseInt(m[1], 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},0.14)`;
+}
+function isCustomFase(f){ return _customFaseIds.indexOf(f) >= 0; }
+function applyCustomFases(){
+  _customFaseIds.forEach(id=>{ delete FASE_LABELS[id]; delete FASE_COLOR[id]; delete FASE_BG_SOFT[id]; delete FASE_ICON_PATHS[id]; });
+  const list = (typeof STATE !== "undefined" && STATE && Array.isArray(STATE.fasesCustom)) ? STATE.fasesCustom : [];
+  _customFaseIds = list.map(c=>c.id);
+  list.forEach(c=>{
+    FASE_LABELS[c.id] = c.label; FASE_COLOR[c.id] = c.color || "#5E7268"; FASE_BG_SOFT[c.id] = faseHexSoft(c.color);
+    FASE_ICON_PATHS[c.id] = FASE_ICON_LIBRARY[c.icon] || FASE_ICON_BASE.accesorio;
+  });
+  FASE_ORDER.length = 0;
+  FASE_BASE_ORDER.forEach(f=>FASE_ORDER.push(f));
+  _customFaseIds.forEach(f=>FASE_ORDER.push(f));
+  FASE_ORDER.push("accesorio");
+}
+let _faseDraft = null;
+function openFaseModal(id){
+  if(!Array.isArray(STATE.fasesCustom)) STATE.fasesCustom = [];
+  const cur = id ? STATE.fasesCustom.find(c=>c.id === id) : null;
+  const used = STATE.fasesCustom.map(c=>c.color);
+  const freeColor = FASE_COLOR_CHOICES.find(c=>used.indexOf(c) < 0) || FASE_COLOR_CHOICES[0];
+  _faseDraft = cur ? { id:cur.id, label:cur.label, color:cur.color, icon:cur.icon }
+                   : { id:null, label:"", color:freeColor, icon:"estrella" };
+  renderFaseModal();
+  document.getElementById("faseModalOverlay").classList.add("open");
+  const inp = document.getElementById("faseName"); if(inp) inp.focus();
+}
+function closeFaseModal(){ document.getElementById("faseModalOverlay").classList.remove("open"); _faseDraft = null; }
+function faseDraftSet(k, v){ if(!_faseDraft) return; _faseDraft[k] = v; renderFaseModal(k === "label"); }
+function renderFaseModal(keepName){
+  const d = _faseDraft; if(!d) return;
+  const box = document.getElementById("faseModal");
+  const nameVal = keepName ? ((document.getElementById("faseName") || {}).value ?? d.label) : d.label;
+  if(keepName) d.label = nameVal;
+  const icons = Object.keys(FASE_ICON_LIBRARY).map(k=>`<button type="button" class="fase-pick-ic ${d.icon === k ? "on" : ""}" style="${d.icon === k ? `color:${d.color};border-color:${d.color}` : ""}" onclick="faseDraftSet('icon','${k}')" title="${k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${FASE_ICON_LIBRARY[k]}</svg></button>`).join("");
+  const sw = FASE_COLOR_CHOICES.map(c=>`<button type="button" class="fase-pick-sw ${d.color.toLowerCase() === c.toLowerCase() ? "on" : ""}" style="background:${c}" onclick="faseDraftSet('color','${c}')" aria-label="${c}"></button>`).join("");
+  const editing = !!d.id;
+  box.innerHTML = `
+    <button class="timer-close-btn" onclick="closeFaseModal()" aria-label="Cerrar">×</button>
+    <div class="add-ex-modal-head"><h3>${editing ? nl("Editar categoría","Edit category") : nl("Nueva categoría","New category")}</h3></div>
+    <div class="add-ex-modal-body">
+      <label class="add-ex-field"><span>${nl("Nombre","Name")}</span>
+        <input type="text" id="faseName" maxlength="28" value="${escapeHtml(nameVal)}" placeholder="${nl("Ej: Yoga, Natación, Movilidad…","E.g. Yoga, Swimming, Mobility…")}" oninput="faseDraftSet('label', this.value)"></label>
+      <div class="add-ex-field"><span>${nl("Ícono","Icon")}</span><div class="fase-pick-grid">${icons}</div></div>
+      <div class="add-ex-field"><span>${nl("Color","Color")}</span>
+        <div class="fase-pick-colors">${sw}<label class="fase-pick-custom" title="${nl("Elegir otro color","Pick another color")}"><input type="color" value="${/^#[0-9a-f]{6}$/i.test(d.color) ? d.color : "#5E7268"}" oninput="faseDraftSet('color', this.value)"></label></div></div>
+      <div class="add-ex-field"><span>${nl("Vista previa","Preview")}</span>
+        <div class="fase-legend" style="margin:0"><span class="fase-legend-btn" style="cursor:default"><span class="fase-icon-badge" style="color:${d.color}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${FASE_ICON_LIBRARY[d.icon]}</svg></span><span class="fase-legend-label" style="--fase-glow:${d.color}">${escapeHtml((nameVal || "").trim() || nl("Nueva categoría","New category"))}</span></span></div></div>
+    </div>
+    <div class="add-ex-modal-actions">
+      ${editing ? `<button class="muro-btn" style="margin-right:auto;color:var(--brick);border-color:var(--brick)" onclick="deleteFaseCustom('${d.id}')">${nl("Eliminar","Delete")}</button>` : ""}
+      <button class="muro-btn" onclick="closeFaseModal()">${nl("Cancelar","Cancel")}</button>
+      <button class="muro-btn primary" onclick="saveFaseModal()">${editing ? nl("Guardar","Save") : nl("Crear categoría","Create category")}</button>
+    </div>`;
+  if(keepName){ const inp = document.getElementById("faseName"); if(inp){ inp.focus(); const n = inp.value.length; inp.setSelectionRange(n, n); } }
+}
+function rerenderRoutines(){ ["rutinaA","rutinaB"].forEach(k=>{ if(document.getElementById(`view-${k}`)) renderRoutine(k); }); }
+function saveFaseModal(){
+  const d = _faseDraft; if(!d) return;
+  const label = (document.getElementById("faseName").value || "").trim();
+  if(!label){ document.getElementById("faseName").focus(); return; }
+  if(!Array.isArray(STATE.fasesCustom)) STATE.fasesCustom = [];
+  if(d.id){
+    const c = STATE.fasesCustom.find(x=>x.id === d.id); if(c){ c.label = label; c.color = d.color; c.icon = d.icon; }
+  } else {
+    STATE.fasesCustom.push({ id: uid("fase"), label, color: d.color, icon: d.icon });
+  }
+  saveState();
+  closeFaseModal();
+  applyCustomFases();
+  rerenderRoutines();
+}
+function deleteFaseCustom(id){
+  const c = (STATE.fasesCustom || []).find(x=>x.id === id); if(!c) return;
+  let n = 0; ["rutinaA","rutinaB"].forEach(k=>{ n += STATE[k].exercises.filter(e=>e.fase === id).length; });
+  const msg = n ? nl(`¿Eliminar la categoría "${c.label}"? Los ${n} ejercicio(s) que la usan pasan a "Accesorio liviano".`, `Delete the category "${c.label}"? The ${n} exercise(s) using it move to "Light accessory".`)
+                : nl(`¿Eliminar la categoría "${c.label}"?`, `Delete the category "${c.label}"?`);
+  if(!confirm(msg)) return;
+  ["rutinaA","rutinaB"].forEach(k=>{
+    let i; while((i = STATE[k].exercises.findIndex(e=>e.fase === id)) !== -1){
+      const ex = STATE[k].exercises.splice(i, 1)[0]; ex.fase = "accesorio";
+      insertExerciseInFase(k, ex, "accesorio");
+    }
+  });
+  STATE.fasesCustom = STATE.fasesCustom.filter(x=>x.id !== id);
+  saveState();
+  closeFaseModal();
+  applyCustomFases();
+  rerenderRoutines();
 }
 
 // ---------- Bloques colapsables estándar de "Técnica y prioridades" ----------
@@ -3283,7 +3493,7 @@ function tagLabel(tag){
 }
 
 function faseSelectHtml(routineKey, idx, currentFase){
-  const opts = FASE_ORDER.map(f=>`<option value="${f}" ${f===currentFase?"selected":""}>${FASE_LABELS[f]}</option>`).join("");
+  const opts = FASE_ORDER.map(f=>`<option value="${f}" ${f===currentFase?"selected":""}>${escapeHtml(FASE_LABELS[f])}</option>`).join("");
   return `<select class="fase-select" onchange="changeFase('${routineKey}',${idx},this.value)">${opts}</select>`;
 }
 
@@ -3488,14 +3698,21 @@ function toggleNotes(el, targetId){
 }
 
 function fasesLegend(routineKey){
+  applyCustomFases();
   return `<div class="fase-legend">
     ${FASE_ORDER.map(f=>{
       const colorVar = faseColorFor(f);
-      return `<button type="button" class="fase-legend-btn" onclick="scrollToFase('${routineKey}','${f}')" title="Ir a ${FASE_LABELS[f]}">
+      const btn = `<button type="button" class="fase-legend-btn" onclick="scrollToFase('${routineKey}','${f}')" title="Ir a ${escapeHtml(FASE_LABELS[f])}">
         <span class="fase-icon-badge" style="color:${colorVar}">${faseIconSvg(f)}</span>
-        <span class="fase-legend-label" style="--fase-glow:${colorVar}">${FASE_LABELS[f]}</span>
+        <span class="fase-legend-label" style="--fase-glow:${colorVar}">${escapeHtml(FASE_LABELS[f])}</span>
       </button>`;
+      return isCustomFase(f)
+        ? `<span class="fase-legend-wrap">${btn}<button type="button" class="fase-legend-edit" onclick="openFaseModal('${f}')" title="${nl("Editar categoría","Edit category")}" aria-label="${nl("Editar categoría","Edit category")}">✎</button></span>`
+        : btn;
     }).join("")}
+    <button type="button" class="fase-legend-btn fase-legend-add" onclick="openFaseModal()" title="${nl("Crear una categoría propia","Create your own category")}" aria-label="${nl("Crear una categoría propia","Create your own category")}">
+      <span class="fase-icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>
+    </button>
   </div>`;
 }
 
@@ -3509,6 +3726,7 @@ function scrollToFase(routineKey, fase){
 }
 
 function renderRoutine(routineKey){
+  applyCustomFases();
   const r = STATE[routineKey];
   const container = document.getElementById(`view-${routineKey}`);
 
@@ -3518,7 +3736,7 @@ function renderRoutine(routineKey){
   r.exercises.forEach((ex, i)=>{
     const fase = ex.fase || "fuerza";
     if(fase !== lastFase){
-      exHtml += `<div class="fase-divider ${fase}" id="fdiv-${routineKey}-${fase}"><span class="dot"></span>${FASE_LABELS[fase]}</div>`;
+      exHtml += `<div class="fase-divider ${fase}" id="fdiv-${routineKey}-${fase}"><span class="dot"${isCustomFase(fase) ? ` style="background:${faseColorFor(fase)}"` : ""}></span>${escapeHtml(FASE_LABELS[fase] || fase)}</div>`;
       lastFase = fase;
     }
     exHtml += exerciseCard(ex, routineKey, i);
@@ -3624,7 +3842,8 @@ function cycleTag(routineKey, idx){
   renderRoutine(routineKey);
 }
 
-function changeFase(routineKey, idx, newFase){
+// Mueve el ejercicio al bloque de su nueva fase y vuelve a dibujar la rutina. Devuelve el ejercicio movido.
+function applyFaseChange(routineKey, idx, newFase){
   STATE[routineKey].exercises[idx].fase = newFase;
   // reordenar: mover el ejercicio al final del bloque de su nueva fase
   const arr = STATE[routineKey].exercises;
@@ -3641,7 +3860,64 @@ function changeFase(routineKey, idx, newFase){
   }
   arr.splice(insertAt,0,moved);
   saveState();
+  const prevY = window.scrollY;
   renderRoutine(routineKey);
+  window.scrollTo(0, prevY); // el re-render no debe sacar al usuario de donde estaba
+  return moved;
+}
+function cardOf(routineKey, ex){
+  const container = document.getElementById(`view-${routineKey}`);
+  const idx = STATE[routineKey].exercises.indexOf(ex);
+  return (container && idx !== -1) ? container.querySelector(`.ex-card[data-idx="${idx}"]`) : null;
+}
+// Animación de reubicación al cambiar la fase de una tarjeta:
+// 1) la tarjeta hace zoom y el resto se desenfoca, 2) la tarjeta se reubica y el panel se desplaza hasta ella,
+// 3) la tarjeta vuelve a su tamaño y el fondo recupera el foco.
+let _relocBusy = false;
+function changeFase(routineKey, idx, newFase){
+  const container = document.getElementById(`view-${routineKey}`);
+  const oldCard = container ? container.querySelector(`.ex-card[data-idx="${idx}"]`) : null;
+  if(!container || !oldCard || _relocBusy){
+    const mv = applyFaseChange(routineKey, idx, newFase);
+    const c = cardOf(routineKey, mv); if(c) followMovedCard(c);
+    return;
+  }
+  _relocBusy = true;
+  container.classList.add("reloc-anim", "reloc-on");
+  oldCard.classList.add("reloc-moving");
+  setTimeout(()=>{
+    const moved = applyFaseChange(routineKey, idx, newFase);
+    const card = cardOf(routineKey, moved);
+    if(!card){ container.classList.remove("reloc-anim", "reloc-on"); _relocBusy = false; return; }
+    card.classList.add("reloc-moving");
+    followMovedCard(card, ()=>{
+      card.classList.remove("reloc-moving");        // vuelve a su tamaño
+      container.classList.remove("reloc-on");        // el fondo recupera el foco
+      card.classList.add("flash");
+      clearTimeout(card._flashTimeout);
+      card._flashTimeout = setTimeout(()=> card.classList.remove("flash"), 1400);
+      setTimeout(()=>{ container.classList.remove("reloc-anim"); _relocBusy = false; }, 600);
+    });
+  }, 380);
+}
+// Desplaza la página (suave) hasta dejar la tarjeta justo bajo la barra de pestañas fija; avisa cuando terminó.
+function followMovedCard(card, done){
+  const tab = document.querySelector(".tab-btn");
+  const navBottom = tab && tab.parentElement ? tab.parentElement.getBoundingClientRect().bottom : 0;
+  window.scrollTo({ top: Math.max(0, card.getBoundingClientRect().top + window.scrollY - navBottom - 16), behavior:"smooth" });
+  if(!done){
+    card.classList.add("flash");
+    clearTimeout(card._flashTimeout);
+    card._flashTimeout = setTimeout(()=> card.classList.remove("flash"), 1400);
+    return;
+  }
+  let last = window.scrollY, still = 0; const t0 = performance.now();
+  const tick = ()=>{
+    const y = window.scrollY;
+    still = Math.abs(y - last) < 0.5 ? still + 1 : 0; last = y;
+    if(still >= 8 || performance.now() - t0 > 2500) done(); else requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
 }
 
 function deleteExercise(routineKey, idx){
@@ -3709,7 +3985,7 @@ function updateAddExDraftAndRerender(field, value){
 }
 function renderAddExerciseModalHtml(){
   const d = _addExDraft;
-  const faseOpts = FASE_ORDER.map(f=>`<option value="${f}" ${f===d.fase?"selected":""}>${FASE_LABELS[f]}</option>`).join("");
+  const faseOpts = FASE_ORDER.map(f=>`<option value="${f}" ${f===d.fase?"selected":""}>${escapeHtml(FASE_LABELS[f])}</option>`).join("");
 
   let subtipoHtml = "";
   if(d.fase === "isometricos"){
@@ -5239,7 +5515,7 @@ function renderBiblioteca(){
       <div class="bib-meta-row"><span>${nl("Modificada","Modified")}</span><span id="bibModified">${bibFmtDate(sel.modificado)}</span></div>
     </div></div>`;
   }
-  c.innerHTML = `<div class="bib ${sel ? "has-sel" : ""}">${list}${main}${side}</div>`;
+  c.innerHTML = `${flBarHtml()}<div class="bib-wrap"><div class="bib ${sel ? "has-sel" : ""}">${list}${main}${side}</div><svg class="bib-fl-layer ${_flMode ? "draw" : ""}" id="bibFlLayer" xmlns="http://www.w3.org/2000/svg"></svg></div>`;
   // Marca "modificada" y, si el usuario toca un campo que se había completado solo, pasa a ser suyo
   c.querySelectorAll('[data-key^="tecnica.biblioteca."]').forEach(el=>{
     el.addEventListener('blur', ()=>{
@@ -5255,7 +5531,523 @@ function renderBiblioteca(){
   });
   attachEditableHandlers(c);
   attachTecnicaEditableTitles(c);
+  flAttach();
 }
+// ============================================================
+// FLECHAS SUPERPUESTAS (Biblioteca): capa SVG sobre toda la pestaña, incluso sobre las tarjetas.
+// Se guardan en STATE.tecnica.biblioteca.flechas[<vista>] donde <vista> = id de la tarjeta abierta o "_lista".
+// Coordenadas: x como fracción del ancho de la pestaña, y en px (la flecha sigue en su lugar al cambiar el ancho).
+// Cada flecha: { id, tipo, p:[[x,y],[x,y]], c?, pts?, raw?, dash, origen, doble, color, w, at:[origen,destino] }
+//   tipo: recta | curva | s | onda | bucle | libre.  at = elementos conectados en cada punta (se resaltan).
+//   ao = posición de cada punta DENTRO de su elemento conectado (fracciones 0–1 del ancho/alto del elemento).
+//   Las puntas conectadas siguen al elemento cuando se reacomoda (ordenar, agrupar, redimensionar, abrir/cerrar…);
+//   solo se vuelven a anclar cuando el usuario edita la flecha (mover o arrastrar una punta).
+// ============================================================
+let _flMode = false, _flSel = null, _flPreset = "recta", _flColor = "#FFB454", _flW = 3, _flDrag = null;
+let _flOpt = { dash:false, origen:false, doble:false, neat:true };
+let _flHoverArrow = null, _flHoverDesc = null;
+const FL_COLORS = ["#FFB454","#FF6B5B","#2DD4BF","#5B9DFF","#8B7CF6","#FFFFFF"];
+const FL_SHAPES = [
+  { k:"recta", es:"Recta",   en:"Straight" },
+  { k:"curva", es:"Curva",   en:"Curved" },
+  { k:"s",     es:"En S",    en:"S-curve" },
+  { k:"onda",  es:"Ondulada",en:"Wavy" },
+  { k:"bucle", es:"Rulo cruzado", en:"Crossed loop" },
+  { k:"libre", es:"A mano alzada", en:"Freehand" }
+];
+const FL_OPTS = [
+  { k:"dash",   es:"Punteada",            en:"Dotted" },
+  { k:"origen", es:"Círculo en el origen",en:"Circle at start" },
+  { k:"doble",  es:"Doble punta",         en:"Double-headed" },
+  { k:"neat",   es:"Prolijar el trazo a mano alzada", en:"Neaten freehand strokes" }
+];
+const FL_ICONS = {
+  recta:'<path d="M4 19L19 6"/><path d="M19 6l-6 .8M19 6l-.8 6"/>',
+  curva:'<path d="M4 19Q6 5 19 7"/><path d="M19 7l-6-1.5M19 7l-3.5 5"/>',
+  s:'<path d="M4 19C4 8 12 18 12 12S19 14 19 6"/><path d="M19 6l-2.2 4.6M19 6l-4.4 3"/>',
+  onda:'<path d="M3 15c2-5 3.5-5 5 0s3.5 5 5 0 3-4 6-6"/><path d="M19 9l-5.5 1M19 9l-1 5.2"/>',
+  bucle:'<path d="M3 19C9 19 11 13 14 10c2-2 4 0 2 2s-5-1-2-5l4-2"/><path d="M18 5l-5.5-.2M18 5l-1.2 5"/>',
+  libre:'<path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/>',
+  dash:'<path d="M3 12h4M10 12h4M17 12h4"/>',
+  origen:'<circle cx="5.5" cy="17.5" r="2.4"/><path d="M8 15.5L19 6"/><path d="M19 6l-6 .8M19 6l-.8 6"/>',
+  doble:'<path d="M5 17.5L19 6.5"/><path d="M19 6.5l-6 .8M19 6.5l-.8 6M5 17.5l6-.8M5 17.5l.8-6"/>',
+  neat:'<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>'
+};
+function flStore(){
+  const d = bibData();
+  if(!d.flechas || typeof d.flechas !== "object" || Array.isArray(d.flechas)) d.flechas = {};
+  const k = _bibSel || "_lista";
+  if(!Array.isArray(d.flechas[k])) d.flechas[k] = [];
+  return d.flechas[k];
+}
+function flBarHtml(){
+  const svg = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${FL_ICONS[k]}</svg>`;
+  const a = _flSel ? flFind(_flSel) : null;
+  const shapeOn = k => (a ? (a.tipo || "recta") : _flPreset) === k;
+  const optOn = k => a && k !== "neat" ? !!a[k] : _flOpt[k];
+  const sh = FL_SHAPES.map(p=>`<button class="fl-ic ${shapeOn(p.k) ? "on" : ""}" onclick="flPreset('${p.k}')" title="${nl(p.es,p.en)}" aria-label="${nl(p.es,p.en)}">${svg(p.k)}</button>`).join("");
+  const op = FL_OPTS.map(p=>`<button class="fl-ic ${optOn(p.k) ? "on" : ""}" onclick="flOpt('${p.k}')" title="${nl(p.es,p.en)}" aria-label="${nl(p.es,p.en)}">${svg(p.k)}</button>`).join("");
+  const cs = FL_COLORS.map(c=>`<button class="fl-sw ${_flColor.toLowerCase() === c.toLowerCase() ? "on" : ""}" style="background:${c}" onclick="flColor('${c}')" aria-label="${c}"></button>`).join("");
+  const ws = [2,3,5].map(w=>`<button class="fl-w ${_flW === w ? "on" : ""}" onclick="flWidth(${w})" aria-label="${nl("Grosor","Thickness")} ${w}"><span style="height:${w}px"></span></button>`).join("");
+  return `<div class="fl-bar ${_flMode ? "open" : ""}">
+    <button class="fl-toggle ${_flMode ? "on" : ""}" onclick="flToggle()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19L19 5"/><path d="M19 5l-7 .9M19 5l-.9 7"/></svg>${nl("Flechas","Arrows")}</button>
+    ${_flMode ? `<div class="fl-tools">${sh}<i class="fl-sep"></i>${op}<i class="fl-sep"></i>${cs}<input type="color" class="fl-color" value="${_flColor.length === 7 ? _flColor : "#ffb454"}" oninput="flColor(this.value)" aria-label="${nl("Color propio","Custom color")}"><i class="fl-sep"></i>${ws}<i class="fl-sep"></i>
+      <button class="fl-del" onclick="flDeleteSel()" ${_flSel ? "" : "disabled"}>${nl("Eliminar","Delete")}</button></div>
+      <div class="fl-hint">${nl("Arrastrá sobre la pestaña para dibujar (con “A mano alzada” trazás libre y la app lo deja prolijo). Poné las puntas sobre una tarjeta o texto para conectarlos: al pasar el cursor se resaltan.","Drag over the tab to draw (with “Freehand” you draw freely and the app tidies it up). Put the ends on a card or text to connect them: they highlight on hover.")}</div>` : ""}
+  </div>`;
+}
+function flToggle(){ _flMode = !_flMode; if(!_flMode) _flSel = null; renderBiblioteca(); }
+function flFind(id){ return flStore().find(a=>a.id === id) || null; }
+function flSetShape(a, key){
+  const W = (flWrap() && flWrap().clientWidth) || 1;
+  if(key === "libre" && !(a.pts && a.pts.length > 1)){
+    a.pts = [a.p[0].slice(), a.p[1].slice()]; a.raw = null;
+  }
+  a.tipo = key;
+  if(key !== "libre"){ a.pts = null; a.raw = null; }
+  if(key !== "curva") a.c = null;
+}
+function flPreset(key){
+  _flPreset = key;
+  const a = _flSel ? flFind(_flSel) : null;
+  if(a){ flSetShape(a, key); saveState(true); }
+  flRedraw(); flRefreshBar();
+}
+function flOpt(k){
+  const a = _flSel ? flFind(_flSel) : null;
+  if(k === "neat"){
+    _flOpt.neat = !_flOpt.neat;
+    if(a && a.tipo === "libre" && a.raw) flReNeaten(a);
+  } else if(a){ a[k] = !a[k]; _flOpt[k] = a[k]; }
+  else _flOpt[k] = !_flOpt[k];
+  if(a) saveState(true);
+  flRedraw(); flRefreshBar();
+}
+function flColor(c){ _flColor = c; const a = _flSel ? flFind(_flSel) : null; if(a){ a.color = c; saveState(true); } flRedraw(); flUpdateHL(); flRefreshBar(true); }
+function flWidth(w){ _flW = w; const a = _flSel ? flFind(_flSel) : null; if(a){ a.w = w; saveState(true); } flRedraw(); flRefreshBar(); }
+function flDeleteSel(){
+  if(!_flSel) return;
+  const arr = flStore(), i = arr.findIndex(a=>a.id === _flSel);
+  if(i >= 0){ arr.splice(i, 1); saveState(true); }
+  _flSel = null; flRedraw(); flRefreshBar();
+}
+function flRefreshBar(keepFocus){
+  const bar = document.querySelector("#view-biblioteca .fl-bar"); if(!bar) return;
+  if(keepFocus) return; // no recrear el selector de color mientras se arrastra
+  bar.outerHTML = flBarHtml();
+}
+// ---------- utilidades geométricas ----------
+function flRdp(pts, eps){
+  if(pts.length < 3) return pts.slice();
+  const s = pts[0], e = pts[pts.length - 1];
+  const dx = e[0] - s[0], dy = e[1] - s[1], L = Math.hypot(dx, dy) || 1;
+  let mi = 0, md = 0;
+  for(let i = 1; i < pts.length - 1; i++){
+    const d = Math.abs((pts[i][0] - s[0]) * dy - (pts[i][1] - s[1]) * dx) / L;
+    if(d > md){ md = d; mi = i; }
+  }
+  if(md <= eps) return [s, e];
+  const l = flRdp(pts.slice(0, mi + 1), eps), r = flRdp(pts.slice(mi), eps);
+  return l.slice(0, -1).concat(r);
+}
+function flChaikin(pts, n){
+  let p = pts;
+  for(let k = 0; k < n; k++){
+    const o = [p[0]];
+    for(let i = 0; i < p.length - 1; i++){
+      const a = p[i], b = p[i + 1];
+      o.push([a[0] * 0.75 + b[0] * 0.25, a[1] * 0.75 + b[1] * 0.25], [a[0] * 0.25 + b[0] * 0.75, a[1] * 0.25 + b[1] * 0.75]);
+    }
+    o.push(p[p.length - 1]); p = o;
+  }
+  return p;
+}
+function flSmoothPath(P){
+  if(P.length < 2) return "";
+  let d = `M${P[0][0]},${P[0][1]}`;
+  if(P.length === 2) return d + ` L${P[1][0]},${P[1][1]}`;
+  for(let i = 0; i < P.length - 1; i++){
+    const p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || p2;
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
+  }
+  return d;
+}
+function flTangent(P, atEnd){
+  const n = P.length; if(n < 2) return [1, 0];
+  const ref = atEnd ? P[n - 1] : P[0];
+  for(let k = 1; k < n; k++){
+    const q = atEnd ? P[n - 1 - k] : P[k];
+    const dx = ref[0] - q[0], dy = ref[1] - q[1], l = Math.hypot(dx, dy);
+    if(l >= 9 || k === n - 1) return l ? [dx / l, dy / l] : [1, 0];
+  }
+  return [1, 0];
+}
+// ---------- corrección automática del trazo a mano alzada ----------
+function flNeaten(rawPx, neat){
+  const n = rawPx.length; if(n < 2) return null;
+  const s = rawPx[0], e = rawPx[n - 1];
+  const len = Math.hypot(e[0] - s[0], e[1] - s[1]);
+  let plen = 0; for(let i = 1; i < n; i++) plen += Math.hypot(rawPx[i][0] - rawPx[i - 1][0], rawPx[i][1] - rawPx[i - 1][1]);
+  if(plen < 18) return null;
+  if(!neat){
+    const pts = flChaikin(flRdp(rawPx, 1.5), 1);
+    return { tipo:"libre", pts };
+  }
+  const closedish = len < plen * 0.18;
+  if(!closedish){
+    const dx = e[0] - s[0], dy = e[1] - s[1], L = len || 1;
+    let md = 0, F = null;
+    rawPx.forEach(q=>{ const d = Math.abs((q[0] - s[0]) * dy - (q[1] - s[1]) * dx) / L; if(d > md){ md = d; F = q; } });
+    if(md < Math.max(5, len * 0.06)){
+      let E = e.slice();
+      const deg = Math.atan2(dy, dx) * 180 / Math.PI;
+      if(Math.abs(deg) < 8 || Math.abs(deg) > 172) E[1] = s[1];
+      else if(Math.abs(Math.abs(deg) - 90) < 8) E[0] = s[0];
+      return { tipo:"recta", p:[s, E] };
+    }
+    const t = Math.min(0.85, Math.max(0.15, ((F[0] - s[0]) * dx + (F[1] - s[1]) * dy) / (L * L)));
+    const k = 2 * t * (1 - t);
+    const C = [(F[0] - (1 - t) * (1 - t) * s[0] - t * t * e[0]) / k, (F[1] - (1 - t) * (1 - t) * s[1] - t * t * e[1]) / k];
+    const Q = []; for(let i = 0; i <= 40; i++){ const u = i / 40; Q.push([(1 - u) * (1 - u) * s[0] + 2 * u * (1 - u) * C[0] + u * u * e[0], (1 - u) * (1 - u) * s[1] + 2 * u * (1 - u) * C[1] + u * u * e[1]]); }
+    let err = 0; rawPx.forEach(q=>{ let m = 1e9; Q.forEach(z=>{ const d = Math.hypot(q[0] - z[0], q[1] - z[1]); if(d < m) m = d; }); err += m; });
+    err /= n;
+    if(err < Math.max(5, len * 0.035)) return { tipo:"curva", p:[s, e], c:C };
+  }
+  let pts = flChaikin(flRdp(rawPx, 3), 3);
+  if(pts.length > 70){ const step = Math.ceil(pts.length / 70); pts = pts.filter((_, i)=>i % step === 0 || i === pts.length - 1); }
+  return { tipo:"libre", pts };
+}
+function flReNeaten(a){
+  const W = (flWrap() && flWrap().clientWidth) || 1;
+  const raw = (a.raw || []).map(q=>[q[0] * W, q[1]]);
+  const r = flNeaten(raw, _flOpt.neat); if(!r) return;
+  flApplyNeat(a, r, W);
+}
+function flApplyNeat(a, r, W){
+  const f = q=>[q[0] / W, q[1]];
+  a.tipo = r.tipo;
+  if(r.tipo === "libre"){ a.pts = r.pts.map(f); a.p = [a.pts[0].slice(), a.pts[a.pts.length - 1].slice()]; a.c = null; }
+  else { a.pts = null; a.p = r.p.map(f); a.c = r.c ? f(r.c) : null; }
+}
+// ---------- geometría de cada tipo ----------
+function flGeom(a, W){
+  const P = a.p.map(q=>[q[0] * W, q[1]]);
+  let s = P[0], e = P[1];
+  const tipo = a.tipo || "recta";
+  if(tipo === "libre" && a.pts && a.pts.length > 1){
+    const Q = a.pts.map(q=>[q[0] * W, q[1]]);
+    return { s:Q[0], e:Q[Q.length - 1], d:flSmoothPath(Q), tEnd:flTangent(Q, true), tStart:flTangent(Q, false), C:null };
+  }
+  const dx = e[0] - s[0], dy = e[1] - s[1], len = Math.hypot(dx, dy) || 1;
+  const u = [dx / len, dy / len], v = [-u[1], u[0]];
+  let d, tEnd = u, tStart = [-u[0], -u[1]], C = null;
+  if(tipo === "curva"){
+    C = a.c ? [a.c[0] * W, a.c[1]] : [(s[0] + e[0]) / 2 + v[0] * len * 0.28, (s[1] + e[1]) / 2 + v[1] * len * 0.28];
+    d = `M${s[0]},${s[1]} Q${C[0]},${C[1]} ${e[0]},${e[1]}`;
+    let tx = e[0] - C[0], ty = e[1] - C[1], tl = Math.hypot(tx, ty) || 1; tEnd = [tx / tl, ty / tl];
+    tx = s[0] - C[0]; ty = s[1] - C[1]; tl = Math.hypot(tx, ty) || 1; tStart = [tx / tl, ty / tl];
+  } else if(tipo === "s"){
+    const k = len * 0.3;
+    const c1 = [s[0] + u[0] * len * 0.45 + v[0] * k, s[1] + u[1] * len * 0.45 + v[1] * k];
+    const c2 = [e[0] - u[0] * len * 0.45 - v[0] * k, e[1] - u[1] * len * 0.45 - v[1] * k];
+    d = `M${s[0]},${s[1]} C${c1[0]},${c1[1]} ${c2[0]},${c2[1]} ${e[0]},${e[1]}`;
+    let tx = e[0] - c2[0], ty = e[1] - c2[1], tl = Math.hypot(tx, ty) || 1; tEnd = [tx / tl, ty / tl];
+    tx = s[0] - c1[0]; ty = s[1] - c1[1]; tl = Math.hypot(tx, ty) || 1; tStart = [tx / tl, ty / tl];
+  } else if(tipo === "onda"){
+    const amp = Math.min(8, Math.max(3, len * 0.035)), cyc = Math.max(2, Math.round(len / 70)), N = Math.max(14, Math.round(len / 7));
+    const Q = [];
+    for(let i = 0; i <= N; i++){
+      const t = i / N, off = amp * Math.sin(2 * Math.PI * cyc * t) * Math.min(1, t * 6, (1 - t) * 6);
+      Q.push([s[0] + dx * t + v[0] * off, s[1] + dy * t + v[1] * off]);
+    }
+    d = flSmoothPath(Q); tEnd = flTangent(Q, true); tStart = flTangent(Q, false);
+  } else if(tipo === "bucle"){
+    // rulo cruzado: cicloide prolata (la línea se cruza a sí misma) en el centro del recorrido
+    const r = Math.max(7, Math.min(len * 0.14, 26, len * 0.2)), A = r * 0.55, B = r;
+    const mid = len * 0.5, Q = [s.slice()];
+    for(let i = 0; i <= 70; i++){
+      const th = -Math.PI + (2 * Math.PI) * i / 70;
+      const along = mid + A * th - B * Math.sin(th), perp = B * (1 + Math.cos(th));
+      Q.push([s[0] + u[0] * along + v[0] * perp, s[1] + u[1] * along + v[1] * perp]);
+    }
+    Q.push(e.slice());
+    d = "M" + Q.map(q=>q[0].toFixed(1) + "," + q[1].toFixed(1)).join(" L");
+  } else {
+    d = `M${s[0]},${s[1]} L${e[0]},${e[1]}`;
+  }
+  return { s, e, d, tEnd, tStart, C };
+}
+function flHead(pt, t, size){
+  const a = Math.PI / 7;
+  const rot = (x, y, ang) => [x * Math.cos(ang) - y * Math.sin(ang), x * Math.sin(ang) + y * Math.cos(ang)];
+  const back = [-t[0], -t[1]];
+  const l = rot(back[0], back[1], a), r = rot(back[0], back[1], -a);
+  return `${pt[0]},${pt[1]} ${pt[0] + l[0] * size},${pt[1] + l[1] * size} ${pt[0] + r[0] * size},${pt[1] + r[1] * size}`;
+}
+function flArrowSvg(a, W, sel){
+  const g = flGeom(a, W), w = a.w || 3, col = a.color || "#FFB454", hs = 8 + w * 2.4;
+  let out = `<g class="fl-arrow ${sel ? "sel" : ""}" data-fl="${a.id}">`;
+  out += `<path class="fl-hit" d="${g.d}" fill="none" stroke="transparent" stroke-width="${Math.max(16, w + 12)}"/>`;
+  out += `<path d="${g.d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" ${a.dash ? `stroke-dasharray="${w * 2.2} ${w * 2.6}"` : ""} style="pointer-events:none"/>`;
+  out += `<polygon points="${flHead(g.e, g.tEnd, hs)}" fill="${col}" stroke="${col}" stroke-width="1" stroke-linejoin="round" style="pointer-events:none"/>`;
+  if(a.doble) out += `<polygon points="${flHead(g.s, g.tStart, hs)}" fill="${col}" stroke="${col}" stroke-width="1" stroke-linejoin="round" style="pointer-events:none"/>`;
+  if(a.origen) out += `<circle cx="${g.s[0]}" cy="${g.s[1]}" r="${4 + w * 0.7}" fill="#0d1118" stroke="${col}" stroke-width="${Math.max(2, w * 0.8)}" style="pointer-events:none"/>`;
+  if(a.at && a.at[0]) out += `<circle class="fl-anch" cx="${g.s[0]}" cy="${g.s[1]}" r="${9 + w}" fill="none" stroke="${col}" stroke-width="1.5" style="pointer-events:none"/>`;
+  if(a.at && a.at[1]) out += `<circle class="fl-anch" cx="${g.e[0]}" cy="${g.e[1]}" r="${9 + w}" fill="none" stroke="${col}" stroke-width="1.5" style="pointer-events:none"/>`;
+  if(sel){
+    const hd = (id, x, y) => `<circle class="fl-handle" data-h="${id}" cx="${x}" cy="${y}" r="7"/>`;
+    out += hd("s", g.s[0], g.s[1]) + hd("e", g.e[0], g.e[1]);
+    if(a.tipo === "curva" && g.C) out += hd("c", g.C[0], g.C[1]);
+  }
+  return out + `</g>`;
+}
+function flWrap(){ return document.querySelector("#view-biblioteca .bib-wrap"); }
+function flRedraw(){
+  const wrap = flWrap(), svg = document.getElementById("bibFlLayer"); if(!wrap || !svg) return;
+  flSync();
+  const W = wrap.clientWidth || 1;
+  const prev = _flDrag && _flDrag.preview ? _flDrag.preview : null;
+  svg.innerHTML = flStore().map(a=>flArrowSvg(a, W, a.id === _flSel && _flMode)).join("") + (prev ? flArrowSvg(prev, W, false) : "");
+  svg.classList.toggle("draw", _flMode);
+  flUpdateHL();
+}
+function flPoint(ev){
+  const wrap = flWrap(), r = wrap.getBoundingClientRect();
+  return [(ev.clientX - r.left) / (r.width || 1), ev.clientY - r.top];
+}
+// ---------- conexión con elementos y resaltado ----------
+function flDescOf(el){
+  if(!el || !el.closest || !el.closest("#view-biblioteca") || el.closest("#bibFlLayer") || el.closest(".fl-bar")) return null;
+  let n;
+  if((n = el.closest(".bib-item[data-bib-id]"))) return "i:" + n.dataset.bibId;
+  if((n = el.closest(".bib-meta-row"))){ const rows = Array.from(document.querySelectorAll("#view-biblioteca .bib-meta-row")); return "m:" + rows.indexOf(n); }
+  if((n = el.closest("[data-key]"))) return "k:" + n.dataset.key;
+  if(el.closest(".bib-load")) return "l";
+  return null;
+}
+function flResolve(desc){
+  if(!desc) return null;
+  const root = document.getElementById("view-biblioteca"); if(!root) return null;
+  const t = desc[0], v = desc.slice(2);
+  if(t === "i") return Array.from(root.querySelectorAll(".bib-item[data-bib-id]")).find(x=>x.dataset.bibId === v) || null;
+  if(t === "m") return root.querySelectorAll(".bib-meta-row")[parseInt(v, 10)] || null;
+  if(t === "k") return Array.from(root.querySelectorAll("[data-key]")).find(x=>x.dataset.key === v) || null;
+  if(desc === "l") return root.querySelector(".bib-load");
+  return null;
+}
+function flDescAt(cx, cy){
+  const els = document.elementsFromPoint(cx, cy);
+  for(const el of els){ const d = flDescOf(el); if(d) return d; }
+  return null;
+}
+function flClamp01(x){ return Math.max(0, Math.min(1, x)); }
+// Ancla cada punta (o solo las indicadas en `only`) al elemento que tiene debajo y guarda dónde cae dentro de él.
+function flAttachArrow(a, only){
+  const wrap = flWrap(); if(!wrap) return;
+  const r = wrap.getBoundingClientRect(), W = r.width || 1;
+  const old = a.at || [null, null], oao = a.ao || [null, null];
+  const at = [old[0] || null, old[1] || null], ao = [oao[0] || null, oao[1] || null];
+  (only || [0, 1]).forEach(i=>{
+    const cx = r.left + a.p[i][0] * W, cy = r.top + a.p[i][1];
+    const d = flDescAt(cx, cy); at[i] = d || null; ao[i] = null;
+    const el = d ? flResolve(d) : null;
+    if(el){ const b = el.getBoundingClientRect(); if(b.width || b.height) ao[i] = [flClamp01((cx - b.left) / (b.width || 1)), flClamp01((cy - b.top) / (b.height || 1))]; }
+  });
+  a.at = (at[0] || at[1]) ? at : null;
+  a.ao = a.at ? ao : null;
+}
+// Posición actual (x fracción, y px) de una punta conectada, según dónde esté hoy su elemento; null si no se puede resolver.
+function flAnchorPos(a, i, r, W){
+  const d = a.at && a.at[i]; if(!d) return null;
+  const el = flResolve(d); if(!el) return null;
+  const b = el.getBoundingClientRect(); if(!b.width && !b.height) return null;
+  if(!a.ao) a.ao = [null, null];
+  if(!a.ao[i]){ // flecha guardada antes de existir `ao`: se toma la posición actual relativa al elemento
+    const q = a.p[i];
+    a.ao[i] = [flClamp01((r.left + q[0] * W - b.left) / (b.width || 1)), flClamp01((r.top + q[1] - b.top) / (b.height || 1))];
+  }
+  const o = a.ao[i];
+  return [(b.left + o[0] * b.width - r.left) / W, b.top + o[1] * b.height - r.top];
+}
+// Mueve las puntas a (ns, ne) arrastrando consigo el resto de la forma (trazo libre, control de la curva) por semejanza.
+function flRetarget(a, ns, ne, W){
+  const s0 = [a.p[0][0] * W, a.p[0][1]], e0 = [a.p[1][0] * W, a.p[1][1]];
+  const s1 = [ns[0] * W, ns[1]], e1 = [ne[0] * W, ne[1]];
+  const v0 = [e0[0] - s0[0], e0[1] - s0[1]], v1 = [e1[0] - s1[0], e1[1] - s1[1]];
+  const m0 = v0[0] * v0[0] + v0[1] * v0[1];
+  if(m0 > 1e-6){
+    const kr = (v1[0] * v0[0] + v1[1] * v0[1]) / m0, ki = (v1[1] * v0[0] - v1[0] * v0[1]) / m0;
+    const tf = q=>{ const x = q[0] * W - s0[0], y = q[1] - s0[1]; return [(s1[0] + kr * x - ki * y) / W, s1[1] + ki * x + kr * y]; };
+    if(a.pts) a.pts = a.pts.map(tf);
+    if(a.raw) a.raw = a.raw.map(tf);
+    if(a.c) a.c = tf(a.c);
+  } else {
+    const dx = ns[0] - a.p[0][0], dy = ns[1] - a.p[0][1];
+    if(a.pts) a.pts = a.pts.map(q=>[q[0] + dx, q[1] + dy]);
+    if(a.raw) a.raw = a.raw.map(q=>[q[0] + dx, q[1] + dy]);
+    if(a.c) a.c = [a.c[0] + dx, a.c[1] + dy];
+  }
+  a.p = [ns.slice(), ne.slice()];
+  if(a.tipo === "libre" && a.pts && a.pts.length > 1) a.p = [a.pts[0].slice(), a.pts[a.pts.length - 1].slice()];
+}
+let _flSaveT = null;
+function flSaveSoon(){ clearTimeout(_flSaveT); _flSaveT = setTimeout(()=>saveState(true), 700); }
+// Recoloca las flechas conectadas según la posición actual de sus elementos. Devuelve true si algo se movió.
+function flSync(){
+  const wrap = flWrap(); if(!wrap || !wrap.getClientRects().length) return false;
+  const r = wrap.getBoundingClientRect(), W = r.width || 1; let changed = false;
+  flStore().forEach(a=>{
+    if(!a.at || !a.p || (_flDrag && _flDrag.a === a)) return;
+    const ns = flAnchorPos(a, 0, r, W) || a.p[0], ne = flAnchorPos(a, 1, r, W) || a.p[1];
+    const far = (u, v) => Math.abs(u[0] - v[0]) * W > 0.4 || Math.abs(u[1] - v[1]) > 0.4;
+    if(!far(ns, a.p[0]) && !far(ne, a.p[1])) return;
+    flRetarget(a, ns, ne, W); changed = true;
+  });
+  if(changed) flSaveSoon();
+  return changed;
+}
+// Vigila cambios de layout (ordenar, agrupar, abrir/cerrar, scroll, animaciones) mientras exista la capa de flechas.
+let _flLoop = false;
+function flLoopStart(){
+  if(_flLoop) return; _flLoop = true;
+  const tick = ()=>{
+    if(!document.getElementById("bibFlLayer")){ _flLoop = false; return; }
+    if(!_flDrag && flSync()) flRedraw();
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+function flUpdateHL(){
+  document.querySelectorAll("#view-biblioteca .fl-hl").forEach(el=>{ el.classList.remove("fl-hl"); el.style.removeProperty("--flc"); });
+  const ids = new Set();
+  if(_flMode && _flSel) ids.add(_flSel);
+  if(_flHoverArrow) ids.add(_flHoverArrow);
+  const arr = flStore();
+  if(_flHoverDesc) arr.forEach(a=>{ if(a.at && a.at.indexOf(_flHoverDesc) >= 0) ids.add(a.id); });
+  arr.forEach(a=>{
+    if(!ids.has(a.id) || !a.at) return;
+    a.at.forEach(dsc=>{ const el = flResolve(dsc); if(el){ el.classList.add("fl-hl"); el.style.setProperty("--flc", a.color || "#FFB454"); } });
+  });
+}
+let _flHoverBound = false;
+function flBindHover(){
+  if(_flHoverBound) return; _flHoverBound = true;
+  const root = document.getElementById("view-biblioteca"); if(!root) return;
+  root.addEventListener("mouseover", ev=>{
+    const d = flDescOf(ev.target);
+    if(d !== _flHoverDesc){ _flHoverDesc = d; flUpdateHL(); }
+  });
+  root.addEventListener("mouseleave", ()=>{ if(_flHoverDesc){ _flHoverDesc = null; flUpdateHL(); } });
+}
+function flAttach(){
+  const wrap = flWrap(), svg = document.getElementById("bibFlLayer"); if(!wrap || !svg) return;
+  flBindHover();
+  flRedraw();
+  flLoopStart();
+  svg.addEventListener("pointerover", ev=>{ const g = ev.target.closest && ev.target.closest(".fl-arrow"); const id = g ? g.dataset.fl : null; if(id !== _flHoverArrow){ _flHoverArrow = id; flUpdateHL(); } });
+  svg.addEventListener("pointerleave", ()=>{ if(_flHoverArrow){ _flHoverArrow = null; flUpdateHL(); } });
+  svg.addEventListener("pointerdown", ev=>{
+    if(!_flMode) return;
+    const h = ev.target.closest && ev.target.closest(".fl-handle");
+    const g = ev.target.closest && ev.target.closest(".fl-arrow");
+    ev.preventDefault();
+    try{ window.getSelection().removeAllRanges(); }catch(e){}
+    if(h && _flSel){
+      const a = flFind(_flSel); if(!a) return;
+      _flDrag = { kind:"handle", h:h.dataset.h, a, orig:JSON.parse(JSON.stringify({ p:a.p, c:a.c || null, pts:a.pts || null })) };
+    } else if(g){
+      const a = flFind(g.dataset.fl); if(!a) return;
+      _flSel = a.id;
+      _flDrag = { kind:"move", a, start:flPoint(ev), orig:JSON.parse(JSON.stringify({ p:a.p, c:a.c || null, pts:a.pts || null })), moved:false };
+      flRefreshBar();
+    } else {
+      const p0 = flPoint(ev);
+      _flDrag = { kind:"draw", p0, preview:null, raw:[p0.slice()] };
+      document.body.classList.add("fl-drawing");
+      _flSel = null; flRefreshBar();
+    }
+    try{ svg.setPointerCapture(ev.pointerId); }catch(e){}
+    flRedraw();
+  });
+  svg.addEventListener("mousedown", ev=>{ if(_flMode) ev.preventDefault(); });
+  svg.addEventListener("pointermove", ev=>{
+    if(!_flDrag) return;
+    const W = wrap.clientWidth || 1, pt = flPoint(ev), D = _flDrag;
+    if(D.kind === "draw"){
+      const base = { id:"pv", color:_flColor, w:_flW, dash:_flOpt.dash, origen:_flOpt.origen, doble:_flOpt.doble };
+      if(_flPreset === "libre"){
+        const last = D.raw[D.raw.length - 1];
+        if(Math.hypot((pt[0] - last[0]) * W, pt[1] - last[1]) > 2) D.raw.push(pt);
+        D.preview = Object.assign(base, { tipo:"libre", p:[D.raw[0], pt], pts:D.raw.slice() });
+      } else {
+        D.preview = Object.assign(base, { tipo:_flPreset, p:[D.p0, pt] });
+      }
+    } else if(D.kind === "handle"){
+      const a = D.a;
+      if(D.h === "c") a.c = pt;
+      else {
+        const i = D.h === "s" ? 0 : 1;
+        if(a.tipo === "libre" && D.orig.pts){
+          // el trazo libre se estira/rota entre las dos puntas (transformación de semejanza)
+          const o = D.orig, s0 = [o.p[0][0] * W, o.p[0][1]], e0 = [o.p[1][0] * W, o.p[1][1]];
+          const s1 = i === 0 ? [pt[0] * W, pt[1]] : s0.slice(), e1 = i === 1 ? [pt[0] * W, pt[1]] : e0.slice();
+          const v0 = [e0[0] - s0[0], e0[1] - s0[1]], v1 = [e1[0] - s1[0], e1[1] - s1[1]];
+          const m0 = v0[0] * v0[0] + v0[1] * v0[1] || 1;
+          const kr = (v1[0] * v0[0] + v1[1] * v0[1]) / m0, ki = (v1[1] * v0[0] - v1[0] * v0[1]) / m0;
+          a.pts = o.pts.map(q=>{ const x = q[0] * W - s0[0], y = q[1] - s0[1]; return [(s1[0] + kr * x - ki * y) / W, s1[1] + ki * x + kr * y]; });
+          a.p = [a.pts[0].slice(), a.pts[a.pts.length - 1].slice()];
+        } else a.p[i] = pt;
+      }
+      D.changed = true;
+    } else if(D.kind === "move"){
+      const dx = pt[0] - D.start[0], dy = pt[1] - D.start[1];
+      if(Math.hypot(dx * W, dy) > 3) D.moved = true;
+      D.a.p = D.orig.p.map(q=>[q[0] + dx, q[1] + dy]);
+      if(D.orig.c) D.a.c = [D.orig.c[0] + dx, D.orig.c[1] + dy];
+      if(D.orig.pts) D.a.pts = D.orig.pts.map(q=>[q[0] + dx, q[1] + dy]);
+      D.changed = D.moved;
+    }
+    flRedraw();
+  });
+  const end = ev=>{
+    if(!_flDrag) return;
+    const D = _flDrag, W = wrap.clientWidth || 1; _flDrag = null; document.body.classList.remove("fl-drawing");
+    if(D.kind === "draw" && D.preview){
+      const pv = D.preview;
+      pv.id = "fl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+      let ok = false;
+      if(pv.tipo === "libre"){
+        const rawPx = D.raw.map(q=>[q[0] * W, q[1]]);
+        const r = flNeaten(rawPx, _flOpt.neat);
+        if(r){ flApplyNeat(pv, r, W); pv.raw = flRdp(rawPx, 1.5).map(q=>[q[0] / W, q[1]]); ok = true; }
+      } else {
+        const len = Math.hypot((pv.p[1][0] - pv.p[0][0]) * W, pv.p[1][1] - pv.p[0][1]);
+        if(len > 14){ if(pv.tipo === "curva") pv.c = null; ok = true; }
+      }
+      if(ok){ flAttachArrow(pv); flStore().push(pv); _flSel = null; saveState(true); }
+    } else if(D.changed){
+      D.a.raw = null; // al editar a mano ya no se vuelve a prolijar desde el trazo original
+      // Al editar, la flecha se vuelve a anclar a lo que quede bajo la(s) punta(s) que el usuario movió
+      if(D.kind === "handle"){ if(D.h !== "c") flAttachArrow(D.a, [D.h === "s" ? 0 : 1]); }
+      else flAttachArrow(D.a);
+      saveState(true);
+    }
+    flRedraw(); flRefreshBar();
+  };
+  svg.addEventListener("pointerup", end);
+  svg.addEventListener("pointercancel", end);
+}
+document.addEventListener("keydown", ev=>{
+  if(!_flMode || !_flSel) return;
+  if(ev.key !== "Delete" && ev.key !== "Backspace") return;
+  const ae = document.activeElement;
+  if(ae && (ae.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))) return;
+  ev.preventDefault(); flDeleteSel();
+});
+window.addEventListener("resize", ()=>{ if(document.getElementById("bibFlLayer")) flRedraw(); });
+
 function renderEstandar(){
   const container = document.getElementById("view-estandar");
   if(!container) return;
@@ -5512,13 +6304,21 @@ function renderTrackerPanel(){
   } else {
     syncTrackerFromLogs();
     const pct = trackerPercent();
+    // Semanas calendario: domingo → sábado. Si el ciclo no arranca en domingo, la primera
+    // fila lleva casillas vacías antes del primer día; si no termina en sábado, la última
+    // fila lleva vacías al final. Los días del ciclo (y el %) no cambian.
     const weeksHtml = [];
-    for(let w=0; w<t.semanas; w++){
+    const lead = new Date(t.days[0].date + "T12:00:00").getDay(); // 0 = domingo
+    const cells = [];
+    for(let i=0;i<lead;i++) cells.push(null);
+    t.days.forEach((day, idx)=> cells.push(idx));
+    while(cells.length % 7 !== 0) cells.push(null);
+    for(let w=0; w<cells.length/7; w++){
       const daysHtml = [];
       for(let d=0; d<7; d++){
-        const idx = w*7 + d;
+        const idx = cells[w*7 + d];
+        if(idx === null){ daysHtml.push(`<div class="tracker-day empty" aria-hidden="true"></div>`); continue; }
         const day = t.days[idx];
-        if(!day) continue;
         const cls = trackerStatusClass(day.status);
         daysHtml.push(`<div class="tracker-day ${cls} ${day.hasLog ? "haslog" : ""}" onclick="cycleTrackerDay(${idx})" title="${day.date}${day.hasLog ? " · con registro" : " · click para marcar"}">
           <span class="num">${trackerDayNum(day.date)}</span>
@@ -6433,6 +7233,7 @@ function exportJSON(){
 // INIT
 // ============================================================
 function renderAll(){
+  applyCustomFases();
   document.getElementById("startDate").textContent = STATE.meta.startDate;
   document.getElementById("cycleName").textContent = STATE.meta.cycleName;
   document.getElementById("lastUpdate").textContent = STATE.meta.lastUpdate || "—";
