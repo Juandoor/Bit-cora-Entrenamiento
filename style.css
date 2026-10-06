@@ -666,6 +666,24 @@
   .ex-notes-toggle.estiratipo{ color: var(--rose); }
   .ex-notes-toggle.estiratipo:hover{ background: var(--rose-soft); }
   .ex-notes-panel.estiratipo{ border-top: 1px dashed var(--rose); background: var(--rose-soft); }
+  /* Casilla "Tipo" de estiramiento (junto a Enfriam.) + pestaña flotante */
+  .stat.stat-estitipo{ border:1px dashed var(--rose); background: var(--rose-soft); color: var(--rose); cursor:pointer; text-align:left; font:inherit; font-family: var(--font-mono); font-size:12px; }
+  .stat.stat-estitipo label{ color: var(--rose); cursor:pointer; }
+  .stat.stat-estitipo:hover, .stat.stat-estitipo.open{ border-style:solid; }
+  .esti-pop{ position:fixed; z-index:9000; width:min(280px, calc(100vw - 16px)); background: var(--surface-3); border:1px solid var(--rose); border-radius:10px; padding:10px; box-shadow:0 12px 32px rgba(0,0,0,.5); display:flex; flex-direction:column; gap:4px; }
+  .esti-pop-title{ font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color: var(--rose); margin-bottom:2px; }
+  .esti-opt{ background:transparent; border:1px solid transparent; color: var(--text); text-align:left; padding:6px 8px; border-radius:6px; font:inherit; font-size:13px; cursor:pointer; }
+  .esti-opt:hover{ background: var(--rose-soft); }
+  .esti-opt.on{ border-color: var(--rose); background: var(--rose-soft); font-weight:700; }
+  .esti-row{ display:flex; gap:4px; align-items:stretch; }
+  .esti-row .esti-opt{ flex:1; }
+  .esti-sub-toggle{ background:transparent; border:1px solid var(--line); color: var(--rose); border-radius:6px; width:30px; cursor:pointer; font-size:12px; transition: transform .15s; }
+  .esti-sub-toggle:hover{ background: var(--rose-soft); }
+  .esti-sub-toggle.open{ transform: rotate(180deg); }
+  .esti-sub{ display:none; flex-direction:column; gap:3px; margin:0 0 2px 14px; padding-left:8px; border-left:2px solid var(--rose); }
+  .esti-sub.open{ display:flex; }
+  .esti-opt.clear{ color: var(--text-dim); font-size:12px; }
+  .esti-pop .subtipo-def{ margin:6px 0 0; font-size:12px; color: var(--text-soft); line-height:1.45; min-height:3.2em; }
   .ex-notes-panel .subtipo-def{ margin:10px 0 0; font-size:12.5px; color: var(--text-soft); line-height:1.5; }
   .ex-notes-panel .subtipo-select{ width:auto; min-width:220px; }
   .ex-notes-panel{
@@ -1054,6 +1072,39 @@
   .bib-btn:hover{ background: rgba(255,255,255,0.14); }
   .bib-btn.danger:hover{ background: rgba(232,113,74,0.3); }
   .bib-main .tecnica-collapsible.panel{ border-radius:22px; border:1px solid rgba(139,124,246,0.35); background: linear-gradient(135deg, rgba(139,124,246,0.16), rgba(199,125,219,0.07)); box-shadow: 0 14px 34px rgba(0,0,0,0.38); }
+  /* Tarjeta cerrada: sin la línea que separa título y texto (rompía las esquinas redondeadas); aparece al desplegar */
+  .bib-main .tecnica-collapsible:not([open]) > summary.panel-head{ border-bottom-color: transparent; }
+  /* ===== Enlaces (links) entre pestañas, tarjetas y webs — popup al pasar el cursor ===== */
+  .stat.stat-links{ border:1px dashed #8B7CF6; background: rgba(139,124,246,0.12); color:#C9C0FF; cursor:pointer; text-align:left; font:inherit; font-family: var(--font-mono); font-size:12px; }
+  .stat.stat-links label{ color:#B9AEFF; cursor:pointer; }
+  .stat.stat-links.has, .stat.stat-links:hover{ border-style:solid; }
+  .lk-chip{ font:inherit; font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px; border:1px solid rgba(139,124,246,0.5); background: rgba(139,124,246,0.14); color:#C9C0FF; cursor:pointer; margin-top:4px; }
+  .lk-chip.has, .lk-chip:hover{ background: rgba(139,124,246,0.32); }
+  .lk-pop{ position:fixed; z-index:9100; width:min(380px, calc(100vw - 16px)); max-height:min(70vh, 520px); overflow:auto; background: var(--surface-3); border:1px solid #8B7CF6; border-radius:12px; padding:10px; box-shadow:0 14px 36px rgba(0,0,0,0.55); display:flex; flex-direction:column; gap:6px; font-size:13px; color: var(--text); }
+  .lk-head{ display:flex; align-items:center; gap:8px; min-width:0; }
+  .lk-head b{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lk-sec{ font-size:10px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#B9AEFF; margin-top:4px; }
+  .lk-empty{ font-size:12px; color: var(--text-dim); padding:2px 0 4px; }
+  .lk-row{ display:flex; align-items:center; gap:6px; padding:3px 0; }
+  .lk-row.lk-broken .lk-t{ text-decoration:line-through; opacity:.6; }
+  .lk-badge{ flex-shrink:0; font-size:10px; font-weight:800; letter-spacing:0.03em; padding:2px 8px; border-radius:999px; white-space:nowrap; }
+  .lk-k-ex{ background: rgba(255,107,91,0.2); color:#FF9A8D; }
+  .lk-k-bib{ background: rgba(139,124,246,0.25); color:#C9C0FF; }
+  .lk-k-tab{ background: rgba(45,212,191,0.2); color:#7DE8D8; }
+  .lk-k-url{ background: rgba(255,180,84,0.2); color:#FFC97F; }
+  .lk-go, .lk-res{ flex:1; min-width:0; text-align:left; background:transparent; border:1px solid transparent; border-radius:6px; color: var(--text); font:inherit; cursor:pointer; padding:3px 6px; display:flex; flex-direction:column; gap:1px; }
+  .lk-go:hover, .lk-res:hover{ background: rgba(139,124,246,0.18); }
+  .lk-t{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700; }
+  .lk-w{ font-size:11px; color: var(--text-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lk-cp, .lk-paste{ flex-shrink:0; background: rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.14); color: var(--text); border-radius:8px; font:inherit; font-size:11px; font-weight:700; padding:3px 8px; cursor:pointer; }
+  .lk-cp:hover, .lk-paste:hover{ background: rgba(255,255,255,0.15); }
+  .lk-x{ flex-shrink:0; background:none; border:none; color: var(--text-dim); font-size:16px; cursor:pointer; padding:0 4px; }
+  .lk-x:hover{ color: var(--brick); }
+  .lk-add{ display:flex; flex-direction:column; gap:6px; border-top:1px solid var(--line-soft); padding-top:8px; margin-top:4px; }
+  .lk-in{ width:100%; box-sizing:border-box; background: rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.14); border-radius:8px; color: var(--text); font:inherit; padding:7px 10px; }
+  .lk-results{ display:flex; flex-direction:column; gap:2px; }
+  .lk-res{ flex-direction:row; align-items:center; gap:8px; }
+  .lk-res .lk-t{ flex:1; min-width:0; }
   .bib-main [contenteditable="true"]:empty::before{ content: attr(data-ph); color: var(--text-dim); }
   .bib-side{ position:sticky; top:150px; display:flex; flex-direction:column; gap:12px; }
   .bib-side-card{ border-radius:20px; padding:16px; border:1px solid rgba(255,255,255,0.1); background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.025)); }
@@ -1629,9 +1680,9 @@
     font-family: var(--font-mono); font-size:10.5px; color: var(--text-dim);
     width:44px; flex-shrink:0; text-transform:uppercase; letter-spacing:0.04em;
   }
-  .tracker-days-row{ display:flex; gap:6px; flex-wrap:wrap; flex:1; }
+  .tracker-days-row{ display:flex; gap:6px; flex-wrap:nowrap; flex:1; min-width:0; }
   .tracker-day{
-    width:38px; height:44px; border-radius:6px;
+    flex:1 1 0; min-width:0; max-width:38px; height:44px; border-radius:6px;
     background: var(--surface-3); border:1px solid var(--line-soft);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     cursor:pointer; user-select:none; position:relative;
@@ -1639,6 +1690,8 @@
     transition: transform .12s ease, border-color .12s ease;
   }
   .tracker-day.empty{ visibility:hidden; pointer-events:none; }
+  /* Casilla "fantasma": rellena la fila pero no es del ciclo (apagada, sin click ni hover) */
+  .tracker-day.ghost{ background: rgba(0,0,0,.28); border:1px dashed var(--line-soft); color: var(--text-dim); opacity:.5; cursor:default; pointer-events:none; }
   .tracker-day:hover{ transform: translateY(-2px); border-color: var(--teal); }
   .tracker-day .num{ font-size:12.5px; font-weight:700; line-height:1.2; }
   .tracker-day .wd{ font-size:8px; text-transform:uppercase; opacity:0.75; letter-spacing:0.03em; }
@@ -1657,7 +1710,7 @@
   .tracker-hint{ font-size:12px; color: var(--text-dim); margin-top:10px; }
 
   @media (max-width:640px){
-    .tracker-day{ width:30px; height:38px; }
+    .tracker-day{ height:38px; }
     .tracker-week-label{ width:36px; font-size:9.5px; }
   }
 

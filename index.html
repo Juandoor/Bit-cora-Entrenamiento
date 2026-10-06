@@ -680,6 +680,24 @@
   .ex-notes-toggle.estiratipo{ color: var(--rose); }
   .ex-notes-toggle.estiratipo:hover{ background: var(--rose-soft); }
   .ex-notes-panel.estiratipo{ border-top: 1px dashed var(--rose); background: var(--rose-soft); }
+  /* Casilla "Tipo" de estiramiento (junto a Enfriam.) + pestaña flotante */
+  .stat.stat-estitipo{ border:1px dashed var(--rose); background: var(--rose-soft); color: var(--rose); cursor:pointer; text-align:left; font:inherit; font-family: var(--font-mono); font-size:12px; }
+  .stat.stat-estitipo label{ color: var(--rose); cursor:pointer; }
+  .stat.stat-estitipo:hover, .stat.stat-estitipo.open{ border-style:solid; }
+  .esti-pop{ position:fixed; z-index:9000; width:min(280px, calc(100vw - 16px)); background: var(--surface-3); border:1px solid var(--rose); border-radius:10px; padding:10px; box-shadow:0 12px 32px rgba(0,0,0,.5); display:flex; flex-direction:column; gap:4px; }
+  .esti-pop-title{ font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color: var(--rose); margin-bottom:2px; }
+  .esti-opt{ background:transparent; border:1px solid transparent; color: var(--text); text-align:left; padding:6px 8px; border-radius:6px; font:inherit; font-size:13px; cursor:pointer; }
+  .esti-opt:hover{ background: var(--rose-soft); }
+  .esti-opt.on{ border-color: var(--rose); background: var(--rose-soft); font-weight:700; }
+  .esti-row{ display:flex; gap:4px; align-items:stretch; }
+  .esti-row .esti-opt{ flex:1; }
+  .esti-sub-toggle{ background:transparent; border:1px solid var(--line); color: var(--rose); border-radius:6px; width:30px; cursor:pointer; font-size:12px; transition: transform .15s; }
+  .esti-sub-toggle:hover{ background: var(--rose-soft); }
+  .esti-sub-toggle.open{ transform: rotate(180deg); }
+  .esti-sub{ display:none; flex-direction:column; gap:3px; margin:0 0 2px 14px; padding-left:8px; border-left:2px solid var(--rose); }
+  .esti-sub.open{ display:flex; }
+  .esti-opt.clear{ color: var(--text-dim); font-size:12px; }
+  .esti-pop .subtipo-def{ margin:6px 0 0; font-size:12px; color: var(--text-soft); line-height:1.45; min-height:3.2em; }
   .ex-notes-panel .subtipo-def{ margin:10px 0 0; font-size:12.5px; color: var(--text-soft); line-height:1.5; }
   .ex-notes-panel .subtipo-select{ width:auto; min-width:220px; }
   .ex-notes-panel{
@@ -1068,6 +1086,39 @@
   .bib-btn:hover{ background: rgba(255,255,255,0.14); }
   .bib-btn.danger:hover{ background: rgba(232,113,74,0.3); }
   .bib-main .tecnica-collapsible.panel{ border-radius:22px; border:1px solid rgba(139,124,246,0.35); background: linear-gradient(135deg, rgba(139,124,246,0.16), rgba(199,125,219,0.07)); box-shadow: 0 14px 34px rgba(0,0,0,0.38); }
+  /* Tarjeta cerrada: sin la línea que separa título y texto (rompía las esquinas redondeadas); aparece al desplegar */
+  .bib-main .tecnica-collapsible:not([open]) > summary.panel-head{ border-bottom-color: transparent; }
+  /* ===== Enlaces (links) entre pestañas, tarjetas y webs — popup al pasar el cursor ===== */
+  .stat.stat-links{ border:1px dashed #8B7CF6; background: rgba(139,124,246,0.12); color:#C9C0FF; cursor:pointer; text-align:left; font:inherit; font-family: var(--font-mono); font-size:12px; }
+  .stat.stat-links label{ color:#B9AEFF; cursor:pointer; }
+  .stat.stat-links.has, .stat.stat-links:hover{ border-style:solid; }
+  .lk-chip{ font:inherit; font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px; border:1px solid rgba(139,124,246,0.5); background: rgba(139,124,246,0.14); color:#C9C0FF; cursor:pointer; margin-top:4px; }
+  .lk-chip.has, .lk-chip:hover{ background: rgba(139,124,246,0.32); }
+  .lk-pop{ position:fixed; z-index:9100; width:min(380px, calc(100vw - 16px)); max-height:min(70vh, 520px); overflow:auto; background: var(--surface-3); border:1px solid #8B7CF6; border-radius:12px; padding:10px; box-shadow:0 14px 36px rgba(0,0,0,0.55); display:flex; flex-direction:column; gap:6px; font-size:13px; color: var(--text); }
+  .lk-head{ display:flex; align-items:center; gap:8px; min-width:0; }
+  .lk-head b{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lk-sec{ font-size:10px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#B9AEFF; margin-top:4px; }
+  .lk-empty{ font-size:12px; color: var(--text-dim); padding:2px 0 4px; }
+  .lk-row{ display:flex; align-items:center; gap:6px; padding:3px 0; }
+  .lk-row.lk-broken .lk-t{ text-decoration:line-through; opacity:.6; }
+  .lk-badge{ flex-shrink:0; font-size:10px; font-weight:800; letter-spacing:0.03em; padding:2px 8px; border-radius:999px; white-space:nowrap; }
+  .lk-k-ex{ background: rgba(255,107,91,0.2); color:#FF9A8D; }
+  .lk-k-bib{ background: rgba(139,124,246,0.25); color:#C9C0FF; }
+  .lk-k-tab{ background: rgba(45,212,191,0.2); color:#7DE8D8; }
+  .lk-k-url{ background: rgba(255,180,84,0.2); color:#FFC97F; }
+  .lk-go, .lk-res{ flex:1; min-width:0; text-align:left; background:transparent; border:1px solid transparent; border-radius:6px; color: var(--text); font:inherit; cursor:pointer; padding:3px 6px; display:flex; flex-direction:column; gap:1px; }
+  .lk-go:hover, .lk-res:hover{ background: rgba(139,124,246,0.18); }
+  .lk-t{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700; }
+  .lk-w{ font-size:11px; color: var(--text-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lk-cp, .lk-paste{ flex-shrink:0; background: rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.14); color: var(--text); border-radius:8px; font:inherit; font-size:11px; font-weight:700; padding:3px 8px; cursor:pointer; }
+  .lk-cp:hover, .lk-paste:hover{ background: rgba(255,255,255,0.15); }
+  .lk-x{ flex-shrink:0; background:none; border:none; color: var(--text-dim); font-size:16px; cursor:pointer; padding:0 4px; }
+  .lk-x:hover{ color: var(--brick); }
+  .lk-add{ display:flex; flex-direction:column; gap:6px; border-top:1px solid var(--line-soft); padding-top:8px; margin-top:4px; }
+  .lk-in{ width:100%; box-sizing:border-box; background: rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.14); border-radius:8px; color: var(--text); font:inherit; padding:7px 10px; }
+  .lk-results{ display:flex; flex-direction:column; gap:2px; }
+  .lk-res{ flex-direction:row; align-items:center; gap:8px; }
+  .lk-res .lk-t{ flex:1; min-width:0; }
   .bib-main [contenteditable="true"]:empty::before{ content: attr(data-ph); color: var(--text-dim); }
   .bib-side{ position:sticky; top:150px; display:flex; flex-direction:column; gap:12px; }
   .bib-side-card{ border-radius:20px; padding:16px; border:1px solid rgba(255,255,255,0.1); background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.025)); }
@@ -1643,9 +1694,9 @@
     font-family: var(--font-mono); font-size:10.5px; color: var(--text-dim);
     width:44px; flex-shrink:0; text-transform:uppercase; letter-spacing:0.04em;
   }
-  .tracker-days-row{ display:flex; gap:6px; flex-wrap:wrap; flex:1; }
+  .tracker-days-row{ display:flex; gap:6px; flex-wrap:nowrap; flex:1; min-width:0; }
   .tracker-day{
-    width:38px; height:44px; border-radius:6px;
+    flex:1 1 0; min-width:0; max-width:38px; height:44px; border-radius:6px;
     background: var(--surface-3); border:1px solid var(--line-soft);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     cursor:pointer; user-select:none; position:relative;
@@ -1653,6 +1704,8 @@
     transition: transform .12s ease, border-color .12s ease;
   }
   .tracker-day.empty{ visibility:hidden; pointer-events:none; }
+  /* Casilla "fantasma": rellena la fila pero no es del ciclo (apagada, sin click ni hover) */
+  .tracker-day.ghost{ background: rgba(0,0,0,.28); border:1px dashed var(--line-soft); color: var(--text-dim); opacity:.5; cursor:default; pointer-events:none; }
   .tracker-day:hover{ transform: translateY(-2px); border-color: var(--teal); }
   .tracker-day .num{ font-size:12.5px; font-weight:700; line-height:1.2; }
   .tracker-day .wd{ font-size:8px; text-transform:uppercase; opacity:0.75; letter-spacing:0.03em; }
@@ -1671,7 +1724,7 @@
   .tracker-hint{ font-size:12px; color: var(--text-dim); margin-top:10px; }
 
   @media (max-width:640px){
-    .tracker-day{ width:30px; height:38px; }
+    .tracker-day{ height:38px; }
     .tracker-week-label{ width:36px; font-size:9.5px; }
   }
 
@@ -2170,7 +2223,8 @@
     <div class="meta">
       Inicio: <b contenteditable="true" id="startDate">25 May 2026</b><br>
       Última actualización: <b id="lastUpdate">—</b><br>
-      Ciclo actual: <b contenteditable="true" id="cycleName">Fuerza + Core</b>
+      Ciclo actual: <b contenteditable="true" id="cycleName">Fuerza + Core</b><br>
+      <button type="button" class="lk-chip" data-lk-v="cur" title="Links desde y hacia esta pestaña">🔗 Enlaces de esta pestaña <span class="lk-n">0</span></button>
       <div class="file-origin-warning" id="fileOriginWarning" style="display:none">
       ⚠️ Estás usando el archivo local: Google Drive no puede conectar acá y tus datos quedan aparte de la versión online. <a href="#" onclick="dismissFileOriginWarning();return false;">Entendido</a>
     </div>
@@ -2793,12 +2847,231 @@ function isoTipoDef(t){
   if(t === "funcional") return "Funcional: pausa isométrica en un punto específico de un movimiento dinámico (ej. a mitad de camino de una sentadilla o dominada), para reforzar un rango de movimiento débil o un punto de estancamiento (sticking point).";
   return "";
 }
-const ESTIRA_TIPO_LABELS = { activo:"Activo", pasivo:"Pasivo" };
+const ESTIRA_TIPO_LABELS = { estatico:"Estático", dinamico:"Dinámico", balistico:"Balístico", fnp:"FNP", activo:"Estático activo", pasivo:"Estático pasivo" };
+// Opciones del selector. "activo" y "pasivo" son subdivisiones del estático (se muestran como
+// "Estático activo" / "Estático pasivo"); se guardan con los mismos valores de siempre.
+const ESTIRA_TIPO_OPCIONES = ["estatico","dinamico","balistico","fnp"];
+const ESTIRA_ESTATICO_SUB = ["activo","pasivo"];
 function estiraTipoDef(t){
-  if(t === "activo") return "Activo: el estiramiento se logra contrayendo el músculo opuesto (agonista), sin ayuda externa. Ej: elevar la pierna estirada sin apoyarla en nada.";
-  if(t === "pasivo") return "Pasivo: el estiramiento se logra con una fuerza externa (peso corporal, gravedad, pared, banda, compañero), sin que el músculo objetivo se contraiga activamente.";
+  if(t === "estatico") return "Estático: mantener una posición de reposo durante 10 a 30 segundos para aumentar la flexibilidad y reducir la rigidez. Puede ser activo (con el músculo antagonista), pasivo (con fuerza externa) o isométrico. Ideal después del ejercicio, para relajar y recuperar.";
+  if(t === "dinamico") return "Dinámico: movimientos controlados y progresivos que llevan la articulación a su límite sin rebotes. Aumentan la temperatura, la agilidad y la resistencia muscular; recomendado como calentamiento antes de la actividad.";
+  if(t === "balistico") return "Balístico: movimientos rítmicos rápidos y rebotes para forzar el rango articular. Aumenta la flexibilidad, pero con mayor riesgo de lesión: usar con precaución.";
+  if(t === "fnp") return "FNP (Facilitación Neuromuscular Propioceptiva): combina estiramiento estático e isométrico en cuatro fases (estiramiento, contracción isométrica de 7 segundos, relajación y nuevo estiramiento). Busca aumentar el rango de movimiento y la coordinación neuromuscular; efectivo pero más complejo.";
+  if(t === "activo") return "Estático activo: el estiramiento se logra contrayendo el músculo opuesto (agonista), sin ayuda externa. Ej: elevar la pierna estirada sin apoyarla en nada.";
+  if(t === "pasivo") return "Estático pasivo: el estiramiento se logra con una fuerza externa (peso corporal, gravedad, pared, banda, compañero), sin que el músculo objetivo se contraiga activamente.";
   return "";
 }
+// Pestaña flotante del tipo de estiramiento: vive en la fila de casillas (junto a Enfriam.)
+// y se abre como panel flotante anclado a esa casilla.
+function closeEstiPop(){ const p = document.getElementById("estiPop"); if(p) p.remove(); document.querySelectorAll(".stat-estitipo.open").forEach(b=>b.classList.remove("open")); }
+function openEstiPop(btn, routineKey, idx){
+  const was = document.getElementById("estiPop");
+  const same = was && was.dataset.r === routineKey && was.dataset.i === String(idx);
+  closeEstiPop();
+  if(same) return;
+  const ex = STATE[routineKey].exercises[idx];
+  const cur = ex.estiramientoTipo || "";
+  const subOpen = ESTIRA_ESTATICO_SUB.includes(cur);
+  const optBtn = o => `<button type="button" class="esti-opt ${o===cur?"on":""}" data-v="${o}">${ESTIRA_TIPO_LABELS[o]}</button>`;
+  const optsHtml = ESTIRA_TIPO_OPCIONES.map(o=> o !== "estatico" ? optBtn(o) : `<div class="esti-row">${optBtn(o)}<button type="button" class="esti-sub-toggle ${subOpen?"open":""}" aria-label="Estático activo / pasivo" title="Estático activo / pasivo">▾</button></div>
+      <div class="esti-sub ${subOpen?"open":""}">${ESTIRA_ESTATICO_SUB.map(s=>`<button type="button" class="esti-opt ${s===cur?"on":""}" data-v="${s}">${s==="activo"?"Activo":"Pasivo"}</button>`).join("")}</div>`).join("");
+  const pop = document.createElement("div");
+  pop.id = "estiPop"; pop.className = "esti-pop"; pop.dataset.r = routineKey; pop.dataset.i = String(idx);
+  pop.innerHTML = `<div class="esti-pop-title">Tipo de estiramiento</div>
+    ${optsHtml}
+    <button type="button" class="esti-opt clear" data-v="">— Sin definir —</button>
+    <p class="subtipo-def" id="estiPopDef">${escapeHtml(estiraTipoDef(cur))}</p>`;
+  document.body.appendChild(pop);
+  btn.classList.add("open");
+  const r = btn.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
+  let left = Math.min(Math.max(8, r.left), window.innerWidth - pw - 8);
+  let top = r.bottom + 6; if(top + ph > window.innerHeight - 8) top = Math.max(8, r.top - ph - 6);
+  pop.style.left = left + "px"; pop.style.top = top + "px";
+  const stb = pop.querySelector(".esti-sub-toggle");
+  if(stb) stb.addEventListener("click", ()=>{ stb.classList.toggle("open"); pop.querySelector(".esti-sub").classList.toggle("open"); });
+  pop.querySelectorAll(".esti-opt").forEach(b=>{
+    b.addEventListener("mouseenter", ()=>{ const d = document.getElementById("estiPopDef"); if(d) d.textContent = estiraTipoDef(b.dataset.v || cur); });
+    b.addEventListener("click", ()=>{ closeEstiPop(); setEstiramientoTipo(routineKey, idx, b.dataset.v); });
+  });
+}
+document.addEventListener("mousedown", ev=>{ if(!document.getElementById("estiPop")) return; if(ev.target.closest && (ev.target.closest("#estiPop") || ev.target.closest(".stat-estitipo"))) return; closeEstiPop(); });
+document.addEventListener("keydown", ev=>{ if(ev.key === "Escape") closeEstiPop(); });
+window.addEventListener("resize", closeEstiPop);
+window.addEventListener("scroll", closeEstiPop, true);
+// ============================================================
+// ENLACES (links) entre cualquier parte de la app — tarea A-1.
+// Se guardan en STATE.tecnica.enlaces: [{ id, from, to, creado }].
+// Cada extremo: { t:"ex", r:"rutinaA|rutinaB", x:<id estable del ejercicio> } | { t:"bib", b:<id de tarjeta> }
+//               | { t:"tab", v:<vista> } | { t:"url", u:<dirección> }  (la URL solo como destino).
+// Se ven en un popup que se abre al pasar el cursor por la casilla "Links" (tarjetas de ejercicio),
+// la fila "Enlaces" de la ficha de la Biblioteca o el chip "Enlaces de esta pestaña" del encabezado.
+// Cada link lleva un identificador (tipo + dónde está) y la conexión se ve en los dos sentidos.
+// ============================================================
+const LK_KINDS = { ex:{label:"Ejercicio", ic:"🏋️"}, bib:{label:"Biblioteca", ic:"📚"}, tab:{label:"Pestaña", ic:"🗂️"}, url:{label:"Web", ic:"🌐"} };
+const LK_ANCHOR_SEL = "[data-lk-r],[data-lk-b],[data-lk-v]";
+let _lkClip = null, _lkOpenTimer = null, _lkCloseTimer = null, _lkAnchor = null, _lkSelf = null;
+function lkStore(){ if(!STATE.tecnica) STATE.tecnica = {}; if(!Array.isArray(STATE.tecnica.enlaces)) STATE.tecnica.enlaces = []; return STATE.tecnica.enlaces; }
+function lkExId(ex){ if(!ex.lid) ex.lid = uid("x"); return ex.lid; }
+function lkRoutineLabel(r){ return r === "rutinaA" ? "Rutina A" : (r === "rutinaB" ? "Rutina B" : r); }
+function lkTabLabel(v){ const b = document.querySelector(`.tab-btn[data-view="${v}"]`); return b ? b.textContent.trim() : v; }
+function lkFindEx(r, x){ const arr = (STATE[r] && STATE[r].exercises) || []; const idx = arr.findIndex(e=>e.lid === x); return idx >= 0 ? { ex: arr[idx], idx } : null; }
+function lkSame(a, b){
+  if(!a || !b || a.t !== b.t) return false;
+  if(a.t === "ex") return a.r === b.r && a.x === b.x;
+  if(a.t === "bib") return a.b === b.b;
+  if(a.t === "tab") return a.v === b.v;
+  return a.u === b.u;
+}
+function lkDesc(ep){
+  if(ep.t === "ex"){ const f = lkFindEx(ep.r, ep.x); return { kind:"ex", where: lkRoutineLabel(ep.r), title: f ? (f.ex.nombre || "Sin nombre") : "(ejercicio no encontrado)", ok: !!f }; }
+  if(ep.t === "bib"){ const f = bibFind(ep.b); return { kind:"bib", where: f && f.priv ? "Biblioteca privada" : "Biblioteca", title: f ? (f.card.titulo || "Sin título") : "(tarjeta no encontrada)", ok: !!f }; }
+  if(ep.t === "tab") return { kind:"tab", where:"", title: lkTabLabel(ep.v), ok:true };
+  let host = ep.u || ""; try{ host = new URL(ep.u).hostname.replace(/^www\./, ""); }catch(e){}
+  return { kind:"url", where: (ep.u || "").replace(/^https?:\/\//i, "").slice(0, 46), title: host, ok:true };
+}
+// Extremo "propio" de un ancla. Con create=false no le asigna id a los ejercicios que todavía no lo tienen.
+function lkSelfOf(a, create){
+  if(a.dataset.lkR){
+    const ex = (STATE[a.dataset.lkR] && STATE[a.dataset.lkR].exercises || [])[+a.dataset.lkI];
+    if(!ex) return null;
+    if(!ex.lid && !create) return null;
+    return { t:"ex", r:a.dataset.lkR, x: lkExId(ex) };
+  }
+  if(a.dataset.lkB) return { t:"bib", b:a.dataset.lkB };
+  if(a.dataset.lkV !== undefined) return { t:"tab", v:_currentView };
+  return null;
+}
+function lkCount(self){ return self ? lkStore().filter(l=>lkSame(l.from, self) || lkSame(l.to, self)).length : 0; }
+function lkCountEx(r, ex){ return ex && ex.lid ? lkCount({ t:"ex", r, x:ex.lid }) : 0; }
+function lkRefreshCounts(){
+  document.querySelectorAll(LK_ANCHOR_SEL).forEach(a=>{
+    const n = lkCount(lkSelfOf(a, false)); const v = a.querySelector(".lk-n");
+    if(v) v.textContent = n; a.classList.toggle("has", n > 0);
+  });
+}
+function lkNorm(s){ return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+function lkSearch(q){
+  const raw = q.trim(), n = lkNorm(raw), out = [];
+  if(/^(https?:\/\/|www\.)\S+$/i.test(raw)) out.push({ t:"url", u: /^www\./i.test(raw) ? "https://" + raw : raw });
+  if(!n) return out;
+  VISTAS_VALIDAS.forEach(v=>{ if(lkNorm(lkTabLabel(v)).includes(n)) out.push({ t:"tab", v }); });
+  const d = bibData();
+  d.cards.concat(d.privada.cards).forEach(c=>{ if(lkNorm(c.titulo).includes(n)) out.push({ t:"bib", b:c.id }); });
+  ["rutinaA","rutinaB"].forEach(r=>{ ((STATE[r] && STATE[r].exercises) || []).forEach((ex, i)=>{ if(lkNorm(ex.nombre).includes(n)) out.push({ t:"ex", r, i }); }); });
+  return out.slice(0, 10);
+}
+function lkFinal(c){ return c.t === "ex" && c.i !== undefined ? { t:"ex", r:c.r, x: lkExId(STATE[c.r].exercises[c.i]) } : c; }
+function lkAdd(from, to){
+  if(!from || !to || lkSame(from, to)) return false;
+  const st = lkStore(); if(st.some(l=>lkSame(l.from, from) && lkSame(l.to, to))) return false;
+  st.push({ id: uid("lk"), from, to, creado: new Date().toISOString() });
+  saveState(); lkRefreshCounts(); return true;
+}
+function lkGo(ep){
+  closeLkPop();
+  if(ep.t === "url"){ window.open(ep.u, "_blank", "noopener"); return; }
+  if(ep.t === "tab"){ showView(ep.v); return; }
+  if(ep.t === "bib"){
+    if(!bibFind(ep.b)) return;
+    showView("biblioteca"); _bibSel = ep.b;
+    try{ ensureUiState().bibSel = _bibSel; saveState("ui"); }catch(e){}
+    renderBiblioteca();
+    setTimeout(()=>{ const el = document.querySelector(`.bib-item[data-bib-id="${ep.b}"]`); if(el){ el.classList.add("search-flash"); setTimeout(()=>el.classList.remove("search-flash"), 1400); } window.scrollTo({ top:0, behavior:"smooth" }); }, 80);
+    return;
+  }
+  const f = lkFindEx(ep.r, ep.x); if(!f) return;
+  showView(ep.r);
+  setTimeout(()=>{ const c = document.querySelector(`#view-${ep.r} .ex-card[data-idx="${f.idx}"]`); if(c) followMovedCard(c); }, 140);
+}
+function lkCopy(link){
+  const d = lkDesc(link.to);
+  const txt = d.kind === "url" ? link.to.u : `${LK_KINDS[d.kind].label}: ${d.title}${d.where && d.kind !== "tab" ? " (" + d.where + ")" : ""}`;
+  _lkClip = { to: JSON.parse(JSON.stringify(link.to)) };
+  try{ if(navigator.clipboard) navigator.clipboard.writeText(txt).catch(()=>{}); }catch(e){}
+}
+function closeLkPop(){ clearTimeout(_lkOpenTimer); clearTimeout(_lkCloseTimer); const p = document.getElementById("lkPop"); if(p) p.remove(); _lkAnchor = null; _lkSelf = null; }
+function lkRowHtml(l, dir){
+  const ep = dir === "out" ? l.to : l.from, d = lkDesc(ep), k = LK_KINDS[d.kind];
+  return `<div class="lk-row ${d.ok ? "" : "lk-broken"}" data-id="${l.id}" data-dir="${dir}">
+    <span class="lk-badge lk-k-${d.kind}" title="${dir === "out" ? "Lleva a" : "Viene de"}: ${k.label}">${dir === "in" ? "← " : ""}${k.ic} ${k.label}</span>
+    <button type="button" class="lk-go" title="Ir"><span class="lk-t">${escapeHtml(d.title)}</span>${d.where ? `<span class="lk-w">${escapeHtml(d.where)}</span>` : ""}</button>
+    ${dir === "out" ? `<button type="button" class="lk-cp" title="Copiar link y texto">Copiar</button>` : ""}
+    <button type="button" class="lk-x" title="Quitar link">×</button>
+  </div>`;
+}
+function lkFillLists(){
+  const pop = document.getElementById("lkPop"); if(!pop || !_lkSelf) return;
+  const st = lkStore(), outs = st.filter(l=>lkSame(l.from, _lkSelf)), ins = st.filter(l=>lkSame(l.to, _lkSelf));
+  pop.querySelector(".lk-lists").innerHTML =
+    `<div class="lk-sec">Lleva a (${outs.length})</div>${outs.length ? outs.map(l=>lkRowHtml(l, "out")).join("") : `<div class="lk-empty">Todavía no hay links desde acá.</div>`}` +
+    (ins.length ? `<div class="lk-sec">Viene de (${ins.length})</div>${ins.map(l=>lkRowHtml(l, "in")).join("")}` : "");
+  const paste = pop.querySelector(".lk-paste"); if(paste) paste.style.display = _lkClip ? "" : "none";
+  lkPlacePop(); lkRefreshCounts();
+}
+function lkPlacePop(){
+  const pop = document.getElementById("lkPop"); if(!pop || !_lkAnchor || !document.body.contains(_lkAnchor)) return;
+  const r = _lkAnchor.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
+  const left = Math.min(Math.max(8, r.left), window.innerWidth - pw - 8);
+  let top = r.bottom + 4; if(top + ph > window.innerHeight - 8) top = Math.max(8, r.top - ph - 4);
+  pop.style.left = left + "px"; pop.style.top = top + "px";
+}
+function openLkPop(anchor){
+  closeLkPop();
+  const self = lkSelfOf(anchor, true); if(!self) return;
+  _lkAnchor = anchor; _lkSelf = self;
+  const d = lkDesc(self), pop = document.createElement("div");
+  pop.id = "lkPop"; pop.className = "lk-pop";
+  pop.innerHTML = `<div class="lk-head"><span class="lk-badge lk-k-${d.kind}">${LK_KINDS[d.kind].ic} ${LK_KINDS[d.kind].label}</span><b>${escapeHtml(d.title)}</b></div>
+    <div class="lk-lists"></div>
+    <div class="lk-add">
+      <input type="text" class="lk-in" placeholder="Buscar ejercicio, tarjeta o pestaña… o pegar una URL" autocomplete="off">
+      <div class="lk-results"></div>
+      <button type="button" class="lk-paste" style="display:none">Pegar link copiado</button>
+    </div>`;
+  document.body.appendChild(pop);
+  lkFillLists();
+  const inp = pop.querySelector(".lk-in"), res = pop.querySelector(".lk-results");
+  const showRes = ()=>{
+    const list = lkSearch(inp.value);
+    res.innerHTML = list.map((c, i)=>{ const dd = lkDesc(c.t === "ex" && c.i !== undefined ? { t:"ex", r:c.r, x:(STATE[c.r].exercises[c.i].lid || "_") } : c); const title = c.t === "ex" && c.i !== undefined ? (STATE[c.r].exercises[c.i].nombre || "Sin nombre") : dd.title; const where = c.t === "ex" ? lkRoutineLabel(c.r) : dd.where; const k = LK_KINDS[c.t === "ex" ? "ex" : dd.kind];
+      return `<button type="button" class="lk-res" data-i="${i}"><span class="lk-badge lk-k-${c.t}">${k.ic} ${k.label}</span><span class="lk-t">${escapeHtml(title)}</span>${where ? `<span class="lk-w">${escapeHtml(where)}</span>` : ""}</button>`; }).join("");
+    res._list = list;
+  };
+  inp.addEventListener("input", showRes);
+  inp.addEventListener("keydown", ev=>{ if(ev.key === "Enter"){ const first = res._list && res._list[0]; if(first){ lkAdd(_lkSelf, lkFinal(first)); inp.value = ""; showRes(); lkFillLists(); } } });
+  res.addEventListener("click", ev=>{ const b = ev.target.closest(".lk-res"); if(!b) return; lkAdd(_lkSelf, lkFinal(res._list[+b.dataset.i])); inp.value = ""; showRes(); lkFillLists(); });
+  pop.querySelector(".lk-paste").addEventListener("click", ()=>{ if(_lkClip) lkAdd(_lkSelf, JSON.parse(JSON.stringify(_lkClip.to))); lkFillLists(); });
+  pop.querySelector(".lk-lists").addEventListener("click", ev=>{
+    const row = ev.target.closest(".lk-row"); if(!row) return;
+    const link = lkStore().find(l=>l.id === row.dataset.id); if(!link) return;
+    if(ev.target.closest(".lk-go")) return lkGo(row.dataset.dir === "out" ? link.to : link.from);
+    if(ev.target.closest(".lk-cp")){ lkCopy(link); ev.target.closest(".lk-cp").textContent = "¡Copiado!"; return; }
+    if(ev.target.closest(".lk-x")){ STATE.tecnica.enlaces = lkStore().filter(l=>l.id !== link.id); saveState(); lkFillLists(); }
+  });
+  lkPlacePop();
+}
+document.addEventListener("mouseover", ev=>{
+  const t = ev.target; if(!t.closest) return;
+  const a = t.closest(LK_ANCHOR_SEL);
+  if(a){ clearTimeout(_lkCloseTimer); if(_lkAnchor === a && document.getElementById("lkPop")) return; clearTimeout(_lkOpenTimer); _lkOpenTimer = setTimeout(()=>openLkPop(a), 140); }
+  else if(t.closest("#lkPop")) clearTimeout(_lkCloseTimer);
+});
+document.addEventListener("mouseout", ev=>{
+  const t = ev.target; if(!t.closest || !t.closest(LK_ANCHOR_SEL + ",#lkPop")) return;
+  clearTimeout(_lkOpenTimer);
+  const to = ev.relatedTarget; if(to && to.closest && to.closest(LK_ANCHOR_SEL + ",#lkPop")) return;
+  _lkCloseTimer = setTimeout(()=>{ const p = document.getElementById("lkPop"); if(p && !(document.activeElement && document.activeElement.classList.contains("lk-in") && p.contains(document.activeElement))) closeLkPop(); }, 320);
+});
+document.addEventListener("click", ev=>{
+  // composedPath: si el clic fue sobre un botón del popup que se volvió a dibujar, igual cuenta como "dentro del popup"
+  const inPop = ev.composedPath().some(n=>n && n.id === "lkPop");
+  const a = ev.target.closest && ev.target.closest(LK_ANCHOR_SEL);
+  if(a){ ev.preventDefault(); if(!(document.getElementById("lkPop") && _lkAnchor === a)) openLkPop(a); }
+  else if(!inPop) closeLkPop();
+});
+document.addEventListener("keydown", ev=>{ if(ev.key === "Escape") closeLkPop(); });
+window.addEventListener("resize", ()=>lkPlacePop());
+
 function setIsoTipo(routineKey, idx, value){
   const ex = STATE[routineKey].exercises[idx];
   ex.isoTipo = value;
@@ -3498,8 +3771,8 @@ function faseSelectHtml(routineKey, idx, currentFase){
 }
 
 function exerciseCard(ex, routineKey, idx){
-  const t = tagLabel(ex.tag);
-  const cardCls = ex.tag === "priority" ? "priority" : (ex.tag === "cardio" ? "cardio" : "");
+  // La pastilla de tipo (Fuerza/Cardio/Prioridad) se eliminó: la categoría vive solo en el desplegable de fase.
+  const cardCls = "";
   const timerId = `${routineKey}_${idx}`;
   const hasNotes = ex.notas && ex.notas.trim().length > 0;
   const hasAclaracion = ex.notasAclaracion && ex.notasAclaracion.trim().length > 0;
@@ -3526,20 +3799,14 @@ function exerciseCard(ex, routineKey, idx){
         </select>
         ${cur ? `<p class="subtipo-def">${escapeHtml(isoTipoDef(cur))}</p>` : ""}
       </div>`;
-  } else if(fase === "estiramiento"){
+  }
+  let estiStatHtml = "";
+  if(fase === "estiramiento"){
     const cur = ex.estiramientoTipo || "";
-    extraTabHtml = `<div class="ex-notes-toggle estiratipo full" onclick="toggleNotes(this,'esti_${timerId}')">
-        <span class="chevron">▸</span>
-        <span>Tipo de estiramiento ${cur ? `(${ESTIRA_TIPO_LABELS[cur]})` : "(sin definir)"}</span>
-      </div>`;
-    extraPanelHtml = `<div class="ex-notes-panel estiratipo" id="panel_esti_${timerId}">
-        <select class="fase-select subtipo-select" onchange="setEstiramientoTipo('${routineKey}',${idx},this.value)">
-          <option value="">— Elegir tipo —</option>
-          <option value="activo" ${cur==="activo"?"selected":""}>Activo</option>
-          <option value="pasivo" ${cur==="pasivo"?"selected":""}>Pasivo</option>
-        </select>
-        ${cur ? `<p class="subtipo-def">${escapeHtml(estiraTipoDef(cur))}</p>` : ""}
-      </div>`;
+    estiStatHtml = `<button type="button" class="stat stat-estitipo" onclick="openEstiPop(this,'${routineKey}',${idx})" title="Tipo de estiramiento">
+        <label>Tipo</label>
+        <span class="val">${cur && ESTIRA_TIPO_LABELS[cur] ? ESTIRA_TIPO_LABELS[cur] : "—"} ▾</span>
+      </button>`;
   }
   return `
   <div class="ex-card ${cardCls}" id="card-${routineKey}-${idx}" data-routine="${routineKey}" data-idx="${idx}">
@@ -3549,10 +3816,9 @@ function exerciseCard(ex, routineKey, idx){
         <div class="ex-title" contenteditable="true" data-field="nombre" data-placeholder="Nombre del ejercicio">${escapeHtml(ex.nombre)}</div>
         ${faseSelectHtml(routineKey, idx, ex.fase || "fuerza")}
       </div>
-      <span class="ex-tag ${t.cls}" data-field="tag" onclick="cycleTag('${routineKey}',${idx})" title="Click para cambiar tipo">${t.text}</span>
       <button class="ex-del" onclick="deleteExercise('${routineKey}',${idx})" title="Eliminar ejercicio">×</button>
     </div>
-    <div class="ex-stats">${statBlock(ex.stats)}</div>
+    <div class="ex-stats">${statBlock(ex.stats)}${estiStatHtml}<button type="button" class="stat stat-links ${lkCountEx(routineKey, ex) ? "has" : ""}" data-lk-r="${routineKey}" data-lk-i="${idx}" title="Links de este ejercicio"><label>Links</label><span class="val">🔗 <span class="lk-n">${lkCountEx(routineKey, ex)}</span></span></button></div>
     <div class="ex-stats ex-stats-extra">${extraStatsBlock(ex, routineKey, idx)}</div>
     <div class="ex-seq-wrap">${cardSeqBlockHtml(routineKey, idx, ex)}</div>
     <div class="ex-notes-row">
@@ -3833,14 +4099,6 @@ function setByPath(obj, path, value){
   cur[parts[parts.length-1]] = value;
 }
 
-function cycleTag(routineKey, idx){
-  const order = ["normal","cardio","priority"];
-  const ex = STATE[routineKey].exercises[idx];
-  const cur = order.indexOf(ex.tag);
-  ex.tag = order[(cur+1)%order.length];
-  saveState();
-  renderRoutine(routineKey);
-}
 
 // Mueve el ejercicio al bloque de su nueva fase y vuelve a dibujar la rutina. Devuelve el ejercicio movido.
 function applyFaseChange(routineKey, idx, newFase){
@@ -4006,8 +4264,7 @@ function renderAddExerciseModalHtml(){
         <span>Tipo de estiramiento</span>
         <select onchange="updateAddExDraftAndRerender('estiramientoTipo', this.value)">
           <option value="">— Elegir tipo —</option>
-          <option value="activo" ${d.estiramientoTipo==="activo"?"selected":""}>Activo</option>
-          <option value="pasivo" ${d.estiramientoTipo==="pasivo"?"selected":""}>Pasivo</option>
+          ${["estatico","activo","pasivo","dinamico","balistico","fnp"].map(o=>`<option value="${o}" ${d.estiramientoTipo===o?"selected":""}>${ESTIRA_TIPO_LABELS[o]}</option>`).join("")}
         </select>
       </label>
       ${d.estiramientoTipo ? `<p class="subtipo-def">${escapeHtml(estiraTipoDef(d.estiramientoTipo))}</p>` : ""}`;
@@ -4027,14 +4284,6 @@ function renderAddExerciseModalHtml(){
         <label class="add-ex-field">
           <span>Fase</span>
           <select onchange="updateAddExDraftAndRerender('fase', this.value)">${faseOpts}</select>
-        </label>
-        <label class="add-ex-field">
-          <span>Tipo</span>
-          <select onchange="updateAddExDraft('tag', this.value)">
-            <option value="normal" ${d.tag==="normal"?"selected":""}>Fuerza</option>
-            <option value="cardio" ${d.tag==="cardio"?"selected":""}>Cardio</option>
-            <option value="priority" ${d.tag==="priority"?"selected":""}>Prioridad</option>
-          </select>
         </label>
       </div>
       ${subtipoHtml}
@@ -5298,6 +5547,11 @@ function bibData(){
     t.biblioteca = JSON.parse(JSON.stringify((DEFAULT_DATA.tecnica && DEFAULT_DATA.tecnica.biblioteca) || { cards: [] }));
   }
   if(!t.biblioteca.privada || !Array.isArray(t.biblioteca.privada.cards)) t.biblioteca.privada = { cards: [] };
+  // Tarjetas generales nuevas que trae data.js: se agregan a la cuenta existente por id (sin pisar nada de lo editado)
+  try{
+    const defs = (DEFAULT_DATA.tecnica && DEFAULT_DATA.tecnica.biblioteca && DEFAULT_DATA.tecnica.biblioteca.cards) || [];
+    defs.forEach(dc=>{ if(!t.biblioteca.cards.some(c=>c.id === dc.id)) t.biblioteca.cards.push(JSON.parse(JSON.stringify(dc))); });
+  }catch(e){ console.error("Error agregando tarjetas nuevas de la Biblioteca", e); }
   return t.biblioteca;
 }
 function bibFind(id){
@@ -5512,6 +5766,7 @@ function renderBiblioteca(){
       <div class="bib-meta-row"><span>${nl("Tamaño","Size")}</span><span>${escapeHtml(bibSizeText(sel))}</span></div>
       <div class="bib-meta-row"><span>${nl("Dirección","Address")}</span><span>${sel.url ? (urlOk ? `<a href="${escapeHtml(sel.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sel.url.replace(/^https?:\/\/(www\.)?/i, "").slice(0, 38))}${sel.url.length > 46 ? "…" : ""}</a>` : escapeHtml(sel.url)) : "—"}</span></div>
       <div class="bib-meta-row"><span>${nl("Creada","Created")}</span><span>${bibFmtDate(sel.creado)}</span></div>
+      <div class="bib-meta-row"><span>${nl("Enlaces","Links")}</span><span><button type="button" class="lk-chip ${lkCount({ t:"bib", b: sel.id }) ? "has" : ""}" data-lk-b="${sel.id}">🔗 <span class="lk-n">${lkCount({ t:"bib", b: sel.id })}</span></button></span></div>
       <div class="bib-meta-row"><span>${nl("Modificada","Modified")}</span><span id="bibModified">${bibFmtDate(sel.modificado)}</span></div>
     </div></div>`;
   }
@@ -5794,8 +6049,7 @@ function flArrowSvg(a, W, sel){
   out += `<polygon points="${flHead(g.e, g.tEnd, hs)}" fill="${col}" stroke="${col}" stroke-width="1" stroke-linejoin="round" style="pointer-events:none"/>`;
   if(a.doble) out += `<polygon points="${flHead(g.s, g.tStart, hs)}" fill="${col}" stroke="${col}" stroke-width="1" stroke-linejoin="round" style="pointer-events:none"/>`;
   if(a.origen) out += `<circle cx="${g.s[0]}" cy="${g.s[1]}" r="${4 + w * 0.7}" fill="#0d1118" stroke="${col}" stroke-width="${Math.max(2, w * 0.8)}" style="pointer-events:none"/>`;
-  if(a.at && a.at[0]) out += `<circle class="fl-anch" cx="${g.s[0]}" cy="${g.s[1]}" r="${9 + w}" fill="none" stroke="${col}" stroke-width="1.5" style="pointer-events:none"/>`;
-  if(a.at && a.at[1]) out += `<circle class="fl-anch" cx="${g.e[0]}" cy="${g.e[1]}" r="${9 + w}" fill="none" stroke="${col}" stroke-width="1.5" style="pointer-events:none"/>`;
+  // (Los aros en las puntas conectadas se quitaron: la conexión se nota por el resaltado del elemento.)
   if(sel){
     const hd = (id, x, y) => `<circle class="fl-handle" data-h="${id}" cx="${x}" cy="${y}" r="7"/>`;
     out += hd("s", g.s[0], g.s[1]) + hd("e", g.e[0], g.e[1]);
@@ -6309,15 +6563,23 @@ function renderTrackerPanel(){
     // fila lleva vacías al final. Los días del ciclo (y el %) no cambian.
     const weeksHtml = [];
     const lead = new Date(t.days[0].date + "T12:00:00").getDay(); // 0 = domingo
+    // Los huecos de la primera/última fila se rellenan con casillas "fantasma": muestran el día
+    // del calendario (apagado, sin click) para dejar claro que no forman parte del ciclo.
+    const shiftIso = (iso, n)=>{ const dt = new Date(iso + "T12:00:00"); dt.setDate(dt.getDate() + n); return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`; };
     const cells = [];
-    for(let i=0;i<lead;i++) cells.push(null);
+    for(let i=0;i<lead;i++) cells.push({ghost: shiftIso(t.days[0].date, i - lead)});
     t.days.forEach((day, idx)=> cells.push(idx));
-    while(cells.length % 7 !== 0) cells.push(null);
+    for(let k=1; cells.length % 7 !== 0; k++) cells.push({ghost: shiftIso(t.days[t.days.length-1].date, k)});
     for(let w=0; w<cells.length/7; w++){
       const daysHtml = [];
       for(let d=0; d<7; d++){
         const idx = cells[w*7 + d];
-        if(idx === null){ daysHtml.push(`<div class="tracker-day empty" aria-hidden="true"></div>`); continue; }
+        if(typeof idx === "object"){
+          daysHtml.push(`<div class="tracker-day ghost" aria-hidden="true" title="${idx.ghost} · fuera del ciclo">
+          <span class="num">${trackerDayNum(idx.ghost)}</span>
+          <span class="wd">${trackerWeekdayShort(idx.ghost)}</span>
+        </div>`); continue;
+        }
         const day = t.days[idx];
         const cls = trackerStatusClass(day.status);
         daysHtml.push(`<div class="tracker-day ${cls} ${day.hasLog ? "haslog" : ""}" onclick="cycleTrackerDay(${idx})" title="${day.date}${day.hasLog ? " · con registro" : " · click para marcar"}">
@@ -7200,6 +7462,7 @@ function showView(viewKey){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelector(`.tab-btn[data-view="${viewKey}"]`).classList.add('active');
   _currentView = viewKey;
+  closeLkPop(); setTimeout(lkRefreshCounts, 0);
   ensureUiState().vista = viewKey;
   restoreScrollFor(viewKey);
   saveState("ui");

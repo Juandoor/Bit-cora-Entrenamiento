@@ -591,6 +591,32 @@ const DEFAULT_DATA = {
           "tipo": "Texto", "categoria": "Artículo", "autor": "", "etiquetas": "",
           "creado": "2026-09-27",
           "modificado": "2026-09-27"
+        },
+        {
+          "id": "isometricos",
+          "titulo": "Ejercicios isométricos",
+          "contenido": "Los ejercicios isométricos son contracciones musculares en las que el músculo genera tensión sin cambiar su longitud ni producir movimiento articular visible. Derivados del griego isos (igual) y metron (medida), son fundamentales para aumentar la fuerza muscular, mejorar la estabilización articular y servir como herramienta clave en rehabilitación para evitar la atrofia durante la inmovilización.\n\nBeneficios:\n\n* Fortalecimiento sin impacto: mejoran la fuerza y la resistencia en ángulos específicos sin \"castigar\" las articulaciones, por lo que son ideales para personas mayores o en recuperación.\n* Accesibilidad: se pueden hacer en casa, sin equipamiento, con el peso corporal o con una resistencia externa estática (por ejemplo, empujar una pared).\n* Eficiencia: mantener una postura tensa durante 30 segundos o más recluta fibras musculares y mejora la postura.\n\nEjemplos:\n\n* Plancha abdominal: cuerpo recto apoyado sobre los antebrazos y las puntas de los pies.\n* Sentadilla isométrica (Wall Sit): posición de sentadilla apoyada contra una pared.\n* Zancada estática: sin subir ni bajar.\n* Puente de glúteos: cadera elevada y sostenida arriba.\n\nDiferencia con los isotónicos: en los ejercicios isotónicos la longitud del músculo cambia (se acorta o se alarga); en la isometría permanece constante. Son excelentes para la fuerza y la estabilización, pero no mejoran directamente la velocidad ni el rendimiento atlético dinámico.",
+          "fuente": "Brave",
+          "tipo": "Texto",
+          "categoria": "Artículo",
+          "autor": "",
+          "etiquetas": "",
+          "url": "https://search.brave.com/search?q=isom%C3%A9tricos&source=desktop&conversation=09a46e4039dd3ccbcb45295f6f373fa5d56d&shared=1",
+          "creado": "2026-10-04",
+          "modificado": "2026-10-04"
+        },
+        {
+          "id": "tipos_estiramiento",
+          "titulo": "Tipos de estiramientos",
+          "contenido": "Existen cuatro tipos principales de estiramientos: estáticos, dinámicos, balísticos y FNP (Facilitación Neuromuscular Propioceptiva).\n\nEstáticos: mantener una posición de reposo durante 10 a 30 segundos para aumentar la flexibilidad y reducir la rigidez. Se subdividen en activos (uso del propio músculo antagonista), pasivos (fuerza externa) e isométricos (contracción contra la resistencia). Ideales después del ejercicio, para la relajación y la recuperación.\n\nDinámicos: movimientos controlados y progresivos que llevan la articulación a su límite sin rebotes. Incrementan la temperatura, la agilidad y la resistencia muscular; recomendados como calentamiento antes de la actividad deportiva.\n\nBalísticos: movimientos rítmicos rápidos y rebotes para forzar el rango articular. Aumentan la flexibilidad, pero conllevan mayor riesgo de lesiones; usar con precaución.\n\nFNP: combinan estiramiento estático e isométrico en cuatro fases (estiramiento, contracción isométrica de 7 segundos, relajación y nuevo estiramiento). Buscan aumentar el rango de movimiento y la coordinación neuromuscular; son efectivos, pero complejos.",
+          "fuente": "Brave",
+          "tipo": "Texto",
+          "categoria": "Artículo",
+          "autor": "",
+          "etiquetas": "",
+          "url": "https://search.brave.com/search?q=Tipos+de+estiramientos&source=web&conversation=09a434285b4de38bc3d8ff47982c283a356b&shared=1",
+          "creado": "2026-10-04",
+          "modificado": "2026-10-04"
         }
       ],
       "privada": { "cards": [] }
