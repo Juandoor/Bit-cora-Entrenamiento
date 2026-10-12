@@ -838,6 +838,8 @@
     font-family:var(--font-body); font-size:13.5px; background: var(--surface-2); color:var(--text);
   }
   .form-field textarea{ resize:vertical; min-height:60px; }
+  /* L-C: las notas del registro diario son más altas y crecen hacia abajo al escribir */
+  #newLogNotas, #editLogNotas{ min-height:140px; max-height:80vh; overflow-y:auto; line-height:1.5; }
   .form-field input::placeholder, .form-field textarea::placeholder{ color: var(--text-dim); }
   /* Campo de fecha editable dígito a dígito */
   .date-text-wrap{ position:relative; display:flex; align-items:stretch; gap:6px; }
@@ -1112,6 +1114,165 @@
   .lk-w{ font-size:11px; color: var(--text-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .lk-cp, .lk-paste{ flex-shrink:0; background: rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.14); color: var(--text); border-radius:8px; font:inherit; font-size:11px; font-weight:700; padding:3px 8px; cursor:pointer; }
   .lk-cp:hover, .lk-paste:hover{ background: rgba(255,255,255,0.15); }
+  .lk-ctx{ position:fixed; z-index:9200; background: var(--surface-3); border:1px solid #8B7CF6; border-radius:8px; padding:4px; box-shadow:0 8px 22px rgba(0,0,0,0.55); }
+  .lk-ctx button{ display:block; width:100%; text-align:left; background:transparent; border:none; border-radius:6px; color: var(--text); font:inherit; font-size:12.5px; padding:6px 12px; cursor:pointer; white-space:nowrap; }
+  .lk-ctx button:hover{ background: rgba(139,124,246,0.25); }
+  .lk-conn{ width:100%; background: rgba(139,124,246,0.28); border:1px solid #8B7CF6; color:#E4DFFF; border-radius:8px; font:inherit; font-size:12.5px; font-weight:800; padding:8px 10px; cursor:pointer; }
+  .lk-conn:hover{ background: rgba(139,124,246,0.45); }
+  .lk-in.lk-bad{ border-color: var(--brick); }
+  .lk-connbar{ position:fixed; left:50%; top:10px; transform:translateX(-50%); z-index:9300; max-width:min(720px, calc(100vw - 16px)); display:flex; align-items:center; gap:10px; flex-wrap:wrap; background: var(--surface-3); border:1px solid #8B7CF6; border-radius:14px; padding:9px 14px; box-shadow:0 12px 32px rgba(0,0,0,0.55); font-size:12.5px; color: var(--text); }
+  .lk-connbar .lk-cb-t{ flex:1 1 260px; line-height:1.4; }
+  .lk-connbar button{ font:inherit; font-size:12px; font-weight:700; color: var(--text); background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:10px; padding:5px 10px; cursor:pointer; }
+  .lk-connbar button:hover{ background: rgba(139,124,246,0.35); }
+  body.lk-connecting .ex-card, body.lk-connecting .bib-item{ cursor:crosshair; }
+  .lk-cand{ outline:2px solid #8B7CF6 !important; outline-offset:2px; box-shadow:0 0 0 6px rgba(139,124,246,0.2) !important; }
+  .lk-chip.lk-tabbtn{ margin-top:0; flex-shrink:0; white-space:nowrap; }
+  /* ===== A-5: pastillas fijas arriba (panelhead y leyenda de fases) ===== */
+  .masthead{ transition: transform .25s ease, box-shadow .25s ease; }
+  body.hdr-collapsed .masthead{ transform: translateY(-100%); pointer-events:none; }
+  body.hdr-collapsed.hdr-open .masthead{ transform:none; pointer-events:auto; box-shadow:0 16px 36px rgba(0,0,0,0.55); }
+  .dock-pill{ position:fixed; z-index:110; top:0; left:calc(50% - 32px); width:64px; height:16px; padding:0; border:0; background:none; cursor:pointer; display:flex; justify-content:center; align-items:flex-start; opacity:0; pointer-events:none; transition: left .25s ease, top .25s ease, opacity .25s ease; }
+  .dock-pill::before{ content:""; width:46px; height:4px; margin-top:4px; border-radius:3px; background: var(--line); opacity:0.85; transition: opacity .2s ease; }
+  .dock-pill:hover::before, .dock-pill:focus-visible::before{ opacity:1; }
+  .dock-pill.lg{ top: calc(var(--dock-h, 200px) - 2px); }
+  body.dock-hd-show .dock-pill.hd, body.dock-leg-show .dock-pill.lg{ opacity:1; pointer-events:auto; }
+  body.hdr-collapsed:not(.hdr-open) .dock-pill.lg{ top:0; }
+  body.dock-leg-show.hdr-collapsed:not(.hdr-open) .dock-pill.hd{ left: calc(50% - 70px); }
+  body.dock-leg-show.hdr-collapsed:not(.hdr-open) .dock-pill.lg{ left: calc(50% + 6px); }
+  .dock-legend{ position:fixed; z-index:105; left:50%; top: calc(var(--dock-h, 200px) + 16px); width:min(1040px, calc(100vw - 24px)); max-height:60vh; overflow:auto; transform: translateX(-50%) translateY(-8px); opacity:0; pointer-events:none; transition: opacity .2s ease, transform .2s ease, top .25s ease; background: linear-gradient(160deg, #101a16, #182621 60%, #1a2d26); border:1px solid var(--line-soft); border-radius:14px; padding:14px 18px; box-shadow:0 16px 36px rgba(0,0,0,0.55); }
+  body.hdr-collapsed:not(.hdr-open) .dock-legend{ top:20px; }
+  .dock-legend.open{ opacity:1; transform: translateX(-50%); pointer-events:auto; }
+  .dock-leg-t{ font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color: var(--text-dim); font-weight:700; margin-bottom:8px; }
+  @media print{ .dock-pill, .dock-legend{ display:none !important; } .masthead{ transform:none !important; } }
+  /* <<ANAT-CSS-BEGIN>> ===== A-6: Anatomía (modelo 2D, panel flotante, pestaña) ===== */
+  .anat-root{ --anat-p:#ff4d4d; --anat-s:#ff9a5c; display:flex; flex-direction:column; gap:10px; color: var(--text); font-size:12.5px; }
+  .anat-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .anat-ex{ display:flex; flex-direction:column; min-width:0; }
+  .anat-ex-l{ font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color: var(--text-dim); font-weight:700; }
+  .anat-ex-n{ font-size:13px; line-height:1.3; word-break:break-word; }
+  .anat-src{ font-size:10.5px; color: var(--text-dim); }
+  .anat-tools{ display:flex; gap:6px; flex-shrink:0; }
+  .anat-tools button, .anat-edit-b button{ font:inherit; font-size:12px; font-weight:700; color: var(--text); background: rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.16); border-radius:9px; padding:4px 10px; cursor:pointer; }
+  .anat-tools button:hover, .anat-edit-b button:hover{ background: rgba(255,255,255,0.16); }
+  .anat-tools button.on{ background: rgba(255,77,77,0.28); border-color: var(--anat-p); }
+  .anat-tools button:disabled{ opacity:.35; cursor:default; }
+  .anat-edit{ background: rgba(255,154,92,0.1); border:1px solid rgba(255,154,92,0.45); border-radius:10px; padding:8px 10px; }
+  .anat-edit-t{ font-size:11.5px; margin-bottom:6px; color: var(--text-soft); }
+  .anat-msg button{ font:inherit; font-size:11.5px; font-weight:700; color: var(--text); background: rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.25); border-radius:8px; padding:2px 9px; cursor:pointer; }
+  .anat-tools{ flex-wrap:wrap; justify-content:flex-end; }
+  .anat-edit-b{ display:flex; gap:6px; flex-wrap:wrap; }
+  .anat-msg{ background: rgba(45,212,191,0.12); border:1px solid rgba(45,212,191,0.45); border-radius:9px; padding:6px 10px; font-size:11.5px; }
+  .anat-stage{ position:relative; perspective:900px; display:flex; justify-content:center; background: radial-gradient(ellipse at 50% 40%, rgba(45,212,191,0.07), transparent 70%); border-radius:12px; padding:6px 0 18px; }
+  .anat-turn{ position:relative; width:100%; transition: transform .19s ease-in; transform-style:preserve-3d; }
+  .anat-turn.turning{ transform: rotateY(90deg); }
+  .anat-svg{ display:none; width:100%; height:auto; max-height:56vh; margin:0 auto; }
+  .anat-svg.on{ display:block; }
+  .anat-viewl{ position:absolute; bottom:2px; left:0; right:0; text-align:center; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color: var(--text-dim); }
+  .anat-sil path{ fill:#1c3039; stroke:#58798a; stroke-width:1.1; }
+  .anat-mus .am path{ fill: rgba(45,212,191,0.2); stroke: rgba(45,212,191,0.6); stroke-width:.9; cursor:pointer; transition: fill .25s ease, stroke .25s ease, filter .25s ease; }
+  .anat-mus .am:hover path{ fill: rgba(45,212,191,0.4); }
+  .anat-mus .am.s path{ fill: rgba(255,154,92,0.62); stroke: var(--anat-s); }
+  .anat-mus .am.p path{ fill: rgba(255,77,77,0.8); stroke: var(--anat-p); filter: drop-shadow(0 0 4px rgba(255,77,77,0.7)); }
+  .anat-mus .am.sel path{ stroke:#fff; stroke-width:1.8; }
+  /* piel (Q-18) */
+  .anat-skin{ display:none; pointer-events:none; }
+  .anat-skin{ filter: drop-shadow(0 0 .8px rgba(70,34,18,.75)); }
+  .anat-skin > path{ stroke:none; }
+  .anat-skin .sk-s path{ fill:none; stroke:rgba(80,40,24,.42); stroke-width:2.6; }
+  .anat-skin .sk-l path{ fill:none; stroke:rgba(255,236,218,.38); stroke-width:3; }
+  .anat-skin .sk-n path{ fill:none; stroke:rgba(90,48,30,.42); stroke-width:.55; }
+  .anat-skin .sk-v path{ stroke:none; }
+  .anat-skin .sk-g path{ fill:none; stroke:rgba(70,34,18,.22); stroke-width:1.2; }
+  .anat-root.show-skin .anat-skin{ display:inline; }
+  .anat-root.show-skin .anat-sil{ display:none; }
+  .anat-root.show-skin .anat-deco{ display:none; }
+  .anat-root.show-skin .anat-mus .am:not(.p):not(.s){ display:none; }
+  .anat-root.show-skin .anat-mus .am.p path{ fill:rgba(255,77,77,.5); stroke:rgba(255,90,70,.95); stroke-width:.8; filter:drop-shadow(0 0 3px rgba(255,77,77,.7)); }
+  .anat-root.show-skin .anat-mus .am.s path{ fill:rgba(255,154,92,.42); stroke:rgba(255,160,100,.9); stroke-width:.7; }
+  /* capa profunda (Q-6) */
+  .anat-mus .am.deep{ display:none; }
+  .anat-mus .am.deep.p, .anat-mus .am.deep.s, .anat-mus .am.deep.sel, .anat-root.show-deep .anat-mus .am.deep{ display:inline; }
+  .anat-mus .am.deep path{ fill: rgba(150,170,255,0.22); stroke: rgba(170,185,255,0.8); stroke-dasharray:2.5 1.8; }
+  .anat-root.show-deep .anat-mus .am:not(.deep):not(.p):not(.s) path{ fill-opacity:.35; }
+  .anat-chip.deep{ border-style:dashed; }
+  .anat-deco path{ fill:none; stroke: rgba(180,215,225,0.28); stroke-width:.8; pointer-events:none; }
+  .anat-legend{ display:flex; align-items:center; justify-content:center; gap:6px; font-size:10.5px; color: var(--text-dim); }
+  .anat-legend i{ display:inline-block; width:11px; height:11px; border-radius:3px; margin-left:8px; }
+  .anat-legend i:first-child{ margin-left:0; }
+  .anat-legend i.p{ background: var(--anat-p); } .anat-legend i.s{ background: var(--anat-s); }
+  .anat-chips{ display:flex; flex-wrap:wrap; gap:5px; }
+  .anat-chip{ font:inherit; font-size:11px; color: var(--text); background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); border-radius:999px; padding:3px 9px; cursor:pointer; }
+  .anat-chip.p{ background: rgba(255,77,77,0.28); border-color: var(--anat-p); }
+  .anat-chip.s{ background: rgba(255,154,92,0.24); border-color: var(--anat-s); }
+  .anat-chip.sel{ outline:2px solid #fff; outline-offset:1px; }
+  .anat-chipgrp{ display:flex; flex-wrap:wrap; gap:5px; align-items:center; width:100%; }
+  .anat-chipgrp > span{ width:100%; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color: var(--text-dim); font-weight:700; margin-top:4px; }
+  .anat-none{ font-size:11.5px; color: var(--text-dim); }
+  .anat-itabs{ display:flex; gap:4px; border-bottom:1px solid var(--line-soft); }
+  .anat-itabs button{ font:inherit; font-size:11.5px; font-weight:700; color: var(--text-dim); background:none; border:none; border-bottom:2px solid transparent; padding:5px 9px; cursor:pointer; }
+  .anat-itabs button.on{ color: var(--text); border-bottom-color: var(--anat-p); }
+  .anat-ibody{ padding-top:8px; line-height:1.5; }
+  .anat-ibody p{ margin:0; font-size:12px; color: var(--text-soft); }
+  .anat-mn{ font-weight:700; margin-bottom:4px; font-size:13px; }
+  .anat-mn em{ font-style:normal; font-size:10px; padding:1px 7px; border-radius:999px; margin-left:6px; }
+  .anat-mn em.p{ background: rgba(255,77,77,0.3); } .anat-mn em.s{ background: rgba(255,154,92,0.3); }
+  /* panel flotante — acoplado al costado de las tarjetas (Q-15) */
+  .anat-fab{ position:fixed; left:20px; bottom:112px; z-index:80; width:48px; height:48px; border-radius:50%; border:none; background:#2a3a44; color:#ff8a7a; box-shadow:0 6px 18px rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; cursor:pointer; transition: transform .15s, background .2s; }
+  .anat-fab:hover{ transform:scale(1.07); background:#34495a; }
+  .anat-fab.open{ background:#ff4d4d; color:#1a0d0d; }
+  .anat-fab svg{ width:26px; height:26px; }
+  .anat-panel{ position:fixed; left:16px; bottom:170px; z-index:70; width:300px; max-height:min(calc(100vh - 190px), 620px); display:none; flex-direction:column; background: linear-gradient(160deg, #101a16, #182621 60%, #1a2d26); border:1px solid var(--line-soft); border-radius:14px; box-shadow:0 12px 30px rgba(0,0,0,0.5); }
+  .anat-panel.open{ display:flex; }
+  .anat-panel.drag{ opacity:.92; }
+  .anat-phead{ display:flex; justify-content:space-between; align-items:center; gap:6px; padding:8px 12px; border-bottom:1px solid var(--line-soft); user-select:none; }
+  .anat-ptitle{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; font-weight:700; color: var(--text-soft); flex:1; }
+  .anat-pbtns{ display:flex; align-items:center; gap:2px; }
+  .anat-pexp, .anat-pclose{ background:none; border:none; color: var(--text-soft); font-size:16px; line-height:1; cursor:pointer; padding:2px 6px; border-radius:6px; }
+  .anat-pclose{ font-size:20px; }
+  .anat-pexp:hover, .anat-pclose:hover{ background: rgba(255,255,255,0.1); color: var(--text); }
+  .anat-pbody{ padding:10px 12px 12px; overflow:auto; }
+  .anat-panel .anat-svg{ max-height:30vh; }
+  /* acoplado al costado: el contenido se corre para dejarle su columna */
+  body.anat-side{ padding-left:332px; }
+  /* acoplado abajo (pantallas angostas): figura a la izquierda, datos a la derecha; deja libres los botones flotantes */
+  .anat-panel.dock-bottom{ left:76px; right:76px; bottom:0; width:auto; max-height:138px; border-radius:14px 14px 0 0; border-bottom:none; }
+  .anat-panel.dock-bottom .anat-phead{ padding:4px 10px; }
+  .anat-panel.dock-bottom .anat-pbody{ padding:6px 10px 8px; overflow:hidden; }
+  .anat-panel.dock-bottom .anat-root{ display:grid; grid-template-columns: 58px 1fr; gap:2px 10px; align-items:start; }
+  .anat-panel.dock-bottom .anat-root > *{ grid-column:2; }
+  .anat-panel.dock-bottom .anat-root > .anat-edit, .anat-panel.dock-bottom .anat-root > .anat-msg{ grid-column:1 / -1; }
+  .anat-panel.dock-bottom .anat-root > .anat-stage{ grid-column:1; grid-row:1 / span 3; padding:0; }
+  .anat-panel.dock-bottom .anat-viewl, .anat-panel.dock-bottom .anat-legend, .anat-panel.dock-bottom .anat-info, .anat-panel.dock-bottom .anat-tools{ display:none; }
+  .anat-panel.dock-bottom .anat-svg{ max-height:92px; }
+  .anat-panel.dock-bottom .anat-chips{ display:flex; flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px; }
+  .anat-panel.dock-bottom .anat-chips > *{ flex:none; }
+  body.anat-bottom{ padding-bottom:160px; }
+  /* expandido: flota por encima de las tarjetas, más grande */
+  .anat-panel.expanded{ left:max(12px, calc(50% - 380px)); top:16px; bottom:auto; right:auto; width:min(760px, calc(100vw - 24px)); max-height:calc(100vh - 32px); border-radius:14px; border-bottom:1px solid var(--line-soft); box-shadow:0 18px 44px rgba(0,0,0,0.6); z-index:105; }
+  .anat-panel.expanded .anat-phead{ cursor:grab; touch-action:none; }
+  .anat-panel.expanded .anat-pbody{ padding:12px 16px 16px; }
+  .anat-panel.expanded .anat-root{ display:grid; grid-template-columns: minmax(200px, 300px) 1fr; gap:6px 22px; align-items:start; }
+  .anat-panel.expanded .anat-root > *{ grid-column:2; }
+  .anat-panel.expanded .anat-root > .anat-top, .anat-panel.expanded .anat-root > .anat-edit, .anat-panel.expanded .anat-root > .anat-msg{ grid-column:1 / -1; }
+  .anat-panel.expanded .anat-root > .anat-stage{ grid-column:1; grid-row:2 / span 6; }
+  .anat-panel.expanded .anat-svg{ max-height:62vh; }
+  @media (max-width:560px){ .anat-panel.expanded .anat-root{ display:flex; flex-direction:column; } .anat-panel.expanded .anat-svg{ max-height:40vh; } }
+  /* pestaña propia */
+  .anat-lead{ margin:0 0 12px; color: var(--text-soft); font-size:12.5px; }
+  .anat-m-tab{ display:grid; grid-template-columns: minmax(220px, 340px) 1fr; gap:6px 24px; align-items:start; }
+  .anat-m-tab .anat-top, .anat-m-tab .anat-edit, .anat-m-tab .anat-msg{ grid-column:1 / -1; }
+  .anat-m-tab .anat-stage{ grid-column:1; grid-row: 3 / span 4; }
+  .anat-m-tab .anat-legend{ grid-column:2; justify-content:flex-start; }
+  .anat-m-tab .anat-chips, .anat-m-tab .anat-info, .anat-m-tab .anat-exlist-wrap{ grid-column:2; }
+  .anat-sec{ font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color: var(--text-dim); font-weight:700; margin:6px 0; }
+  .anat-exgrp{ font-size:11px; font-weight:700; color: var(--text-soft); margin:6px 0 3px; }
+  .anat-exlist{ display:flex; flex-direction:column; gap:3px; max-height:260px; overflow:auto; }
+  .anat-exbtn{ text-align:left; font:inherit; font-size:12px; color: var(--text); background: rgba(255,255,255,0.05); border:1px solid transparent; border-radius:8px; padding:5px 9px; cursor:pointer; }
+  .anat-exbtn:hover{ background: rgba(255,255,255,0.12); }
+  .anat-exbtn.on{ border-color: var(--anat-p); background: rgba(255,77,77,0.16); }
+  @media (max-width:760px){ .anat-m-tab{ display:flex; flex-direction:column; } .anat-fab{ bottom:112px; left:14px; } }
+  @media print{ .anat-fab, .anat-panel{ display:none !important; } }
+  /* <<ANAT-CSS-END>> */
   .lk-x{ flex-shrink:0; background:none; border:none; color: var(--text-dim); font-size:16px; cursor:pointer; padding:0 4px; }
   .lk-x:hover{ color: var(--brick); }
   .lk-add{ display:flex; flex-direction:column; gap:6px; border-top:1px solid var(--line-soft); padding-top:8px; margin-top:4px; }
@@ -1946,6 +2107,17 @@
   .fase-pick-ic svg{ width:24px; height:24px; }
   .fase-pick-ic:hover{ border-color: var(--text-dim); transform: translateY(-1px); }
   .fase-pick-ic.on{ background: var(--surface-3); }
+  /* M-1: emojis como ícono de categoría */
+  .fase-icon-badge img.fase-emo{ width:28px; height:28px; object-fit:contain; border-radius:7px; display:block; background:rgba(255,255,255,.94); padding:1px; box-sizing:border-box; }
+  .fase-icon-badge .fase-uni{ font-size:21px; line-height:1; display:block; }
+  .fase-icon-badge .fase-uni.combo{ font-size:11px; letter-spacing:-1px; white-space:nowrap; }
+  .fase-pick-emo{ max-height:300px; overflow-y:auto; padding:2px 4px 2px 0; }
+  .fase-pick-sub{ grid-column:1 / -1; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); font-weight:700; margin-top:6px; }
+  .fase-pick-e{ display:flex; align-items:center; justify-content:center; padding:2px; }
+  .fase-pick-e img.fase-emo{ width:100%; height:100%; max-width:38px; max-height:38px; object-fit:contain; border-radius:6px; background:rgba(255,255,255,.94); padding:1px; box-sizing:border-box; }
+  .fase-pick-e .fase-uni{ font-size:24px; line-height:1; }
+  .fase-pick-e .fase-uni.combo{ font-size:13px; letter-spacing:-1px; white-space:nowrap; }
+  .fase-pick-e.wide{ grid-column:span 2; }
   .fase-pick-colors{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
   .fase-pick-sw{ width:26px; height:26px; border-radius:50%; border:2px solid transparent; cursor:pointer; padding:0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.35); }
   .fase-pick-sw.on{ border-color: var(--text); }
@@ -2244,6 +2416,7 @@
     <button class="tab-btn" data-view="tecnica">Técnica y prioridades</button>
     <button class="tab-btn" data-view="estandar">Estándar de repeticiones</button>
     <button class="tab-btn" data-view="biblioteca">Biblioteca</button>
+    <button class="tab-btn" data-view="anatomia">Anatomía</button>
     <button class="tab-btn" data-view="registro">Registro diario</button>
     <button class="tab-btn" data-view="semanal">Conclusiones semanales</button>
   </nav>
@@ -2262,6 +2435,7 @@
   <div class="view" id="view-tecnica"></div>
   <div class="view" id="view-estandar"></div>
   <div class="view" id="view-biblioteca"></div>
+  <div class="view" id="view-anatomia"></div>
   <div class="view" id="view-registro"></div>
   <div class="view" id="view-semanal"></div>
 </div>
@@ -2640,8 +2814,24 @@ const FASE_ICON_PATHS = {
   estiramiento: '<circle cx="12" cy="4.3" r="1.9"/><path d="M12 7.4v6.6"/><path d="M12 9.6 7.3 6.8M12 9.6l4.7-2.8"/><path d="M12 14 8.2 20.4M12 14l3.8 6.4"/>',
   accesorio:    '<line x1="4" y1="6.5" x2="20" y2="6.5"/><circle cx="9" cy="6.5" r="1.7" fill="currentColor" stroke="none"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="1.7" fill="currentColor" stroke="none"/><line x1="4" y1="17.5" x2="20" y2="17.5"/><circle cx="11" cy="17.5" r="1.7" fill="currentColor" stroke="none"/>'
 };
+// M-1: ícono de categoría = trazo SVG (de siempre) o emoji ("emo:<id>" imagen del pack, "uni:<emoji>" nativo)
+function faseEmojiMarkup(key){
+  const pack = (typeof EMOJI_PACK !== "undefined" && EMOJI_PACK) ? EMOJI_PACK : { images:[], combos:[] };
+  if(key.indexOf("uni:") === 0){
+    const ch = key.slice(4), combo = (pack.combos || []).some(c=>c.id === ch);
+    return `<span class="fase-uni${combo ? " combo" : ""}" aria-hidden="true">${escapeHtml(ch)}</span>`;
+  }
+  const it = (pack.images || []).find(x=>x.id === key.slice(4));
+  if(!it) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${FASE_ICON_PATHS.accesorio}</svg>`;
+  return `<img class="fase-emo" src="${it.src}" alt="" draggable="false"${it.tile ? ` style="background:${it.tile}"` : ""}>`;
+}
+function faseIconMarkupFromKey(k){
+  if(typeof k === "string" && /^(emo|uni):/.test(k)) return faseEmojiMarkup(k);
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${FASE_ICON_LIBRARY[k] || FASE_ICON_PATHS.accesorio}</svg>`;
+}
 function faseIconSvg(f){
   const path = FASE_ICON_PATHS[f] || FASE_ICON_PATHS.accesorio;
+  if(typeof path === "string" && path.indexOf("__EMO__") === 0) return faseEmojiMarkup(path.slice(7));
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
 }
 
@@ -2687,7 +2877,7 @@ function applyCustomFases(){
   _customFaseIds = list.map(c=>c.id);
   list.forEach(c=>{
     FASE_LABELS[c.id] = c.label; FASE_COLOR[c.id] = c.color || "#5E7268"; FASE_BG_SOFT[c.id] = faseHexSoft(c.color);
-    FASE_ICON_PATHS[c.id] = FASE_ICON_LIBRARY[c.icon] || FASE_ICON_BASE.accesorio;
+    FASE_ICON_PATHS[c.id] = (typeof c.icon === "string" && /^(emo|uni):/.test(c.icon)) ? "__EMO__" + c.icon : (FASE_ICON_LIBRARY[c.icon] || FASE_ICON_BASE.accesorio);
   });
   FASE_ORDER.length = 0;
   FASE_BASE_ORDER.forEach(f=>FASE_ORDER.push(f));
@@ -2708,6 +2898,26 @@ function openFaseModal(id){
 }
 function closeFaseModal(){ document.getElementById("faseModalOverlay").classList.remove("open"); _faseDraft = null; }
 function faseDraftSet(k, v){ if(!_faseDraft) return; _faseDraft[k] = v; renderFaseModal(k === "label"); }
+function faseEmojiPickerHtml(d){
+  const pack = (typeof EMOJI_PACK !== "undefined" && EMOJI_PACK) ? EMOJI_PACK : null;
+  if(!pack) return `<div class="fase-pick-sub">${nl("El pack de emojis no está cargado (falta data.js actualizado).","Emoji pack not loaded (data.js needs updating).")}</div>`;
+  const btn = (key, title, inner, cls)=>`<button type="button" class="fase-pick-ic fase-pick-e ${cls || ""} ${d.icon === key ? "on" : ""}" style="${d.icon === key ? `border-color:${d.color}` : ""}" onclick="faseDraftSet('icon','${key.replace(/'/g, "\\'")}')" title="${escapeHtml(title)}">${inner}</button>`;
+  let html = "";
+  const groups = []; // se agrupan por tema (cada tema aparece una sola vez), en orden de aparición
+  (pack.images || []).forEach(it=>{
+    let g = groups.find(x=>x.name === it.group); if(!g){ g = { name:it.group, list:[] }; groups.push(g); }
+    g.list.push(it);
+  });
+  groups.forEach(g=>{
+    html += `<div class="fase-pick-sub">${escapeHtml(g.name)}</div>`;
+    g.list.forEach(it=>{ html += btn("emo:" + it.id, it.name, faseEmojiMarkup("emo:" + it.id)); });
+  });
+  html += `<div class="fase-pick-sub">${nl("Emojis del gimnasio","Gym emojis")}</div>`;
+  (pack.native || []).forEach(e=>{ html += btn("uni:" + e.id, e.name, faseEmojiMarkup("uni:" + e.id)); });
+  html += `<div class="fase-pick-sub">${nl("Combos","Combos")}</div>`;
+  (pack.combos || []).forEach(e=>{ html += btn("uni:" + e.id, e.name, faseEmojiMarkup("uni:" + e.id), "wide"); });
+  return html;
+}
 function renderFaseModal(keepName){
   const d = _faseDraft; if(!d) return;
   const box = document.getElementById("faseModal");
@@ -2723,10 +2933,11 @@ function renderFaseModal(keepName){
       <label class="add-ex-field"><span>${nl("Nombre","Name")}</span>
         <input type="text" id="faseName" maxlength="28" value="${escapeHtml(nameVal)}" placeholder="${nl("Ej: Yoga, Natación, Movilidad…","E.g. Yoga, Swimming, Mobility…")}" oninput="faseDraftSet('label', this.value)"></label>
       <div class="add-ex-field"><span>${nl("Ícono","Icon")}</span><div class="fase-pick-grid">${icons}</div></div>
+      <div class="add-ex-field"><span>${nl("Emojis (en vez de un ícono)","Emojis (instead of an icon)")}</span><div class="fase-pick-grid fase-pick-emo">${faseEmojiPickerHtml(d)}</div></div>
       <div class="add-ex-field"><span>${nl("Color","Color")}</span>
         <div class="fase-pick-colors">${sw}<label class="fase-pick-custom" title="${nl("Elegir otro color","Pick another color")}"><input type="color" value="${/^#[0-9a-f]{6}$/i.test(d.color) ? d.color : "#5E7268"}" oninput="faseDraftSet('color', this.value)"></label></div></div>
       <div class="add-ex-field"><span>${nl("Vista previa","Preview")}</span>
-        <div class="fase-legend" style="margin:0"><span class="fase-legend-btn" style="cursor:default"><span class="fase-icon-badge" style="color:${d.color}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${FASE_ICON_LIBRARY[d.icon]}</svg></span><span class="fase-legend-label" style="--fase-glow:${d.color}">${escapeHtml((nameVal || "").trim() || nl("Nueva categoría","New category"))}</span></span></div></div>
+        <div class="fase-legend" style="margin:0"><span class="fase-legend-btn" style="cursor:default"><span class="fase-icon-badge" style="color:${d.color}">${faseIconMarkupFromKey(d.icon)}</span><span class="fase-legend-label" style="--fase-glow:${d.color}">${escapeHtml((nameVal || "").trim() || nl("Nueva categoría","New category"))}</span></span></div></div>
     </div>
     <div class="add-ex-modal-actions">
       ${editing ? `<button class="muro-btn" style="margin-right:auto;color:var(--brick);border-color:var(--brick)" onclick="deleteFaseCustom('${d.id}')">${nl("Eliminar","Delete")}</button>` : ""}
@@ -2950,17 +3161,6 @@ function lkRefreshCounts(){
   });
 }
 function lkNorm(s){ return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
-function lkSearch(q){
-  const raw = q.trim(), n = lkNorm(raw), out = [];
-  if(/^(https?:\/\/|www\.)\S+$/i.test(raw)) out.push({ t:"url", u: /^www\./i.test(raw) ? "https://" + raw : raw });
-  if(!n) return out;
-  VISTAS_VALIDAS.forEach(v=>{ if(lkNorm(lkTabLabel(v)).includes(n)) out.push({ t:"tab", v }); });
-  const d = bibData();
-  d.cards.concat(d.privada.cards).forEach(c=>{ if(lkNorm(c.titulo).includes(n)) out.push({ t:"bib", b:c.id }); });
-  ["rutinaA","rutinaB"].forEach(r=>{ ((STATE[r] && STATE[r].exercises) || []).forEach((ex, i)=>{ if(lkNorm(ex.nombre).includes(n)) out.push({ t:"ex", r, i }); }); });
-  return out.slice(0, 10);
-}
-function lkFinal(c){ return c.t === "ex" && c.i !== undefined ? { t:"ex", r:c.r, x: lkExId(STATE[c.r].exercises[c.i]) } : c; }
 function lkAdd(from, to){
   if(!from || !to || lkSame(from, to)) return false;
   const st = lkStore(); if(st.some(l=>lkSame(l.from, from) && lkSame(l.to, to))) return false;
@@ -2983,19 +3183,202 @@ function lkGo(ep){
   showView(ep.r);
   setTimeout(()=>{ const c = document.querySelector(`#view-${ep.r} .ex-card[data-idx="${f.idx}"]`); if(c) followMovedCard(c); }, 140);
 }
-function lkCopy(link){
-  const d = lkDesc(link.to);
-  const txt = d.kind === "url" ? link.to.u : `${LK_KINDS[d.kind].label}: ${d.title}${d.where && d.kind !== "tab" ? " (" + d.where + ")" : ""}`;
-  _lkClip = { to: JSON.parse(JSON.stringify(link.to)) };
+function lkCopy(link, dir){
+  const ep = dir === "in" ? link.from : link.to;
+  const d = lkDesc(ep);
+  const txt = d.kind === "url" ? ep.u : `${LK_KINDS[d.kind].label}: ${d.title}${d.where && d.kind !== "tab" ? " (" + d.where + ")" : ""}`;
+  _lkClip = { to: JSON.parse(JSON.stringify(ep)) };
   try{ if(navigator.clipboard) navigator.clipboard.writeText(txt).catch(()=>{}); }catch(e){}
 }
-function closeLkPop(){ clearTimeout(_lkOpenTimer); clearTimeout(_lkCloseTimer); const p = document.getElementById("lkPop"); if(p) p.remove(); _lkAnchor = null; _lkSelf = null; }
+// ---- Modo "Conectar": el destino se elige con un clic en la propia app ----
+let _lkConn = null;
+function lkConnBar(){
+  let bar = document.getElementById("lkConnBar");
+  if(!bar){ bar = document.createElement("div"); bar.id = "lkConnBar"; bar.className = "lk-connbar"; document.body.appendChild(bar); }
+  return bar;
+}
+function lkConnStart(from){
+  if(!from) return;
+  closeLkPop(); _lkConn = { from };
+  document.body.classList.add("lk-connecting");
+  const d = lkDesc(from), bar = lkConnBar();
+  bar.innerHTML = `<span class="lk-cb-t">🔗 Conectando desde <b>${escapeHtml(d.title)}</b> — hacé clic en un <b>ejercicio</b> o una <b>tarjeta de la Biblioteca</b>. Para una <b>pestaña</b>, entrá a ella y tocá el botón.</span>
+    <button type="button" class="lk-cb-tab">Usar esta pestaña como destino</button><button type="button" class="lk-cb-x">Cancelar</button>`;
+  bar.style.display = "";
+  bar.querySelector(".lk-cb-tab").addEventListener("click", ev=>{ ev.stopPropagation(); lkConnPick({ t:"tab", v:_currentView }); });
+  bar.querySelector(".lk-cb-x").addEventListener("click", ev=>{ ev.stopPropagation(); lkConnEnd(); });
+}
+function lkConnEnd(msg){
+  _lkConn = null; document.body.classList.remove("lk-connecting");
+  document.querySelectorAll(".lk-cand").forEach(n=>n.classList.remove("lk-cand"));
+  const bar = lkConnBar();
+  if(msg){ bar.innerHTML = `<span class="lk-cb-t">${msg}</span>`; bar.style.display = ""; clearTimeout(lkConnEnd._t); lkConnEnd._t = setTimeout(()=>{ if(!_lkConn) bar.style.display = "none"; }, 2600); }
+  else bar.style.display = "none";
+}
+function lkConnPick(to){
+  if(!_lkConn) return;
+  const from = _lkConn.from;
+  if(lkSame(from, to)){ lkConnEnd("No se puede conectar algo consigo mismo."); return; }
+  const dup = lkStore().some(l=>lkSame(l.from, from) && lkSame(l.to, to));
+  const ok = lkAdd(from, to), a = lkDesc(from), b = lkDesc(to);
+  lkConnEnd(dup ? "Ese link ya existía." : (ok ? `✅ Link creado: <b>${escapeHtml(a.title)}</b> → <b>${escapeHtml(b.title)}</b>` : "No se pudo crear el link."));
+}
+function lkConnTarget(el){
+  if(!el || !el.closest) return null;
+  let n;
+  if((n = el.closest(".bib-item[data-bib-id]"))) return { node:n, ep:{ t:"bib", b:n.dataset.bibId } };
+  if((n = el.closest(".ex-card[data-routine][data-idx]"))){
+    const ex = (STATE[n.dataset.routine] && STATE[n.dataset.routine].exercises || [])[+n.dataset.idx];
+    if(ex) return { node:n, ep:{ t:"ex", r:n.dataset.routine, x: lkExId(ex) } };
+  }
+  return null;
+}
+document.addEventListener("mouseover", ev=>{
+  if(!_lkConn) return;
+  const t = lkConnTarget(ev.target);
+  document.querySelectorAll(".lk-cand").forEach(n=>{ if(!t || n !== t.node) n.classList.remove("lk-cand"); });
+  if(t) t.node.classList.add("lk-cand");
+});
+document.addEventListener("click", ev=>{
+  if(!_lkConn) return;
+  if(ev.target.closest && ev.target.closest("#lkConnBar")) return;
+  if(ev.target.closest && ev.target.closest(".tab-btn[data-view]")) return; // las pestañas navegan normal
+  const t = lkConnTarget(ev.target);
+  if(!t) return;
+  ev.preventDefault(); ev.stopPropagation(); ev.stopImmediatePropagation();
+  lkConnPick(t.ep);
+}, true);
+document.addEventListener("keydown", ev=>{ if(ev.key === "Escape" && _lkConn) lkConnEnd(); });
+// A-1e: botón "🔗 Links" dentro de cada pestaña sin anclas propias (Muro, Calentamiento, Técnica, Estándar, Registro, Semanal),
+// en el primer encabezado de panel de la pestaña. Se vuelve a poner solo si la pestaña se redibuja.
+const LK_TAB_BTN_VIEWS = ["muro","calentamiento","tecnica","estandar","anatomia","registro","semanal"];
+function lkInjectTabBtns(){
+  LK_TAB_BTN_VIEWS.forEach(v=>{
+    const root = document.getElementById("view-" + v); if(!root) return;
+    const head = root.querySelector(".panel-head"); if(!head || head.querySelector(".lk-tabbtn")) return;
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "lk-chip lk-tabbtn"; b.dataset.lkV = "cur";
+    b.title = "Links desde y hacia esta pestaña";
+    b.innerHTML = `🔗 Links de esta pestaña <span class="lk-n">${lkCount({ t:"tab", v })}</span>`;
+    if(lkCount({ t:"tab", v })) b.classList.add("has");
+    head.appendChild(b);
+  });
+}
+(function(){
+  let t = null;
+  const run = ()=>{ clearTimeout(t); t = setTimeout(lkInjectTabBtns, 30); };
+  const start = ()=>{ const w = document.querySelector(".wrap"); if(!w) return; new MutationObserver(run).observe(w, { childList:true, subtree:true }); run(); };
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
+})();
+// ============================================================
+// A-5 (= L-A + L-B): dos pastillas fijas arriba, iguales al asa de la barra de abajo.
+//  · Pastilla 1 despliega el panelhead (encabezado + barra de pestañas) en cualquier punto del scroll.
+//  · Pastilla 2 despliega la leyenda de fases (solo en Rutina A y B).
+// Se abren con el cursor encima y también con clic/toque (el clic las deja fijas hasta otro clic, Esc o clic afuera).
+// Al bajar del todo del encabezado, este se repliega; al volver arriba, regresa solo a su lugar.
+// ============================================================
+const DOCK = { collapsed:false, hdr:{ open:false, pin:false, t:null }, leg:{ open:false, pin:false, t:null } };
+function dockMast(){ return document.querySelector(".masthead"); }
+function dockLegRoutine(){ return (_currentView === "rutinaA" || _currentView === "rutinaB") ? _currentView : null; }
+function dockApply(){
+  const m = dockMast(); if(!m) return;
+  document.documentElement.style.setProperty("--dock-h", m.offsetHeight + "px");
+  const b = document.body;
+  b.classList.toggle("hdr-collapsed", DOCK.collapsed);
+  b.classList.toggle("hdr-open", DOCK.hdr.open);
+  // Las pastillas solo aparecen cuando tiene sentido: la del panelhead cuando el encabezado está replegado,
+  // y la de la leyenda cuando la leyenda real de la rutina no se ve en pantalla.
+  const r = dockLegRoutine();
+  let legSeen = false;
+  if(r){
+    const el = document.querySelector(`#view-${r} .fase-legend`);
+    if(el){
+      const rc = el.getBoundingClientRect(), cover = (!DOCK.collapsed || DOCK.hdr.open) ? m.offsetHeight : 0;
+      legSeen = rc.bottom > cover + 4 && rc.top < window.innerHeight - 4;
+    }
+  }
+  const showLeg = !!r && !legSeen;
+  if(!showLeg && DOCK.leg.open){ DOCK.leg.open = false; DOCK.leg.pin = false; }
+  b.classList.toggle("dock-hd-show", DOCK.collapsed);
+  b.classList.toggle("dock-leg-show", showLeg);
+  const dl = document.getElementById("dockLegend");
+  if(dl) dl.classList.toggle("open", DOCK.leg.open && showLeg);
+}
+function dockScroll(){
+  const m = dockMast(); if(!m) return;
+  const H = m.offsetHeight, y = window.scrollY;
+  const want = DOCK.collapsed ? !(y < H - 10) : (y > H + 10);
+  if(want !== DOCK.collapsed){ DOCK.collapsed = want; if(!want){ DOCK.hdr.open = false; DOCK.hdr.pin = false; } }
+  dockApply();
+}
+function dockSet(which, open, pin){
+  const g = DOCK[which]; clearTimeout(g.t);
+  if(open && which === "leg"){
+    const r = dockLegRoutine(); if(!r) return;
+    const dl = document.getElementById("dockLegend");
+    if(dl && !g.open) dl.innerHTML = `<div class="dock-leg-t">Categorías · ${r === "rutinaA" ? "Rutina A" : "Rutina B"}</div>${fasesLegend(r)}`;
+  }
+  g.open = open; g.pin = open ? (pin !== undefined ? pin : g.pin) : false;
+  dockApply();
+}
+function dockCloseSoon(which){ const g = DOCK[which]; clearTimeout(g.t); if(g.open && !g.pin) g.t = setTimeout(()=>dockSet(which, false), 260); }
+function dockInside(which, el){
+  if(!el || !el.closest) return false;
+  if(which === "hdr") return !!el.closest(".dock-pill.hd") || (DOCK.collapsed && !!el.closest(".masthead"));
+  return !!el.closest(".dock-pill.lg, #dockLegend");
+}
+function dockUpdate(){ // al cambiar de pestaña
+  DOCK.leg.open = false; DOCK.leg.pin = false; DOCK.hdr.pin = false; if(DOCK.collapsed) DOCK.hdr.open = false;
+  dockScroll(); dockApply(); setTimeout(dockApply, 350);
+}
+function dockInit(){
+  if(document.getElementById("dockPillHd")) return;
+  const mk = (cls, id, title)=>{ const p = document.createElement("button"); p.type = "button"; p.id = id; p.className = "dock-pill " + cls; p.title = title; p.setAttribute("aria-label", title); document.body.appendChild(p); return p; };
+  mk("hd", "dockPillHd", "Mostrar el encabezado y las pestañas"); mk("lg", "dockPillLg", "Mostrar la leyenda de categorías");
+  const dl = document.createElement("div"); dl.id = "dockLegend"; dl.className = "dock-legend"; document.body.appendChild(dl);
+  window.addEventListener("scroll", dockScroll, { passive:true });
+  window.addEventListener("resize", ()=>{ dockScroll(); });
+  document.addEventListener("mouseover", ev=>{
+    ["hdr","leg"].forEach(w=>{
+      // Si el panelhead ya estaba abierto, se mantiene abierto mientras el cursor esté en la leyenda (su pastilla o su panel):
+      // así la leyenda no sube de posición ni se cierra sola al pasar de uno al otro.
+      const inside = dockInside(w, ev.target) || (w === "hdr" && DOCK.hdr.open && dockInside("leg", ev.target));
+      if(inside){ clearTimeout(DOCK[w].t); if(!DOCK[w].open && dockInside(w, ev.target)) dockSet(w, true, false); }
+      else dockCloseSoon(w);
+    });
+  });
+  document.documentElement.addEventListener("mouseleave", ()=>{ dockCloseSoon("hdr"); dockCloseSoon("leg"); });
+  document.addEventListener("click", ev=>{
+    const pill = ev.target.closest && ev.target.closest(".dock-pill");
+    if(pill){
+      const w = pill.classList.contains("hd") ? "hdr" : "leg", g = DOCK[w];
+      if(g.pin) dockSet(w, false); else dockSet(w, true, true);
+      return;
+    }
+    ["hdr","leg"].forEach(w=>{ if(DOCK[w].open && DOCK[w].pin && !dockInside(w, ev.target)) dockSet(w, false); });
+    if(ev.target.closest && ev.target.closest("#dockLegend button")) setTimeout(()=>dockSet("leg", false), 0);
+    if(DOCK.collapsed && ev.target.closest && ev.target.closest(".masthead .tab-btn")) setTimeout(()=>dockSet("hdr", false), 0);
+  });
+  document.addEventListener("keydown", ev=>{ if(ev.key === "Escape"){ dockSet("hdr", false); dockSet("leg", false); } });
+  dockScroll();
+}
+if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", dockInit); else dockInit();
+function lkCtxClose(){ const m = document.getElementById("lkCtx"); if(m) m.remove(); }
+function lkCtxMenu(pop, x, y, link, dir){
+  lkCtxClose();
+  const m = document.createElement("div"); m.id = "lkCtx"; m.className = "lk-ctx";
+  m.innerHTML = `<button type="button">Copiar link</button>`;
+  pop.appendChild(m);
+  m.style.left = Math.min(x, window.innerWidth - 130) + "px"; m.style.top = Math.min(y, window.innerHeight - 44) + "px";
+  m.firstChild.addEventListener("click", ev=>{ ev.stopPropagation(); lkCopy(link, dir); lkFillLists(); lkCtxClose(); });
+}
+document.addEventListener("click", ()=>setTimeout(lkCtxClose, 0), true);
+function closeLkPop(){ lkCtxClose(); clearTimeout(_lkOpenTimer); clearTimeout(_lkCloseTimer); const p = document.getElementById("lkPop"); if(p) p.remove(); _lkAnchor = null; _lkSelf = null; }
 function lkRowHtml(l, dir){
   const ep = dir === "out" ? l.to : l.from, d = lkDesc(ep), k = LK_KINDS[d.kind];
   return `<div class="lk-row ${d.ok ? "" : "lk-broken"}" data-id="${l.id}" data-dir="${dir}">
     <span class="lk-badge lk-k-${d.kind}" title="${dir === "out" ? "Lleva a" : "Viene de"}: ${k.label}">${dir === "in" ? "← " : ""}${k.ic} ${k.label}</span>
     <button type="button" class="lk-go" title="Ir"><span class="lk-t">${escapeHtml(d.title)}</span>${d.where ? `<span class="lk-w">${escapeHtml(d.where)}</span>` : ""}</button>
-    ${dir === "out" ? `<button type="button" class="lk-cp" title="Copiar link y texto">Copiar</button>` : ""}
     <button type="button" class="lk-x" title="Quitar link">×</button>
   </div>`;
 }
@@ -3021,31 +3404,34 @@ function openLkPop(anchor){
   _lkAnchor = anchor; _lkSelf = self;
   const d = lkDesc(self), pop = document.createElement("div");
   pop.id = "lkPop"; pop.className = "lk-pop";
-  pop.innerHTML = `<div class="lk-head"><span class="lk-badge lk-k-${d.kind}">${LK_KINDS[d.kind].ic} ${LK_KINDS[d.kind].label}</span><b>${escapeHtml(d.title)}</b></div>
+  pop.innerHTML = `<div class="lk-head"><span class="lk-badge lk-k-${d.kind}">${LK_KINDS[d.kind].ic} ${LK_KINDS[d.kind].label}</span><b>Links</b></div>
     <div class="lk-lists"></div>
     <div class="lk-add">
-      <input type="text" class="lk-in" placeholder="Buscar ejercicio, tarjeta o pestaña… o pegar una URL" autocomplete="off">
-      <div class="lk-results"></div>
+      <button type="button" class="lk-conn" title="Elegí el destino con un clic en la app">🔗 Conectar con… (clic en el destino)</button>
+      <input type="text" class="lk-in" placeholder="O pegá una dirección web (https://…) y Enter" autocomplete="off">
       <button type="button" class="lk-paste" style="display:none">Pegar link copiado</button>
     </div>`;
   document.body.appendChild(pop);
   lkFillLists();
-  const inp = pop.querySelector(".lk-in"), res = pop.querySelector(".lk-results");
-  const showRes = ()=>{
-    const list = lkSearch(inp.value);
-    res.innerHTML = list.map((c, i)=>{ const dd = lkDesc(c.t === "ex" && c.i !== undefined ? { t:"ex", r:c.r, x:(STATE[c.r].exercises[c.i].lid || "_") } : c); const title = c.t === "ex" && c.i !== undefined ? (STATE[c.r].exercises[c.i].nombre || "Sin nombre") : dd.title; const where = c.t === "ex" ? lkRoutineLabel(c.r) : dd.where; const k = LK_KINDS[c.t === "ex" ? "ex" : dd.kind];
-      return `<button type="button" class="lk-res" data-i="${i}"><span class="lk-badge lk-k-${c.t}">${k.ic} ${k.label}</span><span class="lk-t">${escapeHtml(title)}</span>${where ? `<span class="lk-w">${escapeHtml(where)}</span>` : ""}</button>`; }).join("");
-    res._list = list;
-  };
-  inp.addEventListener("input", showRes);
-  inp.addEventListener("keydown", ev=>{ if(ev.key === "Enter"){ const first = res._list && res._list[0]; if(first){ lkAdd(_lkSelf, lkFinal(first)); inp.value = ""; showRes(); lkFillLists(); } } });
-  res.addEventListener("click", ev=>{ const b = ev.target.closest(".lk-res"); if(!b) return; lkAdd(_lkSelf, lkFinal(res._list[+b.dataset.i])); inp.value = ""; showRes(); lkFillLists(); });
+  const inp = pop.querySelector(".lk-in");
+  pop.querySelector(".lk-conn").addEventListener("click", ()=>lkConnStart(_lkSelf));
+  inp.addEventListener("keydown", ev=>{
+    if(ev.key !== "Enter") return;
+    const raw = inp.value.trim();
+    if(/^(https?:\/\/|www\.)\S+$/i.test(raw)){ lkAdd(_lkSelf, { t:"url", u: /^www\./i.test(raw) ? "https://" + raw : raw }); inp.value = ""; lkFillLists(); }
+    else inp.classList.add("lk-bad");
+  });
+  inp.addEventListener("input", ()=>inp.classList.remove("lk-bad"));
   pop.querySelector(".lk-paste").addEventListener("click", ()=>{ if(_lkClip) lkAdd(_lkSelf, JSON.parse(JSON.stringify(_lkClip.to))); lkFillLists(); });
+  pop.querySelector(".lk-lists").addEventListener("contextmenu", ev=>{
+    const row = ev.target.closest(".lk-row"); if(!row) return;
+    const link = lkStore().find(l=>l.id === row.dataset.id); if(!link) return;
+    ev.preventDefault(); lkCtxMenu(pop, ev.clientX, ev.clientY, link, row.dataset.dir);
+  });
   pop.querySelector(".lk-lists").addEventListener("click", ev=>{
     const row = ev.target.closest(".lk-row"); if(!row) return;
     const link = lkStore().find(l=>l.id === row.dataset.id); if(!link) return;
     if(ev.target.closest(".lk-go")) return lkGo(row.dataset.dir === "out" ? link.to : link.from);
-    if(ev.target.closest(".lk-cp")){ lkCopy(link); ev.target.closest(".lk-cp").textContent = "¡Copiado!"; return; }
     if(ev.target.closest(".lk-x")){ STATE.tecnica.enlaces = lkStore().filter(l=>l.id !== link.id); saveState(); lkFillLists(); }
   });
   lkPlacePop();
@@ -3053,6 +3439,7 @@ function openLkPop(anchor){
 document.addEventListener("mouseover", ev=>{
   const t = ev.target; if(!t.closest) return;
   const a = t.closest(LK_ANCHOR_SEL);
+  if(_lkConn) return;
   if(a){ clearTimeout(_lkCloseTimer); if(_lkAnchor === a && document.getElementById("lkPop")) return; clearTimeout(_lkOpenTimer); _lkOpenTimer = setTimeout(()=>openLkPop(a), 140); }
   else if(t.closest("#lkPop")) clearTimeout(_lkCloseTimer);
 });
@@ -3066,6 +3453,7 @@ document.addEventListener("click", ev=>{
   // composedPath: si el clic fue sobre un botón del popup que se volvió a dibujar, igual cuenta como "dentro del popup"
   const inPop = ev.composedPath().some(n=>n && n.id === "lkPop");
   const a = ev.target.closest && ev.target.closest(LK_ANCHOR_SEL);
+  if(_lkConn) return;
   if(a){ ev.preventDefault(); if(!(document.getElementById("lkPop") && _lkAnchor === a)) openLkPop(a); }
   else if(!inPop) closeLkPop();
 });
@@ -3169,7 +3557,9 @@ function mergeMissingDefaults(state){
   }catch(e){ console.error("Error completando campos nuevos de tecnica", e); }
   return state;
 }
+let _autoCommit = false; // true mientras el autoguardado al escribir confirma un campo (guardado silencioso)
 async function saveState(silent){
+  if(_autoCommit && !silent) silent = true;
   if(silent === "ui"){
     // Solo estado de interfaz (pestaña/desplazamiento): se guarda en este dispositivo,
     // pero NO cambia lastUpdateTs ni se sube a Drive. Así, mirar la app en un
@@ -3234,6 +3624,7 @@ function blankAccountData(){
 // entrante (inId). outId/inId son el correo, o null/undefined para el
 // cajón local del dispositivo (sin sesión). No toca STATE.settings.
 async function switchAccountData(inId, outId){
+  try{ driveClearBase(); }catch(e){}
   try{
     const outgoing = extractAccountData(STATE);
     await idbSet(accountBucketKey(outId || LOCAL_BUCKET_ID), outgoing);
@@ -3436,31 +3827,19 @@ async function drivePollRemote(){
     if(!(await ensureDriveToken())) return;
     if(!driveFileId) driveFileId = await driveFindFile();
     if(!driveFileId) return;
-    const mres = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?fields=modifiedTime`, { headers: driveAuthHeaders() });
-    if(!mres.ok) return;
-    const mt = (await mres.json()).modifiedTime;
+    const mt = await driveGetModified(driveFileId);
     if(!mt || mt === driveLastModified) return;
     if(!driveSafeToApplyRemote()) return;
     driveSyncing = true;
+    let res = null;
     try{
       const remote = await driveDownloadFile(driveFileId);
-      const remoteTs = (remote && remote.meta && remote.meta.lastUpdateTs) || 0;
-      const localTs = (STATE && STATE.meta && STATE.meta.lastUpdateTs) || 0;
-      if(remoteTs > localTs && driveSafeToApplyRemote(true)){
-        await idbSaveBackup(STATE);
-        const keepUi = STATE.ui, keepSettings = STATE.settings;
-        STATE = remote;
-        if(keepUi) STATE.ui = keepUi;
-        if(keepSettings) STATE.settings = keepSettings;
-        if(!STATE.logs) STATE.logs = JSON.parse(JSON.stringify(EMPTY_LOGS));
-        if(!STATE.muro) STATE.muro = {cover:null, avatar:null, coverAspect:null};
-        if(STATE.tracker === undefined) STATE.tracker = null;
-        await idbSet(IDB_KEY, STATE);
-        renderAll();
-        setDriveStatus("☁️ Sincronizado ✓ (cambios de otro dispositivo)", "ok");
-      }
+      res = await driveIncorporate(remote, false);
       driveLastModified = mt;
+      if(res === "pulled") setDriveStatus("☁️ Sincronizado ✓ (cambios de otro dispositivo)", "ok");
     } finally { driveSyncing = false; }
+    // Había cambios locales que el otro dispositivo no tiene: se suben ya fusionados.
+    if(res === "needs-push" || res === "local-newer") scheduleDrivePush(300);
   }catch(e){ console.error("Sondeo de Drive:", e); }
 }
 function startDrivePolling(){
@@ -3484,10 +3863,12 @@ function initDriveAuth(){
   // quedó guardado ahí desde la primera conexión.
   loadDriveSession();
   startDrivePolling();
-  if(driveSessionId){
-    setDriveStatus("☁️ Conectando…", "warn");
-    driveRefreshAccessToken().then((ok)=>{ if(ok) syncPullAndMerge(false); });
-  }
+  driveLoadBase().then(()=>{
+    if(driveSessionId){
+      setDriveStatus("☁️ Conectando…", "warn");
+      driveRefreshAccessToken().then((ok)=>{ if(ok) syncPullAndMerge(false); });
+    }
+  });
 }
 
 function connectDrive(){
@@ -3589,29 +3970,227 @@ async function ensureDriveToken(){
   return await driveRefreshAccessToken();
 }
 
-function scheduleDrivePush(){
+// ---------- Fusión de cambios entre dispositivos (Q-21) ----------
+// Antes, cada dispositivo subía su copia completa y pisaba lo que el otro hubiera guardado.
+// Ahora se guarda la "base" (la última copia que este dispositivo sincronizó) y, cuando el
+// archivo de Drive cambió desde entonces, se fusiona de 3 vías: lo que cambió acá se conserva,
+// lo que cambió en el otro dispositivo también; solo si se tocó EL MISMO dato en los dos gana
+// lo de este dispositivo. Ajustes de interfaz (STATE.ui / STATE.settings) siguen siendo del dispositivo.
+const DRIVE_BASE_KEY = "drive_base_v1";
+let driveBase = null;
+let driveRenderPending = false;
+async function driveLoadBase(){ try{ driveBase = (await idbGet(DRIVE_BASE_KEY)) || null; }catch(e){ driveBase = null; } }
+async function driveSaveBase(stateObj){
+  try{ driveBase = JSON.parse(JSON.stringify(stateObj)); await idbSet(DRIVE_BASE_KEY, driveBase); }
+  catch(e){ console.error("Error guardando la base de sincronización", e); }
+}
+async function driveClearBase(){ driveBase = null; try{ await idbDelete(DRIVE_BASE_KEY); }catch(e){} }
+
+function dIsObj(x){ return x !== null && typeof x === "object" && !Array.isArray(x); }
+function dKeys(o){ return Object.keys(o).filter(k => o[k] !== undefined); }
+function dEq(a, b){
+  if(a === b) return true;
+  if(a === undefined || b === undefined || a === null || b === null) return false;
+  if(typeof a !== "object" || typeof b !== "object") return false;
+  if(Array.isArray(a) !== Array.isArray(b)) return false;
+  if(Array.isArray(a)){
+    if(a.length !== b.length) return false;
+    for(let i = 0; i < a.length; i++) if(!dEq(a[i], b[i])) return false;
+    return true;
+  }
+  const ka = dKeys(a), kb = dKeys(b);
+  if(ka.length !== kb.length) return false;
+  for(const k of ka){ if(b[k] === undefined || !dEq(a[k], b[k])) return false; }
+  return true;
+}
+// b = base, l = local, r = remoto. Devuelve el valor fusionado (undefined = no existe).
+function dm3(b, l, r){
+  if(dEq(l, r)) return l;
+  if(b !== undefined && dEq(l, b)) return r;   // acá no cambió: vale lo del otro dispositivo
+  if(b !== undefined && dEq(r, b)) return l;   // el otro no cambió: vale lo de acá
+  if(l === undefined) return r;                // borrado acá pero cambiado allá: se conserva (no se pierde nada)
+  if(r === undefined) return l;
+  if(dIsObj(l) && dIsObj(r)){
+    const bo = dIsObj(b) ? b : {};
+    const out = {};
+    const ks = new Set([...dKeys(l), ...dKeys(r)]);
+    ks.forEach(k=>{ const v = dm3(bo[k], l[k], r[k]); if(v !== undefined) out[k] = v; });
+    return out;
+  }
+  if(Array.isArray(l) && Array.isArray(r)) return dMergeArr(b, l, r);
+  return l; // mismo dato tocado en los dos: gana lo de este dispositivo
+}
+function dMergeArr(b, l, r){
+  const bb = Array.isArray(b) ? b : [];
+  const hasId = a => a.every(x => x && typeof x === "object" && typeof x.id === "string");
+  if((l.length || r.length) && hasId(l) && hasId(r)){
+    const bm = new Map(bb.filter(x => x && typeof x === "object" && typeof x.id === "string").map(x => [x.id, x]));
+    const rm = new Map(r.map(x => [x.id, x]));
+    const out = [], used = new Set();
+    l.forEach(x=>{
+      used.add(x.id);
+      const bx = bm.get(x.id), rx = rm.get(x.id);
+      if(rx === undefined){
+        if(bx !== undefined && dEq(x, bx)) return; // lo borraron en el otro dispositivo y acá no se tocó
+        out.push(x); return;
+      }
+      out.push(dm3(bx, x, rx));
+    });
+    r.forEach(x=>{
+      if(used.has(x.id)) return;
+      const bx = bm.get(x.id);
+      if(bx !== undefined && dEq(x, bx)) return; // lo borraron acá y allá no se tocó
+      out.push(x);
+    });
+    return out;
+  }
+  if(l.length === r.length) return l.map((x, i)=> dm3(bb[i], x, r[i]));
+  return l;
+}
+function dStripDevice(o){
+  const c = {};
+  Object.keys(o || {}).forEach(k=>{ if(k !== "ui" && k !== "settings") c[k] = o[k]; });
+  return c;
+}
+function driveReconcile(remote){
+  const local = STATE, out = {};
+  const keys = new Set([...Object.keys(local || {}), ...Object.keys(remote || {})]);
+  keys.forEach(k=>{
+    if(k === "ui" || k === "settings"){ if(local[k] !== undefined) out[k] = local[k]; return; }
+    const v = dm3(driveBase ? driveBase[k] : undefined, local[k], remote[k]);
+    if(v !== undefined) out[k] = v;
+  });
+  const lm = local.meta || {}, rm = remote.meta || {};
+  const lt = lm.lastUpdateTs || 0, rt = rm.lastUpdateTs || 0;
+  out.meta = Object.assign({}, out.meta);
+  out.meta.lastUpdateTs = Math.max(lt, rt);
+  out.meta.lastUpdate = (lt >= rt ? lm.lastUpdate : rm.lastUpdate) || out.meta.lastUpdate;
+  return out;
+}
+function driveFixDefaults(){
+  if(!STATE.logs) STATE.logs = JSON.parse(JSON.stringify(EMPTY_LOGS));
+  if(!STATE.muro) STATE.muro = {cover:null, avatar:null, coverAspect:null};
+  if(STATE.tracker === undefined) STATE.tracker = null;
+  if(!STATE.timerPresets) STATE.timerPresets = [];
+}
+function driveCanRenderNow(){
+  const a = document.activeElement;
+  if(a && (a.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))) return false;
+  if(typeof timerRun !== "undefined" && timerRun) return false;
+  if(typeof cardSeqRun !== "undefined" && cardSeqRun) return false;
+  if(document.querySelector(".timer-modal-overlay.open, .fullscreen-timer-overlay.open")) return false;
+  return true;
+}
+function driveRenderWhenSafe(){
+  if(driveCanRenderNow()){ driveRenderPending = false; try{ renderAll(); }catch(e){ console.error(e); } return; }
+  driveRenderPending = true;
+  setTimeout(()=>{ if(driveRenderPending) driveRenderWhenSafe(); }, 2500);
+}
+// Incorpora lo que hay en Drive a este dispositivo. Devuelve:
+//  "pulled"      → se trajeron cambios del otro dispositivo (nada nuevo que subir)
+//  "same"        → ya estaba todo igual
+//  "needs-push"  → se fusionó y hay cambios de acá que Drive todavía no tiene
+//  "local-newer" → (sin base) lo de acá es más nuevo: subir lo local
+//  "kept-local"  → el usuario eligió conservar lo local
+async function driveIncorporate(remote, askIfNewer){
+  const remoteTs = (remote && remote.meta && remote.meta.lastUpdateTs) || 0;
+  const localTs = (STATE && STATE.meta && STATE.meta.lastUpdateTs) || 0;
+  if(!driveBase){
+    // Primera sincronización de este dispositivo con la versión nueva: no hay base para fusionar,
+    // se usa la regla de siempre (gana lo más reciente, con aviso y copia de seguridad de lo local).
+    if(remoteTs > localTs){
+      const remoteWhen = (remote.meta && remote.meta.lastUpdate) || "desconocida";
+      const proceed = !askIfNewer || confirm(
+        `Hay una versión más reciente en Google Drive (última edición: ${remoteWhen}).\n\n¿Reemplazar los datos de este dispositivo con esa versión?`
+      );
+      if(!proceed) return "kept-local";
+      const keepUi = STATE && STATE.ui, keepSettings = STATE && STATE.settings;
+      if(STATE) idbSaveBackup(STATE);
+      STATE = remote;
+      if(keepUi) STATE.ui = keepUi;
+      if(keepSettings) STATE.settings = keepSettings;
+      driveFixDefaults();
+      await idbSet(IDB_KEY, STATE);
+      await driveSaveBase(STATE);
+      driveRenderWhenSafe();
+      return "pulled";
+    }
+    return "local-newer";
+  }
+  const merged = driveReconcile(remote);   // síncrono: no hay esperas entre calcular y aplicar
+  const changedLocal = !dEq(dStripDevice(merged), dStripDevice(STATE));
+  const needsPush = !dEq(dStripDevice(merged), dStripDevice(remote));
+  if(changedLocal){
+    idbSaveBackup(STATE); // red de seguridad (el clon se hace en este mismo instante)
+    STATE = merged;
+    driveFixDefaults();
+    await idbSet(IDB_KEY, STATE);
+    driveRenderWhenSafe();
+  }
+  if(needsPush) return "needs-push";
+  await driveSaveBase(STATE);
+  return changedLocal ? "pulled" : "same";
+}
+async function driveGetModified(fileId){
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=modifiedTime`, { headers: driveAuthHeaders() });
+  if(!res.ok) throw new Error("No se pudo consultar Drive (" + res.status + ")");
+  return (await res.json()).modifiedTime || null;
+}
+
+// ---------- Subida a Drive con reintentos ----------
+let drivePushSeq = 0;
+function scheduleDrivePush(delay){
   if(!driveSessionId) return; // no conectado, no hay nada que empujar
   clearTimeout(drivePushTimer);
   drivePushPending = true;
-  drivePushTimer = setTimeout(()=>{ pushToDrive().catch(e=>{
+  drivePushSeq++;
+  // Con la pestaña oculta o cerrándose no se espera: se sube ya.
+  const d = (document.visibilityState === "hidden") ? 0 : (delay == null ? 1800 : delay);
+  drivePushTimer = setTimeout(runDrivePush, d);
+}
+async function runDrivePush(){
+  const seq = drivePushSeq;
+  try{
+    const r = await pushToDrive();
+    if(r === "busy"){ drivePushTimer = setTimeout(runDrivePush, 1200); return; }       // otra sincronización en curso: reintenta
+    if(r === "retry"){ drivePushTimer = setTimeout(runDrivePush, 8000); return; }      // sin token por ahora: reintenta
+    if(seq === drivePushSeq) drivePushPending = false;                                  // si hubo cambios nuevos mientras subía, sigue pendiente
+  }catch(e){
     console.error(e);
-    setDriveStatus("☁️ Error al sincronizar", "err");
-  }).finally(()=>{ drivePushPending = false; }); }, 1800);
+    setDriveStatus("☁️ Error al sincronizar — reintentando…", "err");
+    drivePushTimer = setTimeout(runDrivePush, 15000);                                   // el cambio NO se descarta: queda pendiente
+  }
 }
 
 async function pushToDrive(){
-  if(!driveSessionId || driveSyncing) return;
-  if(!(await ensureDriveToken())) return;
+  if(!driveSessionId) return "skip";
+  if(driveSyncing) return "busy";
+  if(!(await ensureDriveToken())) return driveSessionId ? "retry" : "skip";
   driveSyncing = true;
   setDriveStatus("☁️ Sincronizando…", "warn");
   try{
     if(!driveFileId) driveFileId = await driveFindFile();
     if(!driveFileId){
       driveFileId = await driveCreateFile(STATE);
+      await driveSaveBase(STATE);
     } else {
-      await driveUpdateFile(driveFileId, STATE);
+      const mt = await driveGetModified(driveFileId);
+      let upload = true;
+      if(mt && mt !== driveLastModified){
+        // Otro dispositivo guardó algo desde la última vez: se fusiona ANTES de subir para no pisarlo.
+        const remote = await driveDownloadFile(driveFileId);
+        const res = await driveIncorporate(remote, false);
+        if(res === "pulled" || res === "same" || res === "kept-local") upload = (res === "kept-local");
+      }
+      if(upload){
+        await driveUpdateFile(driveFileId, STATE);
+        await driveSaveBase(STATE);
+      } else if(mt){
+        driveLastModified = mt;
+      }
     }
     setDriveStatus("☁️ Sincronizado ✓", "ok");
+    return "ok";
   } finally {
     driveSyncing = false;
   }
@@ -3627,34 +4206,20 @@ async function syncPullAndMerge(askIfNewer){
     if(!driveFileId){
       // Todavía no existe copia en Drive: la creamos con lo que tenemos localmente.
       driveFileId = await driveCreateFile(STATE);
+      await driveSaveBase(STATE);
       setDriveStatus("☁️ Sincronizado ✓", "ok");
       return;
     }
+    const mt = await driveGetModified(driveFileId);
     const remote = await driveDownloadFile(driveFileId);
-    const remoteTs = (remote && remote.meta && remote.meta.lastUpdateTs) || 0;
-    const localTs = (STATE && STATE.meta && STATE.meta.lastUpdateTs) || 0;
-    if(remoteTs > localTs){
-      const remoteWhen = (remote.meta && remote.meta.lastUpdate) || "desconocida";
-      const proceed = !askIfNewer || confirm(
-        `Hay una versión más reciente en Google Drive (última edición: ${remoteWhen}).\n\n¿Reemplazar los datos de este dispositivo con esa versión?`
-      );
-      if(proceed){
-        if(STATE) await idbSaveBackup(STATE); // red de seguridad: lo local se guarda aparte antes de pisarlo
-        STATE = remote;
-        if(!STATE.logs) STATE.logs = JSON.parse(JSON.stringify(EMPTY_LOGS));
-        if(!STATE.muro) STATE.muro = {cover:null, avatar:null, coverAspect:null};
-        if(STATE.tracker === undefined) STATE.tracker = null;
-        await idbSet(IDB_KEY, STATE);
-        renderAll();
-        setDriveStatus("☁️ Sincronizado ✓ (traído de Drive)", "ok");
-        return;
-      }
-    }
-    // Si lo local es igual o más nuevo, empujamos lo local para dejar todo alineado.
-    if(localTs >= remoteTs){
+    const res = await driveIncorporate(remote, askIfNewer);
+    if(mt) driveLastModified = mt;
+    if(res === "local-newer" || res === "needs-push"){
+      // Lo de acá (ya fusionado con lo del otro dispositivo) es más nuevo: se sube para alinear todo.
       await driveUpdateFile(driveFileId, STATE);
+      await driveSaveBase(STATE);
     }
-    setDriveStatus("☁️ Sincronizado ✓", "ok");
+    setDriveStatus(res === "pulled" ? "☁️ Sincronizado ✓ (traído de Drive)" : "☁️ Sincronizado ✓", "ok");
   } catch(e){
     console.error(e);
     setDriveStatus("☁️ Error al sincronizar", "err");
@@ -3663,9 +4228,55 @@ async function syncPullAndMerge(askIfNewer){
   }
 }
 
-function manualSyncDrive(){
-  syncPullAndMerge(true);
+async function manualSyncDrive(){
+  flushPendingEdits();           // confirma lo que se esté escribiendo
+  await new Promise(r => setTimeout(r, 200));
+  clearTimeout(drivePushTimer);
+  await syncPullAndMerge(true);  // fusiona con Drive y sube lo pendiente
+  if(!driveSyncing) drivePushPending = false;
 }
+
+// ---------- Autoguardado al escribir + guardado al salir (Q-21) ----------
+// Antes, un campo editable solo se guardaba al perder el foco (blur): si se recargaba o se
+// cerraba la página con el cursor todavía adentro, lo escrito se perdía y nunca llegaba a Drive.
+// Ahora se confirma solo ~1 s después de dejar de escribir, y también al ocultar/cerrar la página.
+const _pendingEdits = new Set();
+let _autoCommitTimer = null;
+function flushPendingEdits(){
+  clearTimeout(_autoCommitTimer);
+  const els = Array.from(_pendingEdits);
+  _pendingEdits.clear();
+  els.forEach(el=>{
+    if(!el.isConnected) return;
+    _autoCommit = true; // los blur() de abajo guardan en silencio (sin destello ni copia de seguridad por cada pausa)
+    try{ el.dispatchEvent(new FocusEvent("blur")); }
+    catch(err){ console.error("Autoguardado:", err); }
+    finally{ _autoCommit = false; }
+  });
+}
+document.addEventListener("input", function(e){
+  const el = e.target;
+  if(!el || !el.isContentEditable) return;
+  if(el.closest && el.closest(".tecnica-collapsible summary")) return; // títulos: se confirman al terminar de editar
+  _pendingEdits.add(el);
+  clearTimeout(_autoCommitTimer);
+  _autoCommitTimer = setTimeout(flushPendingEdits, 900);
+}, true);
+function driveFlushOnLeave(){
+  flushPendingEdits();
+  if(driveSessionId && drivePushPending){ clearTimeout(drivePushTimer); runDrivePush(); }
+}
+document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState === "hidden") setTimeout(driveFlushOnLeave, 0); });
+window.addEventListener("pagehide", driveFlushOnLeave);
+window.addEventListener("beforeunload", function(e){
+  const hadEdits = _pendingEdits.size > 0;
+  flushPendingEdits();
+  if(driveSessionId && (hadEdits || drivePushPending || driveSyncing)){
+    // Aviso del navegador solo cuando hay algo que todavía no llegó a Drive.
+    e.preventDefault();
+    e.returnValue = "";
+  }
+});
 
 // ---------- exercise card markup ----------
 function statBlock(stats){
@@ -5475,6 +6086,7 @@ function renderSettingsModal(){
     ${renderAccountSection(STATE.settings, T)}
     ${renderRegistroSection(STATE.settings.registro, T)}
     ${renderNotifSettingsSection(STATE.settings.notificaciones, T)}
+    ${renderAnatSettingsSection()}
     ${renderSoundSection(STATE.settings.sonido, T)}
   `;
 }
@@ -6841,6 +7453,33 @@ function applyRegistroDraft(d){
   });
   paintFatiga("scaleFatiga");
 }
+// L-C: el campo de notas del registro (nuevo y edición) se agranda hacia abajo según lo escrito
+function autoGrowNotes(){
+  document.querySelectorAll("#newLogNotas, #editLogNotas").forEach(function(el){
+    if(!el.offsetParent) return; // oculto: se ajusta cuando se vea
+    el.style.height = "auto";
+    el.style.height = (el.scrollHeight + 2) + "px";
+  });
+}
+(function(){
+  let raf = 0;
+  function soon(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(autoGrowNotes); }
+  document.addEventListener("input", function(e){ if(e.target && /^(newLogNotas|editLogNotas)$/.test(e.target.id)) soon(); }, true);
+  window.addEventListener("resize", soon);
+  new MutationObserver(soon).observe(document.documentElement, { childList:true, subtree:true });
+  document.addEventListener("click", function(){ setTimeout(soon, 60); }, true);
+})();
+// M-2: en las notas del registro diario, Enter guarda y Shift+Enter baja un renglón
+document.addEventListener("keydown", function(e){
+  const t = e.target;
+  if(!t || (t.id !== "newLogNotas" && t.id !== "editLogNotas")) return;
+  if(e.key !== "Enter" || e.shiftKey || e.isComposing || e.altKey) return; // Shift+Enter: comportamiento normal (salto de línea)
+  e.preventDefault();
+  try{ t.blur(); }catch(err){} // confirma el campo (change) ANTES de guardar, igual que al tocar el botón
+  if(t.id === "newLogNotas"){ saveNewLog(); return; }
+  const btn = document.querySelector('button[onclick^="saveEditLog("]');
+  if(btn) btn.click();
+}, true);
 function initRegistroForm(){
   applyRegistroDraft(loadRegistroDraft());
   ["newLogDate","newLogRoutine","newLogSueno","newLogComida","newLogNotas"].forEach(id=>{
@@ -7387,7 +8026,7 @@ function renderMuro(){
 // app: al abrirla vuelve a la misma pestaña y al mismo punto donde la dejaste.
 const _scrollPositions = {};          // copia en memoria de la sesión (más fresca que STATE)
 let _currentView = "rutinaA";         // se corrige al arrancar con STATE.ui.vista
-const VISTAS_VALIDAS = ["muro","rutinaA","rutinaB","calentamiento","tecnica","estandar","biblioteca","registro","semanal"];
+const VISTAS_VALIDAS = ["muro","rutinaA","rutinaB","calentamiento","tecnica","estandar","biblioteca","anatomia","registro","semanal"];
 
 function ensureUiState(){
   if(!STATE.ui || typeof STATE.ui !== "object") STATE.ui = {};
@@ -7463,6 +8102,8 @@ function showView(viewKey){
   document.querySelector(`.tab-btn[data-view="${viewKey}"]`).classList.add('active');
   _currentView = viewKey;
   closeLkPop(); setTimeout(lkRefreshCounts, 0);
+  try{ dockUpdate(); }catch(e){}
+  try{ anatSync(); setTimeout(anatTrack, 120); }catch(e){}
   ensureUiState().vista = viewKey;
   restoreScrollFor(viewKey);
   saveState("ui");
@@ -7495,6 +8136,634 @@ function exportJSON(){
 // ============================================================
 // INIT
 // ============================================================
+// <<ANAT-BEGIN>>
+// ============================================================
+// A-6 · ANATOMÍA — modelo 2D detallado (frente y espalda) + panel flotante + pestaña propia.
+// Los músculos se asignan AUTOMÁTICO por el nombre del ejercicio y el usuario puede corregirlos:
+// la corrección queda en STATE.anatomia.corr[<nombre normalizado>] y se reutiliza en todo ejercicio con ese nombre.
+// Dibujo: lienzo 200 x 460, eje de simetría x = 100; cada trazo es la mitad derecha y se espeja a la izquierda.
+// ============================================================
+const ANAT_SIL = {
+  head: "M100 8 C112 8 119 18 119 30 C119 44 111 54 100 54 C89 54 81 44 81 30 C81 18 88 8 100 8 Z",
+  neck: "M92 48 L92 68 L108 68 L108 48 Z",
+  body: "M100 66 C112 66 126 68 138 76 L134 98 C133 130 125 160 122 190 C124 206 130 220 131 234 C133 264 131 300 127 332 C129 352 127 382 124 410 C123 420 122 428 121 434 C127 440 129 448 125 453 L107 453 C104 447 106 438 107 430 C105 400 103 372 106 352 C105 320 104 290 103 262 C102 254 101 248 100 244 Z",
+  arm:  "M136 78 C150 74 162 84 164 100 C167 120 168 142 168 156 C172 178 178 200 180 222 C181 228 180 232 176 232 L168 232 C165 230 164 226 164 222 C160 202 152 182 148 160 C146 140 142 120 138 104 Z",
+  hand: "M174 228 C181 228 184 240 182 252 C180 258 172 258 169 252 C166 244 167 232 174 228 Z"
+};
+const ANAT_GROUPS = { sup:"Tren superior", hom:"Hombro, escápula y cuello", bra:"Brazo, antebrazo y mano", core:"Core", inf:"Tren inferior" };
+const ANAT_M = {
+  pectoral:{ n:"Pectoral", g:"sup",
+    v:{}, kids:["pectoral_clav", "pectoral_esterno"],
+    i:{ a:"Pectoral mayor (con el menor por debajo). Nace en la clavícula, el esternón y los cartílagos costales, y se inserta en el húmero. Tiene una porción clavicular (superior) y otra esternocostal (media e inferior), con fibras de distinta orientación.",
+        f:"Músculo grande y potente, pensado para empujar y aducir el brazo. Las dos porciones se activan distinto según el ángulo del empuje: cuanto más inclinado hacia arriba, más trabaja la porción clavicular.",
+        m:"Aducción horizontal, flexión y rotación interna del hombro. Lo trabajan flexiones, press de banca y aperturas. En flexiones declinadas (pies elevados) aumenta la participación de la porción superior y del deltoides anterior." } },
+  deltoides:{ n:"Deltoides", g:"sup",
+    v:{ f:"M136 76 C150 72 163 82 165 102 C165 114 158 120 154 112 C148 100 140 92 134 90 Z", b:"M136 76 C150 72 163 82 165 102 C165 114 158 120 154 112 C148 100 140 92 134 90 Z" },
+    i:{ a:"Cubre la articulación del hombro. Nace en el tercio externo de la clavícula, el acromion y la espina de la escápula; se inserta en la tuberosidad deltoidea del húmero. Tiene tres haces: anterior, medio y posterior.",
+        f:"Cada haz trabaja casi como un músculo distinto. Es muy sensible al volumen de entrenamiento y se recupera relativamente rápido, pero acumula fatiga cuando se suman muchos empujes y elevaciones en la misma semana.",
+        m:"Anterior: flexión del hombro (elevaciones frontales). Medio: abducción (elevaciones laterales). Posterior: extensión y abducción horizontal (remos, aperturas posteriores). Interviene en casi todos los empujes y en el press sobre la cabeza." } },
+  biceps:{ n:"Bíceps y braquial", g:"sup",
+    v:{ f:"M147 118 C155 116 163 122 165 136 C165 148 160 156 154 156 C148 148 146 132 147 118 Z" },
+    i:{ a:"Bíceps braquial de dos cabezas (nace en la escápula, apófisis coracoides y tubérculo supraglenoideo; se inserta en la tuberosidad del radio). Debajo está el braquial, que se inserta en el cúbito.",
+        f:"El bíceps cruza hombro y codo; el braquial solo el codo, por eso es el flexor 'puro' del codo. Responden bien a tensiones moderadas con tempo controlado.",
+        m:"Flexión del codo y supinación del antebrazo (el bíceps). El curl martillo, con agarre neutro, carga más el braquial y el braquiorradial. Las dominadas y los remos también lo reclutan como apoyo." } },
+  triceps:{ n:"Tríceps", g:"sup",
+    v:{ b:"M147 112 C155 108 164 116 165 134 C165 148 160 156 154 156 C148 146 146 128 147 112 Z" },
+    i:{ a:"Tríceps braquial de tres cabezas: larga (nace en la escápula), lateral y medial (nacen en el húmero). Se inserta en el olécranon del cúbito.",
+        f:"Ocupa cerca de dos tercios de la masa del brazo. La cabeza larga cruza el hombro, por lo que trabaja más cuando el brazo está elevado y el músculo queda estirado.",
+        m:"Extensión del codo; la cabeza larga ayuda además en la extensión y aducción del hombro. Es clave en flexiones, press y fondos. La extensión tras nuca estira la cabeza larga y la carga con fuerza." } },
+  antebrazo:{ n:"Antebrazo y agarre", g:"sup",
+    v:{ f:"M151 162 C159 160 167 166 171 182 C174 198 177 212 177 222 C172 224 168 222 166 218 C162 202 154 184 151 162 Z", b:"M151 162 C159 160 167 166 171 182 C174 198 177 212 177 222 C172 224 168 222 166 218 C162 202 154 184 151 162 Z" },
+    i:{ a:"Grupo de flexores y extensores de muñeca y dedos, pronadores, supinadores y el braquiorradial. Nacen cerca del codo y sus tendones largos llegan a la mano.",
+        f:"Predominan fibras resistentes a la fatiga, pero un trabajo prolongado de agarre (colgadas, pesos pesados) las fatiga y limita el rendimiento de espalda y piernas.",
+        m:"Cierre de mano, flexión y extensión de muñeca, rotación del antebrazo. La colgada muerta y las dominadas son entrenamiento directo de agarre; el peso muerto y los remos lo exigen sin que se vea." } },
+  trapecio:{ n:"Trapecio superior y cuello", g:"sup",
+    v:{}, kids:["trapecio_sup"],
+    i:{ a:"Trapecio: nace en el occipital, el ligamento nucal y las espinosas de C7 a T12; se inserta en la clavícula, el acromion y la espina de la escápula. La porción superior es la que se ve junto al cuello.",
+        f:"Combina funciones posturales con acciones dinámicas. Se tensa con facilidad con el estrés y la postura sostenida.",
+        m:"Elevación, retracción y rotación superior de la escápula, y extensión del cuello. Se activa en elevaciones de hombro, remos, colgadas y al sostener peso en las manos (peso muerto)." } },
+  espalda_media:{ n:"Espalda media (romboides y trapecio medio)", g:"sup",
+    v:{}, kids:["trapecio_med", "trapecio_inf", "romboides"],
+    i:{ a:"Romboides (nacen en las espinosas de C7 a T5 y se insertan en el borde medial de la escápula) con el trapecio medio e inferior, que acompañan el movimiento de la escápula.",
+        f:"Músculos estabilizadores de ritmo lento; se fatigan en posturas sostenidas y mejoran con trabajo de retracción controlada.",
+        m:"Retracción escapular (juntar las escápulas), rotación inferior y estabilización durante remos y dominadas. Compensan el exceso de trabajo de pecho y hombros." } },
+  dorsal:{ n:"Dorsal ancho", g:"sup",
+    v:{ b:"M100 134 C116 124 130 108 134 102 C137 132 130 168 120 190 L100 198 Z" },
+    i:{ a:"Latísimo del dorso: nace en las espinosas de T7 a L5, la fascia toracolumbar y la cresta ilíaca; se inserta en el surco intertubercular del húmero. Es el músculo más ancho de la espalda.",
+        f:"Gran músculo de tracción, con mucha capacidad de fuerza. Responde a series de tracción vertical y horizontal con descenso controlado.",
+        m:"Aducción, extensión y rotación interna del hombro; lleva el brazo hacia el cuerpo. Dominadas (tracción vertical) y remos (horizontal) son sus ejercicios base; en la colgada trabaja de forma isométrica y decomprime la columna." } },
+  erectores:{ n:"Erectores lumbares", g:"core",
+    v:{ b:"M100 152 L109 152 C111 172 110 192 106 208 L100 208 Z" },
+    i:{ a:"Erector de la columna (iliocostal, longísimo y espinoso) junto con los multífidos. Recorren la columna desde la pelvis hasta el cráneo.",
+        f:"Alta proporción de fibras de tipo I: están hechos para sostener la postura durante mucho tiempo. Trabajan sobre todo de forma isométrica.",
+        m:"Extensión y estabilización de la columna. Sostienen la espalda neutra en el peso muerto, las sentadillas y los remos; si fallan, la técnica se rompe antes que la fuerza de piernas." } },
+  abdominales:{ n:"Recto abdominal", g:"core",
+    v:{ f:"M101 120 L117 120 C118 150 117 176 113 194 L101 194 Z" },
+    deco:{ f:["M101 138 L117 138","M101 156 L116.5 156","M101 174 L115 174"] },
+    i:{ a:"Recto abdominal: nace en la cresta y la sínfisis del pubis y se inserta en los cartílagos de las costillas 5 a 7 y en el xifoides. Las líneas transversales son intersecciones tendinosas.",
+        f:"Músculo postural y dinámico a la vez. Responde bien al trabajo isométrico y a tensiones sostenidas, que además enseñan a controlar la pelvis.",
+        m:"Flexión del tronco y retroversión de la pelvis. En el hollow hold lo exige de forma isométrica manteniendo la zona lumbar contra el suelo; en las elevaciones de piernas suspendido y el crunch inverso actúa para elevar la pelvis." } },
+  oblicuos:{ n:"Oblicuos y transverso", g:"core",
+    v:{}, kids:["oblicuo_ext", "oblicuo_int", "transverso"],
+    i:{ a:"Oblicuo externo, oblicuo interno y transverso del abdomen forman la pared lateral del abdomen, en capas con fibras de distinta dirección.",
+        f:"Trabajan mucho como estabilizadores (anti-rotación y anti-inclinación) más que moviendo carga. El transverso actúa como faja natural al comprimir el abdomen.",
+        m:"Rotación y flexión lateral del tronco, compresión abdominal. En cualquier ejercicio unilateral o con carga asimétrica (remo unilateral, búlgaras) evitan que el tronco se tuerza." } },
+  serrato:{ n:"Serrato anterior", g:"sup",
+    v:{ f:"M126 104 L133 100 C134 112 133 124 128 132 C126 124 126 114 126 104 Z" },
+    i:{ a:"Nace en las costillas superiores y se inserta en el borde medial de la escápula por su cara anterior; se ve como 'dedos' al costado de las costillas.",
+        f:"Estabilizador clave de la escápula; suele quedar débil si solo se entrena empuje horizontal.",
+        m:"Protracción y rotación superior de la escápula. Mantiene el omóplato pegado a la caja torácica en flexiones y en cualquier movimiento sobre la cabeza. Sin serrato la escápula 'se despega'." } },
+  flexores_cadera:{ n:"Flexores de cadera (iliopsoas)", g:"core",
+    v:{ f:"M103 200 C112 200 122 206 125 222 C120 230 112 232 108 232 C104 222 102 212 103 200 Z" },
+    i:{ a:"Iliopsoas (psoas mayor e ilíaco): nace en las vértebras T12 a L5 y en el ilíaco, y se inserta en el trocánter menor del fémur. Trabaja junto con el recto femoral del cuádriceps.",
+        f:"Músculo profundo que se acorta con facilidad por las posturas sentadas; se beneficia de estiramientos y de trabajo de fuerza controlado.",
+        m:"Flexión de cadera. Dominan las elevaciones de piernas suspendido y los mountain climbers; si el abdomen no frena la pelvis, el psoas tira de la zona lumbar." } },
+  gluteo_mayor:{ n:"Glúteo mayor", g:"inf",
+    v:{ b:"M100 208 C114 202 129 210 130 234 C128 252 114 258 100 252 Z" },
+    i:{ a:"El músculo más voluminoso del cuerpo. Nace en el sacro, el cóccix y la cara posterior del ilíaco; se inserta en la tuberosidad glútea del fémur y en la cintilla iliotibial.",
+        f:"Gran capacidad de producir fuerza y potencia. Se activa más cuanto mayor es la flexión de cadera al inicio del movimiento, y responde muy bien a cargas altas.",
+        m:"Extensión y rotación externa de cadera. Protagonista en sentadillas profundas, zancadas, búlgaras, peso muerto y saltos; es el motor que sube del fondo." } },
+  gluteo_medio:{ n:"Glúteo medio", g:"inf",
+    v:{ b:"M110 202 C120 196 130 204 130 218 C124 212 116 210 106 214 Z" },
+    i:{ a:"Nace en la cara externa del ilion y se inserta en el trocánter mayor del fémur. Está parcialmente cubierto por el glúteo mayor.",
+        f:"Su función principal es de estabilización, con fibras que sostienen la pelvis a cada paso; se fatiga rápido en trabajo unilateral.",
+        m:"Abducción de cadera y estabilización lateral de la pelvis al apoyar una sola pierna. La elevación lateral con tobillera lo trabaja directo; las búlgaras y sentadillas unilaterales lo exigen para que la rodilla no se cierre." } },
+  cuadriceps:{ n:"Cuádriceps", g:"inf",
+    v:{ f:"M106 238 C116 232 128 234 131 248 C132 280 129 312 125 328 L108 328 C106 300 104 272 106 238 Z" },
+    deco:{ f:["M112 250 C114 280 114 304 112 322"] },
+    i:{ a:"Cuatro porciones: recto femoral, vasto lateral, vasto medial y vasto intermedio. Se unen en el tendón rotuliano que se inserta en la tuberosidad de la tibia.",
+        f:"Mezcla de fibras rápidas y lentas. Es muy exigido en saltos y sprints, y por su volumen genera mucha fatiga general en series largas.",
+        m:"Extensión de rodilla; el recto femoral también flexiona la cadera. Sentadillas, búlgaras, saltos y sprints lo trabajan; cuanto más profunda la flexión de rodilla, mayor su demanda." } },
+  aductores:{ n:"Aductores", g:"inf",
+    v:{ f:"M102 246 L105 242 C108 270 108 298 107 316 C104 300 102 270 102 246 Z" },
+    i:{ a:"Aductor mayor, largo y corto, pectíneo y grácil: nacen en el pubis y la rama isquiopubiana y se insertan en el fémur (el grácil en la tibia).",
+        f:"Estabilizadores de la pelvis y la rodilla; el aductor mayor se comporta casi como un isquiotibial en la extensión de cadera.",
+        m:"Aducción de cadera. Además estabilizan en sentadillas y zancadas, y trabajan en jumping jacks al juntar las piernas. Es una zona frecuente de tirones si se fuerza la flexibilidad." } },
+  isquiotibiales:{ n:"Isquiotibiales", g:"inf",
+    v:{ b:"M102 258 C114 260 126 256 129 268 C130 296 127 320 124 332 L106 332 C104 304 102 282 102 258 Z" },
+    i:{ a:"Bíceps femoral, semitendinoso y semimembranoso. Nacen en la tuberosidad isquiática (salvo la cabeza corta del bíceps) y se insertan en la tibia y el peroné.",
+        f:"Predominan las fibras rápidas y trabajan mucho de forma excéntrica, frenando la extensión de la rodilla. Son una lesión frecuente en sprints y estiramientos forzados.",
+        m:"Extensión de cadera y flexión de rodilla. El peso muerto los carga con la cadera hacia atrás mientras se alargan; los sprints y los saltos los exigen al frenar y al despegar." } },
+  pantorrilla:{ n:"Pantorrilla (gemelos y sóleo)", g:"inf",
+    v:{ b:"M106 342 C117 338 127 346 125 368 C123 388 120 408 116 420 C111 410 107 384 106 342 Z" },
+    i:{ a:"Gemelos (dos cabezas que nacen en el fémur) y sóleo (nace en tibia y peroné). Se unen en el tendón de Aquiles, que se inserta en el calcáneo.",
+        f:"El sóleo tiene predominio de fibras lentas y soporta mucho trabajo; los gemelos son más rápidos y explosivos. Ambos tienen mucha capacidad de fuerza elástica en saltos.",
+        m:"Flexión plantar del tobillo. Con la rodilla extendida trabajan más los gemelos; con la rodilla flexionada, el sóleo. Sprints, saltos y la elevación plantar unilateral los trabajan." } },
+  tibial:{ n:"Tibial anterior", g:"inf",
+    v:{ f:"M108 344 C116 340 124 346 123 372 C122 398 119 418 116 428 C111 412 108 380 108 344 Z" },
+    i:{ a:"Nace en la cara externa de la tibia y se inserta en el primer cuneiforme y el primer metatarsiano.",
+        f:"Fibras resistentes a la fatiga, imprescindible para el control del pie al caminar y correr.",
+        m:"Dorsiflexión (levantar la punta del pie) e inversión. Frena el pie al apoyar y participa en la amortiguación de saltos y sprints." } },
+  // ── Tanda 1 (Q-6): hombro, escápula y cuello. l:"d" = capa profunda (se ve al activarla o cuando el músculo está en uso)
+  esternocleido:{ n:"Esternocleidomastoideo", g:"hom",
+    v:{ f:"M107 44 L108 52 C106 60 104 65 101 68 L99 66 C101 58 104 50 107 44 Z" },
+    i:{ a:"Músculo superficial a cada lado del cuello. Nace en el esternón y la clavícula y sube en diagonal hasta la apófisis mastoides, detrás de la oreja.",
+        f:"Sostiene y orienta la cabeza. Se tensa con facilidad por posturas sostenidas (pantalla, cuello adelantado) y también ayuda a respirar cuando la demanda es alta.",
+        m:"Un lado: inclina la cabeza hacia ese lado y la gira hacia el opuesto. Los dos juntos: flexionan el cuello. Trabaja de forma isométrica en casi todo ejercicio de pie o con carga sobre los hombros." } },
+  platisma:{ n:"Platisma", g:"hom",
+    v:{ f:"M94 54 L99 54 L99 67 L95 66 Z" },
+    i:{ a:"Lámina muy fina bajo la piel del cuello, desde la fascia del pecho y el hombro hasta la mandíbula.",
+        f:"Es un músculo cutáneo: mueve la piel y el ángulo de la boca. Casi no aporta fuerza; se tensa en esfuerzos máximos y en gestos de tensión.",
+        m:"Baja la mandíbula y tensa la piel del cuello. No se entrena de forma directa; participa como apoyo durante esfuerzos con tensión de cuello." } },
+  escalenos:{ n:"Escalenos", g:"hom", l:"d",
+    v:{ f:"M104 58 C108 60 111 66 112 72 L106 70 C104 66 103 62 104 58 Z" },
+    i:{ a:"Tres músculos profundos a los lados del cuello (anterior, medio y posterior). Nacen en las vértebras cervicales y se insertan en las dos primeras costillas.",
+        f:"Son músculos respiratorios accesorios: elevan las primeras costillas al inhalar. Por el pasillo que dejan pasan los nervios del brazo, por eso su tensión puede dar hormigueo en el hombro y la mano.",
+        m:"Inclinan y flexionan el cuello y elevan las costillas superiores en la inspiración. Se cargan con ejercicios de respiración profunda y en cargas pesadas sostenidas (acarreos)." } },
+  subclavio:{ n:"Subclavio", g:"hom", l:"d",
+    v:{ f:"M110 74 C118 72 128 74 136 78 L135 82 C126 80 117 79 110 79 Z" },
+    i:{ a:"Músculo pequeño bajo la clavícula. Nace en la primera costilla y se inserta en la cara inferior de la clavícula.",
+        f:"Estabiliza la clavícula contra el esternón y protege los vasos y nervios que pasan por debajo.",
+        m:"Baja y estabiliza la clavícula durante movimientos del hombro. Trabaja de apoyo en empujes y flexiones." } },
+  pectoral_menor:{ n:"Pectoral menor", g:"hom", l:"d",
+    v:{ f:"M118 106 C124 98 130 90 136 84 L139 90 C132 98 126 108 120 114 Z" },
+    i:{ a:"Está debajo del pectoral mayor. Nace en las costillas 3 a 5 y se inserta en la apófisis coracoides de la escápula.",
+        f:"Estabiliza la escápula. Cuando se acorta por posturas encorvadas, empuja el hombro hacia adelante y abajo; suele ser un punto de tensión en quien entrena mucho empuje.",
+        m:"Inclina la escápula hacia adelante y abajo (protracción) y eleva las costillas en la inspiración forzada. Lo reclutan las flexiones, los fondos y el press." } },
+  subescapular:{ n:"Subescapular", g:"hom", l:"d",
+    v:{ f:"M128 98 C133 94 137 96 138 102 C136 108 131 110 127 108 Z" },
+    i:{ a:"Músculo del manguito rotador. Ocupa la cara anterior de la escápula (la que mira a las costillas) y se inserta en el tubérculo menor del húmero.",
+        f:"Es el rotador interno más potente del hombro y estabiliza la cabeza del húmero hacia adelante. Se lesiona con empujes pesados mal controlados o con sobreuso.",
+        m:"Rotación interna del hombro y estabilidad anterior. Participa en press, flexiones, dominadas y en cualquier tracción con el brazo cerca del cuerpo." } },
+  supraespinoso:{ n:"Supraespinoso", g:"hom", l:"d",
+    v:{ b:"M118 84 C124 80 131 80 136 82 L134 88 C128 90 122 90 117 90 Z" },
+    i:{ a:"Músculo del manguito rotador. Está en la fosa sobre la espina de la escápula, bajo el trapecio, y se inserta en el tubérculo mayor del húmero.",
+        f:"Inicia la elevación lateral del brazo y mantiene la cabeza del húmero centrada. Su tendón es el que más se irrita en el hombro (pinzamiento) cuando hay mucha elevación por encima de la cabeza.",
+        m:"Abducción del brazo (primeros 15°) y estabilización del hombro. Trabaja en elevaciones laterales, press sobre la cabeza y al cargar pesos con el brazo estirado." } },
+  infraespinoso:{ n:"Infraespinoso", g:"hom",
+    v:{ b:"M116 94 C124 92 132 92 135 96 C134 106 128 112 122 114 C118 108 116 100 116 94 Z" },
+    i:{ a:"Músculo del manguito rotador. Cubre la fosa bajo la espina de la escápula y se inserta en el tubérculo mayor del húmero.",
+        f:"Es el rotador externo principal y frena la rotación interna en empujes y lanzamientos. Equilibrar su fuerza con la del subescapular protege el hombro.",
+        m:"Rotación externa del hombro y estabilidad posterior. Lo trabajan los face pulls, las rotaciones externas con banda y las aperturas posteriores." } },
+  redondo_menor:{ n:"Redondo menor", g:"hom",
+    v:{ b:"M126 108 C131 106 135 108 136 112 L132 118 C129 116 127 113 126 108 Z" },
+    i:{ a:"Músculo pequeño del manguito rotador. Nace en el borde lateral de la escápula y se inserta en el tubérculo mayor del húmero.",
+        f:"Colabora con el infraespinoso en la rotación externa y mantiene la cabeza del húmero en su lugar al elevar el brazo.",
+        m:"Rotación externa y aducción débil del brazo. Trabaja en rotaciones externas, aperturas posteriores y remos." } },
+  redondo_mayor:{ n:"Redondo mayor", g:"hom",
+    v:{ b:"M122 116 C128 114 134 116 136 122 L130 128 C126 126 123 122 122 116 Z" },
+    i:{ a:"Nace en el ángulo inferior de la escápula y se inserta en el borde del surco intertubercular del húmero, junto al dorsal ancho.",
+        f:"Se lo llama el 'pequeño ayudante del dorsal': acompaña casi todas las tracciones. No pertenece al manguito rotador.",
+        m:"Aducción, extensión y rotación interna del brazo. Se activa en dominadas, jalones, remos y pullovers." } },
+  elevador_escapula:{ n:"Elevador de la escápula", g:"hom", l:"d",
+    v:{ b:"M106 62 C112 66 116 74 118 84 L113 86 C111 78 108 70 104 66 Z" },
+    i:{ a:"Nace en las vértebras cervicales superiores (C1 a C4) y baja hasta el ángulo superior de la escápula. Va debajo del trapecio.",
+        f:"Sostiene la escápula contra el peso del brazo y el cuello. Es una de las zonas que más se carga ('contractura de cuello') con estrés, mala postura y pantallas.",
+        m:"Eleva la escápula y la rota hacia abajo; inclina el cuello hacia el mismo lado. Trabaja en encogimientos de hombros y en acarreos pesados." } },
+  esplenio:{ n:"Esplenio de la cabeza y el cuello", g:"hom", l:"d",
+    v:{ b:"M101 44 C106 48 110 56 112 66 L102 62 Z" },
+    i:{ a:"Nace en las apófisis espinosas de las vértebras cervicales y torácicas altas y se inserta en el hueso occipital y la mastoides. Queda bajo el trapecio.",
+        f:"Mantiene la cabeza erguida frente a la gravedad. Se fatiga con posturas con la cabeza adelantada.",
+        m:"Extensión del cuello y rotación de la cabeza hacia el mismo lado. Se refuerza con ejercicios de extensión cervical y con press o sentadillas con barra alta." } },
+  // ── Tanda 2 (Q-6): brazo, antebrazo y mano
+  braquial:{ n:"Braquial", g:"bra", l:"d",
+    v:{ f:"M149 134 C154 132 160 136 161 144 C160 152 156 158 151 158 C148 150 148 142 149 134 Z" },
+    i:{ a:"Está debajo del bíceps, en la parte baja del brazo. Nace en la mitad inferior del húmero y se inserta en el cúbito.",
+        f:"Es el flexor 'puro' del codo: trabaja siempre, sin importar si la palma mira arriba, abajo o al costado. Responde bien a tensiones moderadas y tempos controlados.",
+        m:"Flexión del codo. Lo cargan los curl martillo, los curl con agarre pronado y las dominadas con agarre neutro." } },
+  coracobraquial:{ n:"Coracobraquial", g:"bra", l:"d",
+    v:{ f:"M140 102 C144 100 148 104 150 112 C150 120 148 126 145 130 C142 122 140 112 140 102 Z" },
+    i:{ a:"Músculo delgado en la cara interna del brazo, junto a la axila. Nace en la apófisis coracoides de la escápula y se inserta en la mitad del húmero.",
+        f:"Ayuda a mantener el brazo pegado al cuerpo y estabiliza el hombro. Lo atraviesa el nervio musculocutáneo.",
+        m:"Flexión y aducción del hombro. Participa en press inclinado, aperturas y en todo movimiento que lleva el brazo hacia adelante y adentro." } },
+  anconeo:{ n:"Ancóneo", g:"bra",
+    v:{ b:"M150 158 C156 156 161 158 162 164 C158 168 152 168 149 164 Z" },
+    i:{ a:"Pequeño músculo triangular en la parte posterior del codo. Nace en el epicóndilo lateral del húmero y se inserta en el cúbito.",
+        f:"Colabora con el tríceps y estabiliza el codo en la extensión final.",
+        m:"Extensión del codo (ayuda al tríceps) y estabilización de la articulación. Trabaja en fondos, press cerrado y extensiones." } },
+  pronador_redondo:{ n:"Pronador redondo", g:"bra",
+    v:{ f:"M149 160 C154 160 158 164 160 170 C156 172 152 170 149 166 Z" },
+    i:{ a:"Nace en el epicóndilo medial del húmero y el cúbito y cruza en diagonal el antebrazo hasta el radio.",
+        f:"Controla la rotación del antebrazo y es muy usado en agarres con la palma hacia abajo. Se sobrecarga en el 'codo de golfista'.",
+        m:"Pronación del antebrazo y flexión débil del codo. Lo trabajan remos, dominadas pronadas y todo giro de muñeca con carga." } },
+  braquiorradial:{ n:"Braquiorradial", g:"bra",
+    v:{ f:"M160 162 C166 164 170 172 172 184 C168 182 164 176 160 170 Z", b:"M160 162 C166 164 170 172 172 184 C168 182 164 176 160 170 Z" },
+    i:{ a:"Es el músculo grande del borde externo del antebrazo. Nace en el húmero, arriba del codo, y se inserta cerca de la muñeca, en el radio.",
+        f:"Es un flexor del codo atípico: se ve en el antebrazo pero actúa sobre el codo. Trabaja más con la palma neutra.",
+        m:"Flexión del codo, sobre todo con agarre neutro o pronado. Lo cargan los curl martillo, los curl inverso y los remos con agarre neutro." } },
+  flexores_antebrazo:{ n:"Flexores de muñeca y dedos", g:"bra",
+    v:{ f:"M151 170 C156 174 160 190 164 206 C162 214 158 214 156 208 C152 192 150 180 151 170 Z" },
+    i:{ a:"Grupo de la cara anterior del antebrazo (palmar largo, flexores radial y cubital del carpo, flexores superficial y profundo de los dedos). Nacen sobre todo en el epicóndilo medial del húmero.",
+        f:"Sostienen el agarre. Son músculos de resistencia y se fatigan con trabajo de agarre prolongado (colgadas, acarreos).",
+        m:"Flexión de la muñeca y de los dedos. Se trabajan con curl de muñeca, colgadas, acarreos y en todo agarre con carga." } },
+  extensores_antebrazo:{ n:"Extensores de muñeca y dedos", g:"bra",
+    v:{ b:"M158 168 C164 172 168 188 170 206 C168 212 164 212 162 206 C160 190 158 178 158 168 Z" },
+    i:{ a:"Grupo de la cara posterior del antebrazo (extensores radiales y cubital del carpo, extensor de los dedos). Nacen en el epicóndilo lateral del húmero.",
+        f:"Contrarrestan a los flexores y estabilizan la muñeca durante el agarre. Se sobrecargan en el 'codo de tenista'.",
+        m:"Extensión de la muñeca y de los dedos. Trabajan en curl inverso de muñeca, press y en cualquier agarre donde la muñeca debe mantenerse recta." } },
+  supinador:{ n:"Supinador", g:"bra", l:"d",
+    v:{ b:"M156 164 C160 166 163 170 163 176 C159 176 156 172 156 164 Z" },
+    i:{ a:"Músculo profundo que rodea la parte alta del radio, debajo de los extensores. Nace en el epicóndilo lateral y el cúbito.",
+        f:"Gira el antebrazo para que la palma mire hacia arriba, con o sin ayuda del bíceps.",
+        m:"Supinación del antebrazo. Se activa en curl con rotación de muñeca y en el inicio de las dominadas supinas." } },
+  abductor_pulgar:{ n:"Abductor largo y extensores del pulgar", g:"bra",
+    v:{ b:"M165 196 C169 196 172 202 172 210 C168 212 165 206 165 196 Z" },
+    i:{ a:"Tres tendones que cruzan el borde radial de la muñeca (abductor largo, extensor corto y extensor largo del pulgar).",
+        f:"Mueven el pulgar hacia atrás y afuera. Se irritan con movimientos repetitivos (tendinitis de De Quervain).",
+        m:"Abducción y extensión del pulgar. Intervienen en los agarres con pulgar abierto y en el agarre con gancho." } },
+  pronador_cuadrado:{ n:"Pronador cuadrado", g:"bra", l:"d",
+    v:{ f:"M163 214 C168 214 172 218 172 224 L164 224 Z" },
+    i:{ a:"Músculo plano y profundo, cerca de la muñeca. Une la parte baja del cúbito con la del radio.",
+        f:"Es el pronador principal de la muñeca; trabaja con y sin carga y estabiliza la articulación entre radio y cúbito.",
+        m:"Pronación del antebrazo. Se activa en giros con la palma hacia abajo y en agarres pronados." } },
+  mano:{ n:"Músculos de la mano (tenar, hipotenar, interóseos)", g:"bra",
+    v:{ f:"M171 232 C178 232 182 242 180 252 C176 256 170 252 169 244 Z", b:"M171 232 C178 232 182 242 180 252 C176 256 170 252 169 244 Z" },
+    i:{ a:"Músculos intrínsecos de la mano: tenar (pulgar), hipotenar (meñique), lumbricales e interóseos entre los huesos de la palma.",
+        f:"Dan precisión y fuerza de pinza. Se fatigan con agarres cerrados y repetitivos; se recuperan rápido.",
+        m:"Pinza, apertura y cierre de los dedos. Se entrenan con ejercicios de agarre, pinzas con discos y trepa." } },
+  // ── Pasada superficial · torso (Q-6): pecho, abdomen y espalda
+  pectoral_clav:{ n:"Pectoral · porción clavicular", g:"sup",
+    v:{ f:"M101 79 C106 77 113 76 120 77 C127 79 132 83 136 88 L136 92 C128 93 114 94 101 93 Z" },
+    deco:{ f:["M103 80 C112 82 124 87 135 90","M108 78 C116 81 126 86 135 90","M114 77 C121 80 129 85 135 90","M120 78 C126 81 131 86 135 90.5","M102 86 C112 87 124 89 135 91","M102 90 C112 91 124 91 135 91.5"] },
+    i:{ a:"Parte alta del pectoral mayor. Nace en la mitad interna de la clavícula y sus fibras bajan en diagonal hasta un tendón común que se inserta en el labio lateral del surco intertubercular del húmero.",
+        f:"Se activa más cuanto más inclinado hacia arriba es el empuje, y trabaja junto al deltoides anterior. Suele ser la zona menos desarrollada si solo se hace press plano.",
+        m:"Flexión del hombro con el brazo por encima del pecho y aducción horizontal. La trabajan el press inclinado, las flexiones con pies elevados y las aperturas inclinadas." } },
+  pectoral_esterno:{ n:"Pectoral · porción esternocostal", g:"sup",
+    v:{ f:"M101 93 C114 94 128 93 136 92 L136 97 C134 101 130 106 125 110 C120 114 112 118 106 117 C103 116 101 114 101 110 Z" },
+    deco:{ f:["M102 96 C112 96 124 94.5 135 93.5","M102 101 C112 101 124 97.5 134.5 94.5","M103 106 C112 106 123 100.5 133.5 95.5","M104 111 C112 110 122 104.5 131.5 96.5","M106 115 C113 113 121 108 128.5 98","M109 117 C115 115 121 111 126 105"] },
+    i:{ a:"Parte media e inferior del pectoral mayor. Nace en el esternón, los cartílagos de las costillas 2 a 6 y la vaina del recto abdominal; sus fibras suben y convergen en el mismo tendón del húmero, retorciéndose (las más bajas terminan más arriba).",
+        f:"Es la porción más voluminosa y potente. Sus fibras bajas trabajan más cuando el brazo se baja hacia la cadera (fondos, press declinado).",
+        m:"Aducción horizontal y extensión del hombro desde posición flexionada. Principal en press plano, declinado, fondos, aperturas y cruces." } },
+  trapecio_sup:{ n:"Trapecio superior", g:"sup",
+    v:{ b:"M100 52 L108 62 C122 66 134 72 138 78 C128 80 114 84 100 84 Z" },
+    deco:{ b:["M101 58 C112 66 124 74 136 78","M101 66 C112 72 122 78 130 80"] },
+    i:{ a:"Fibras superiores del trapecio. Nacen en el occipital y el ligamento nucal y se insertan en el tercio externo de la clavícula y el acromion.",
+        f:"Sostiene el peso del brazo y el cuello. Se tensa con estrés y postura sostenida; recupera rápido pero se carga fácil con acarreos y encogimientos.",
+        m:"Eleva la escápula (encogimiento), inclina y extiende el cuello y ayuda a rotar la escápula hacia arriba al elevar el brazo. Se trabaja con encogimientos, remo al mentón y acarreos." } },
+  trapecio_med:{ n:"Trapecio medio", g:"sup",
+    v:{ b:"M100 84 C114 84 128 80 138 78 C135 88 128 96 120 100 C112 98 104 96 100 98 Z" },
+    deco:{ b:["M101 88 L134 82","M101 92 L128 90"] },
+    i:{ a:"Fibras horizontales del trapecio, desde las vértebras torácicas altas (C7 a T3) hasta el acromion y la espina de la escápula.",
+        f:"Une las escápulas hacia la columna; es clave para una postura erguida. Suele estar débil y alargado en quien trabaja sentado.",
+        m:"Retracción escapular (juntar escápulas). Se trabaja con remos, face pulls, aperturas posteriores y retracciones escapulares." } },
+  trapecio_inf:{ n:"Trapecio inferior", g:"sup",
+    v:{ b:"M100 100 C110 100 118 100 124 100 C118 114 108 128 100 142 Z" },
+    deco:{ b:["M101 104 C110 104 118 102 123 101","M101 114 C108 112 116 108 120 103"] },
+    i:{ a:"Fibras inferiores del trapecio. Nacen en las vértebras torácicas medias y bajas (T4 a T12) y se insertan en la espina de la escápula.",
+        f:"Baja y rota hacia arriba la escápula; estabiliza el hombro al elevar el brazo por encima de la cabeza.",
+        m:"Depresión y rotación superior de la escápula. Se trabaja con elevaciones en Y, dominadas controladas, face pulls altos y press sobre la cabeza." } },
+  romboides:{ n:"Romboides", g:"sup", l:"d",
+    v:{ b:"M101 94 C108 92 114 94 118 100 C114 108 108 114 101 118 Z" },
+    i:{ a:"Mayor y menor. Nacen en las apófisis espinosas de C7 a T5 y se insertan en el borde medial de la escápula, debajo del trapecio.",
+        f:"Mantienen la escápula pegada al tórax. Si están débiles, la escápula 'se despega' (escápula alada).",
+        m:"Retracción y rotación inferior de la escápula. Se trabajan con remos, face pulls y retracciones escapulares." } },
+  oblicuo_ext:{ n:"Oblicuo externo", g:"core",
+    v:{ f:"M118 122 C128 124 130 140 128 162 C127 176 124 188 120 196 L114 196 C117 176 119 150 118 122 Z" },
+    deco:{ f:["M121 130 L127 136","M120 142 L128 148","M120 154 L128 160","M119 166 L127 172","M118 178 L125 184"] },
+    i:{ a:"Es el oblicuo más superficial, a los lados del abdomen. Nace en las costillas 5 a 12 en forma de dientes (se interdigita con el serrato anterior) y se inserta en la cresta ilíaca y la vaina del recto abdominal.",
+        f:"Con el oblicuo interno forma un 'cinturón' que estabiliza el tronco y protege la columna. Responde bien al trabajo anti-rotación.",
+        m:"Rotación del tronco al lado opuesto y flexión lateral. Se trabaja con leñadores, planchas laterales, Pallof press y rotaciones." } },
+  oblicuo_int:{ n:"Oblicuo interno", g:"core", l:"d",
+    v:{ f:"M116 150 C124 150 128 156 128 168 C126 180 122 190 118 196 C114 186 114 166 116 150 Z" },
+    i:{ a:"Capa intermedia del abdomen, debajo del oblicuo externo. Nace en la cresta ilíaca y la fascia toracolumbar y se inserta en las últimas costillas y la vaina del recto.",
+        f:"Sus fibras van en sentido contrario al oblicuo externo; juntos rotan el tronco de forma coordinada.",
+        m:"Rotación del tronco al mismo lado y flexión lateral; apoya la espiración forzada. Se trabaja con leñadores, planchas laterales y rotaciones." } },
+  transverso:{ n:"Transverso del abdomen", g:"core", l:"d",
+    v:{ f:"M110 160 C116 160 118 168 118 180 C116 190 112 196 108 196 C108 184 108 170 110 160 Z" },
+    i:{ a:"Es la capa más profunda del abdomen, con fibras horizontales. Nace en las costillas inferiores, la fascia toracolumbar y la cresta ilíaca.",
+        f:"Funciona como un corsé natural: aumenta la presión abdominal y estabiliza la columna lumbar antes de mover las extremidades.",
+        m:"Comprime el abdomen (estabilización del tronco y espiración forzada). Se trabaja con vacíos abdominales, planchas, respiración con bracing y cargas pesadas." } }
+};
+const ANAT_DECO = {
+  f:["M100 78 L100 200","M96 74 C86 72 78 76 70 82","M104 74 C114 72 122 76 130 82","M116 336 m-7 0 a7 7 0 1 0 14 0 a7 7 0 1 0 -14 0"],
+  b:["M100 52 L100 208"]
+};
+// Reglas automáticas (sobre el nombre normalizado). Se suman todas las que coincidan.
+const ANAT_RULES = [
+  [/flexion(es)?\b|push.?up/, ["pectoral","triceps","deltoides"], ["serrato","abdominales"]],
+  [/press de (banca|pecho)|banca plana|apertura/, ["pectoral"], ["triceps","deltoides","serrato"]],
+  [/\bpress\b(?! de (banca|pecho))/, ["deltoides","triceps"], ["trapecio","serrato"]],
+  [/elevaci(on|ones) frontal/, ["deltoides"], ["trapecio","serrato","pectoral"]],
+  [/elevaci(on|ones) lateral/, ["deltoides"], ["trapecio"]],
+  [/gluteo medio|abduccion/, ["gluteo_medio"], ["gluteo_mayor","oblicuos"]],
+  [/bulgara|zancada|desplante|lunge|step.?up/, ["cuadriceps","gluteo_mayor"], ["isquiotibiales","aductores","gluteo_medio","pantorrilla"]],
+  [/peso muerto/, ["gluteo_mayor","isquiotibiales","erectores"], ["dorsal","trapecio","antebrazo","cuadriceps","abdominales"]],
+  [/sentadilla|squat|goblet/, ["cuadriceps","gluteo_mayor"], ["isquiotibiales","aductores","erectores","abdominales","pantorrilla"]],
+  [/salto|jump|pliom/, ["cuadriceps","gluteo_mayor","pantorrilla"], ["isquiotibiales","tibial","abdominales"]],
+  [/jack/, ["pantorrilla","gluteo_medio","deltoides"], ["aductores","cuadriceps","trapecio"]],
+  [/mountain/, ["abdominales","flexores_cadera"], ["deltoides","pectoral","triceps","cuadriceps","serrato"]],
+  [/sprint|carrera|correr/, ["cuadriceps","isquiotibiales","gluteo_mayor","pantorrilla"], ["flexores_cadera","abdominales","tibial"]],
+  [/dominada|pull.?up|chin.?up|jalon/, ["dorsal","biceps"], ["espalda_media","trapecio","antebrazo","abdominales","deltoides"]],
+  [/colgada|descompresion/, ["antebrazo","dorsal"], ["deltoides","trapecio","abdominales","serrato"]],
+  [/remo/, ["dorsal","espalda_media"], ["biceps","deltoides","trapecio","erectores","antebrazo"]],
+  [/triceps|fondos/, ["triceps"], ["deltoides"]],
+  [/curl|biceps|martillo/, ["biceps"], ["antebrazo"]],
+  [/elevacion(es)? de piernas|leg raise/, ["flexores_cadera","abdominales"], ["antebrazo","oblicuos"]],
+  [/crunch inverso/, ["abdominales"], ["flexores_cadera","oblicuos"]],
+  [/hollow|dead.?bug/, ["abdominales"], ["oblicuos","flexores_cadera"]],
+  [/crunch oblicuo|oblicuo/, ["oblicuos"], ["abdominales"]],
+  [/crunch|abdominal/, ["abdominales"], ["oblicuos"]],
+  [/plantar|gemelo|pantorrilla|calf/, ["pantorrilla"], ["tibial"]],
+  [/plancha|plank/, ["abdominales"], ["oblicuos","deltoides","serrato","gluteo_mayor"]],
+  [/puente|hip.?thrust|elevacion de cadera/, ["gluteo_mayor"], ["isquiotibiales"]]
+];
+const ANAT = { active:null, roots:[], editing:null };
+
+function anatNorm(s){ return String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+function anatKey(name){ return anatNorm(name).replace(/\([^)]*\)/g, " ").replace(/\d+([.,]\d+)?\s*kg/g, " ").replace(/[^a-z0-9ñ ]+/g, " ").replace(/\s+/g, " ").trim(); }
+function anatState(){
+  if(!STATE.anatomia || typeof STATE.anatomia !== "object") STATE.anatomia = { v:1 };
+  const a = STATE.anatomia;
+  if(!a.tabs || typeof a.tabs !== "object") a.tabs = { rutinaA:true, rutinaB:true };
+  if(!a.corr || typeof a.corr !== "object") a.corr = {};
+  if(!Array.isArray(a.hist)) a.hist = [];
+  return a;
+}
+function anatAuto(name){
+  const k = anatNorm(name), p = [], s = [];
+  ANAT_RULES.forEach(([re, pp, ss])=>{ if(re.test(k)){ pp.forEach(m=>{ if(!p.includes(m)) p.push(m); }); ss.forEach(m=>{ if(!s.includes(m)) s.push(m); }); } });
+  return { p, s: s.filter(m=>!p.includes(m)) };
+}
+// Músculos de un ejercicio: corrección guardada > automático
+// Un músculo "padre" (p. ej. pectoral) se reemplaza por sus porciones; así las correcciones y reglas viejas siguen funcionando
+function anatSkinOn(){ try{ return localStorage.getItem("btc_anat_skin") === "1"; }catch(e){ return false; } }
+function anatSkinSync(){ const on = anatSkinOn(); (ANAT.roots || []).forEach(r=>{ r.classList.toggle("show-skin", on); const b = r.querySelector('[data-a="skin"]'); if(b) b.classList.toggle("on", on); }); }
+function anatExpand(keys){ const out = []; (keys || []).forEach(k=>{ const m = ANAT_M[k]; (m && m.kids ? anatExpand(m.kids) : [k]).forEach(x=>{ if(!out.includes(x)) out.push(x); }); }); return out; }
+function anatKeys(){ return Object.keys(ANAT_M).filter(k=>!ANAT_M[k].kids); }
+function anatFor(name){
+  const c = anatState().corr[anatKey(name)];
+  if(c){ const p = anatExpand(c.p), s = anatExpand(c.s).filter(k=>!p.includes(k)); return { p, s, src:"edit" }; }
+  const a = anatAuto(name), p = anatExpand(a.p); return { p, s: anatExpand(a.s).filter(k=>!p.includes(k)), src:"auto" };
+}
+let ANAT_UID = 0;
+// Detalles de la piel (Q-18): sombras suaves, luces y surcos; el lado derecho se refleja en el izquierdo
+const ANAT_SKIN = {
+  f:{ shadow:["M104 118 C112 120 120 117 126 112 C130 108 134 101 136 97","M101 80.5 C112 77.5 126 80.5 136 86.5","M121 79 C127 84 132 90 136 96","M102 197 C108 199 114 198 118 196"],
+      light:["M108 90 C116 86 126 88 130 94","M101 78 C112 75 126 78 136 84","M106 124 C108 134 108 150 107 164"],
+      line:["M100.7 80 L100.7 114","M100.7 118 L100.7 198","M101.5 132 L113 132.5","M101.5 146 L113 146.5","M101.5 160 L112.5 160.5","M101.5 174 L111.5 174.5"] },
+  b:{ shadow:["M104 94 C112 90 124 92 128 100 C124 110 114 114 106 112","M100 100 C108 104 112 112 111 124"],
+      light:["M110 84 C118 82 126 84 131 88","M104 150 C110 156 112 168 110 184"],
+      line:["M100.6 54 L100.6 208"] }
+};
+function anatSvg(view){
+  const mir = 'transform="translate(200 0) scale(-1 1)"';
+  const pair = d => `<path d="${d}"/><path d="${d}" ${mir}/>`;
+  let h = `<svg class="anat-svg" data-view="${view}" viewBox="0 0 200 460" xmlns="http://www.w3.org/2000/svg" aria-label="${view === "f" ? "Vista frontal" : "Vista posterior"}">`;
+  h += `<g class="anat-sil"><path d="${ANAT_SIL.head}"/><path d="${ANAT_SIL.neck}"/>${pair(ANAT_SIL.body)}${pair(ANAT_SIL.arm)}${pair(ANAT_SIL.hand)}</g>`;
+  const u = ++ANAT_UID, sk = ANAT_SKIN[view] || { shadow:[], light:[], line:[] };
+  h += `<defs><linearGradient id="sg${u}" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#e3b99c"/><stop offset=".55" stop-color="#cfa085"/><stop offset="1" stop-color="#a97a5e"/></linearGradient><radialGradient id="sh${u}" cx=".5" cy=".4" r=".65"><stop offset="0" stop-color="#e3b99c"/><stop offset="1" stop-color="#b78767"/></radialGradient><radialGradient id="mh${u}" cx=".42" cy=".34" r=".72"><stop offset="0" stop-color="rgba(255,240,226,.50)"/><stop offset=".5" stop-color="rgba(255,228,208,.10)"/><stop offset="1" stop-color="rgba(70,34,18,.34)"/></radialGradient><filter id="sb${u}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.1"/></filter></defs>`;
+  const sp = (d, f) => `<path d="${d}" fill="url(#${f}${u})"/>`, spp = (d, f) => `<path d="${d}" fill="url(#${f}${u})"/><path d="${d}" fill="url(#${f}${u})" ${mir}/>`;
+  h += `<g class="anat-skin">${sp(ANAT_SIL.head, "sh")}${sp(ANAT_SIL.neck, "sh")}${spp(ANAT_SIL.body, "sg")}${spp(ANAT_SIL.arm, "sg")}${spp(ANAT_SIL.hand, "sg")}`;
+  const mk = Object.keys(ANAT_M).filter(k=>ANAT_M[k].l !== "d" && !ANAT_M[k].kids && ANAT_M[k].v[view]);
+  h += `<g class="sk-v">${mk.map(k=>pair(ANAT_M[k].v[view]).replace(/<path /g, `<path fill="url(#mh${u})" `)).join("")}</g>`;
+  h += `<g class="sk-g" filter="url(#sb${u})">${mk.map(k=>pair(ANAT_M[k].v[view])).join("")}</g>`;
+  h += `<g class="sk-s" filter="url(#sb${u})">${sk.shadow.map(d=>pair(d)).join("")}</g><g class="sk-l" filter="url(#sb${u})">${sk.light.map(d=>pair(d)).join("")}</g><g class="sk-n">${sk.line.map(d=>pair(d)).join("")}</g></g>`;
+  h += `<g class="anat-mus">`;
+  [false, true].forEach(deep=>{ Object.keys(ANAT_M).forEach(k=>{ const m = ANAT_M[k], d = m.v[view]; if(d && (m.l === "d") === deep) h += `<g class="am${deep ? " deep" : ""}" data-m="${k}">${pair(d)}</g>`; }); });
+  h += `</g><g class="anat-deco">`;
+  (ANAT_DECO[view] || []).forEach(d=>{ h += `<path d="${d}"/><path d="${d}" ${mir}/>`; });
+  Object.keys(ANAT_M).forEach(k=>{ ((ANAT_M[k].deco || {})[view] || []).forEach(d=>{ h += `<path d="${d}"/><path d="${d}" ${mir}/>`; }); });
+  h += `</g></svg>`;
+  return h;
+}
+function anatRootHtml(mode){
+  return `<div class="anat-root anat-m-${mode}" data-mode="${mode}">
+    <div class="anat-top">
+      <div class="anat-ex"><span class="anat-ex-l">Ejercicio activo</span><b class="anat-ex-n">—</b><span class="anat-src"></span></div>
+      <div class="anat-tools">
+        <button type="button" data-a="turn" title="Girar: frente / espalda">⟳</button>
+        <button type="button" data-a="edit" title="Corregir los músculos de este ejercicio">✎</button>
+        <button type="button" data-a="skin" title="Mostrar u ocultar la piel (con piel, solo se ven translúcidos los músculos del ejercicio activo)">◍ Piel</button>
+        <button type="button" data-a="deep" title="Mostrar u ocultar la capa profunda (músculos que quedan tapados por otros)">◐ Capa</button>
+        <button type="button" data-a="undo" title="Deshacer el último cambio guardado">↶</button>
+        <button type="button" data-a="resetall" title="Restablecer todo el modelo a la versión por defecto">↺ Todo</button>
+      </div>
+    </div>
+    <div class="anat-edit" hidden>
+      <div class="anat-edit-t">Tocá un músculo: 1 vez = principal, 2 = secundario, 3 = quitar.</div>
+      <div class="anat-edit-b"><button type="button" data-a="save">Guardar cambio</button><button type="button" data-a="reset">Volver al automático</button><button type="button" data-a="cancel">Volver a como estaba</button></div>
+    </div>
+    <div class="anat-msg" hidden></div>
+    <div class="anat-stage"><div class="anat-turn">${anatSvg("f")}${anatSvg("b")}</div><span class="anat-viewl">Frente</span></div>
+    <div class="anat-legend"><i class="p"></i>Principal <i class="s"></i>Secundario</div>
+    <div class="anat-chips"></div>
+    <div class="anat-info">
+      <div class="anat-itabs"><button type="button" data-t="a" class="on">Anatomía</button><button type="button" data-t="f">Fisiología</button><button type="button" data-t="m">Mecánica</button></div>
+      <div class="anat-ibody"></div>
+    </div>
+    ${mode === "tab" ? `<div class="anat-exlist-wrap"><div class="anat-sec">Ejercicios de tus rutinas</div><div class="anat-exlist"></div></div>` : ""}
+  </div>`;
+}
+function anatMount(host, mode){
+  host.innerHTML = anatRootHtml(mode);
+  const root = host.firstElementChild;
+  root._st = { view:"f", sel:null, tab:"a", edit:false, draft:null, selFor:null };
+  ANAT.roots = ANAT.roots.filter(r=>document.body.contains(r) && r !== root);
+  ANAT.roots.push(root);
+  root.addEventListener("click", ev=>anatClick(root, ev));
+  anatPaint(root, true);
+  anatSkinSync();
+  return root;
+}
+function anatActiveInfo(){
+  const a = ANAT.active; if(!a) return null;
+  const ex = (STATE[a.r] && STATE[a.r].exercises || [])[a.idx];
+  return ex ? { name: ex.nombre || "Sin nombre", r:a.r, idx:a.idx } : null;
+}
+function anatTurn(root, view, instant){
+  const st = root._st; if(st.view === view) return;
+  const t = root.querySelector(".anat-turn");
+  const apply = ()=>{ st.view = view; root.querySelectorAll(".anat-svg").forEach(s=>s.classList.toggle("on", s.dataset.view === view)); const l = root.querySelector(".anat-viewl"); if(l) l.textContent = view === "f" ? "Frente" : "Espalda"; };
+  if(instant){ apply(); return; }
+  t.classList.add("turning");
+  setTimeout(()=>{ apply(); t.classList.remove("turning"); }, 190);
+}
+function anatSides(keys){ let f = 0, b = 0; keys.forEach(k=>{ const v = ANAT_M[k] && ANAT_M[k].v; if(!v) return; if(v.f && !v.b) f++; else if(v.b && !v.f) b++; }); return { f, b }; }
+function anatPaint(root, auto){
+  const st = root._st, act = anatActiveInfo();
+  const fx = st.edit && st.draft ? st.draft : (act ? anatFor(act.name) : { p:[], s:[], src:"none" });
+  const nameEl = root.querySelector(".anat-ex-n"), srcEl = root.querySelector(".anat-src");
+  nameEl.textContent = act ? act.name : "Ninguno";
+  srcEl.textContent = !act ? "" : (st.edit ? "Editando…" : (fx.src === "edit" ? "· corregido por vos" : (fx.p.length || fx.s.length ? "· detectado automáticamente" : "· sin músculos definidos")));
+  root.classList.toggle("is-editing", st.edit);
+  const editBox = root.querySelector(".anat-edit"); editBox.hidden = !st.edit;
+  root.querySelector('[data-a="edit"]').classList.toggle("on", st.edit);
+  root.querySelector('[data-a="edit"]').disabled = !act;
+  root.querySelectorAll(".am").forEach(g=>{
+    const k = g.dataset.m;
+    g.classList.toggle("p", fx.p.includes(k)); g.classList.toggle("s", fx.s.includes(k)); g.classList.toggle("sel", st.sel === k);
+  });
+  // selección por defecto: primer músculo principal del ejercicio cuando cambia el ejercicio
+  const sig = act ? act.r + ":" + act.idx + ":" + act.name : "";
+  if(!st.edit && st.selFor !== sig){ st.selFor = sig; st.sel = fx.p[0] || fx.s[0] || null; root.querySelectorAll(".am").forEach(g=>g.classList.toggle("sel", st.sel === g.dataset.m)); if(auto !== "noturn"){ const c = anatSides(fx.p.concat(fx.s)); anatTurn(root, c.b > c.f ? "b" : (c.f > c.b ? "f" : st.view), auto === true); } }
+  if(!root.querySelector(".anat-svg.on")) root.querySelector(`.anat-svg[data-view="${st.view}"]`).classList.add("on");
+  // chips
+  const chips = root.querySelector(".anat-chips");
+  const list = root.dataset.mode === "tab" && !act ? anatKeys() : fx.p.concat(fx.s);
+  if(root.dataset.mode === "tab"){
+    chips.innerHTML = Object.keys(ANAT_GROUPS).map(g=>`<div class="anat-chipgrp"><span>${ANAT_GROUPS[g]}</span>${anatKeys().filter(k=>ANAT_M[k].g === g).map(k=>`<button type="button" class="anat-chip ${ANAT_M[k].l === "d" ? "deep " : ""}${fx.p.includes(k) ? "p" : (fx.s.includes(k) ? "s" : "")} ${st.sel === k ? "sel" : ""}" data-m="${k}">${ANAT_M[k].n}</button>`).join("")}</div>`).join("");
+  } else {
+    chips.innerHTML = list.length ? list.map(k=>`<button type="button" class="anat-chip ${ANAT_M[k].l === "d" ? "deep " : ""}${fx.p.includes(k) ? "p" : "s"} ${st.sel === k ? "sel" : ""}" data-m="${k}">${ANAT_M[k].n}</button>`).join("")
+      : `<span class="anat-none">${act ? "Todavía no hay músculos definidos para este ejercicio. Tocá ✎ para elegirlos." : "Elegí un ejercicio para ver sus músculos."}</span>`;
+  }
+  // info
+  const body = root.querySelector(".anat-ibody"), m = st.sel && ANAT_M[st.sel];
+  root.querySelectorAll(".anat-itabs button").forEach(b=>b.classList.toggle("on", b.dataset.t === st.tab));
+  if(m){
+    const role = fx.p.includes(st.sel) ? '<em class="p">Principal</em>' : (fx.s.includes(st.sel) ? '<em class="s">Secundario</em>' : "");
+    body.innerHTML = `<div class="anat-mn">${m.n} ${role}</div><p>${m.i[st.tab]}</p>`;
+  } else body.innerHTML = `<p class="anat-none">Tocá un músculo del dibujo o de la lista para ver su información.</p>`;
+  if(root.dataset.mode === "tab"){
+    const lst = root.querySelector(".anat-exlist"); let h = "";
+    ["rutinaA","rutinaB"].forEach(r=>{ const arr = (STATE[r] && STATE[r].exercises) || []; h += `<div class="anat-exgrp">${r === "rutinaA" ? "Rutina A" : "Rutina B"}</div>`;
+      arr.forEach((ex, i)=>{ h += `<button type="button" class="anat-exbtn ${act && act.r === r && act.idx === i ? "on" : ""}" data-ex="${r}:${i}">${escapeHtml(ex.nombre || "Sin nombre")}</button>`; }); });
+    lst.innerHTML = h;
+  }
+}
+function anatRefreshAll(){ ANAT.roots = ANAT.roots.filter(r=>document.body.contains(r)); ANAT.roots.forEach(r=>anatPaint(r)); }
+function anatAsk(root, txt, yes, no){
+  const m = root.querySelector(".anat-msg"); clearTimeout(m._t); root._ask = { yes, no };
+  m.innerHTML = ""; const s = document.createElement("span"); s.textContent = txt + " "; m.appendChild(s);
+  [["ask-yes","Confirmar"],["ask-no","Cancelar"]].forEach(([a,l])=>{ const b = document.createElement("button"); b.type = "button"; b.dataset.a = a; b.textContent = l; b.style.cssText = "margin-left:6px"; m.appendChild(b); });
+  m.hidden = false;
+}
+function anatMsg(root, txt){ const m = root.querySelector(".anat-msg"); if(txt) root._ask = null; m.textContent = txt; m.hidden = !txt; clearTimeout(m._t); if(txt) m._t = setTimeout(()=>{ m.hidden = true; }, 3800); }
+function anatClick(root, ev){
+  const st = root._st, t = ev.target;
+  const act = anatActiveInfo();
+  const btn = t.closest("button[data-a]");
+  if(btn){
+    const a = btn.dataset.a;
+    if(a === "turn") anatTurn(root, st.view === "f" ? "b" : "f");
+    else if(a === "edit"){ if(!act) return; st.edit = !st.edit; if(st.edit && anatSkinOn()){ try{ localStorage.setItem("btc_anat_skin", "0"); }catch(e){} anatSkinSync(); } st.draft = st.edit ? (()=>{ const f = anatFor(act.name); return { p:f.p, s:f.s, src:"edit" }; })() : null; anatPaint(root, "noturn"); }
+    else if(a === "skin"){ const on = !anatSkinOn(); try{ localStorage.setItem("btc_anat_skin", on ? "1" : "0"); }catch(e){} anatSkinSync(); }
+    else if(a === "deep"){ const on = root.classList.toggle("show-deep"); btn.classList.toggle("on", on); }
+    else if(a === "cancel"){ st.edit = false; st.draft = null; anatPaint(root, "noturn"); }
+    else if(a === "save" && act){
+      const k = anatKey(act.name), A = anatState();
+      anatAsk(root, `¿Guardar este cambio en "${act.name}"? Se usará en todos los ejercicios con ese nombre.`, ()=>{
+        A.hist.push({ k, prev: A.corr[k] ? JSON.parse(JSON.stringify(A.corr[k])) : null }); if(A.hist.length > 40) A.hist.shift();
+        A.corr[k] = { p: st.draft.p.slice(), s: st.draft.s.slice(), t: Date.now() };
+        st.edit = false; st.draft = null; saveState(); anatRefreshAll(); anatMsg(root, "Guardado.");
+      }, ()=>{ anatMsg(root, "Sin guardar: seguís editando."); });
+    } else if(a === "reset" && act){
+      const k = anatKey(act.name), A = anatState();
+      if(!A.corr[k]){ st.edit = false; st.draft = null; anatPaint(root, "noturn"); anatMsg(root, "Este ejercicio ya está en automático."); return; }
+      anatAsk(root, `¿Volver "${act.name}" a la detección automática?`, ()=>{
+        A.hist.push({ k, prev: JSON.parse(JSON.stringify(A.corr[k])) }); delete A.corr[k];
+        st.edit = false; st.draft = null; saveState(); anatRefreshAll(); anatMsg(root, "Volvió a la detección automática.");
+      });
+    } else if(a === "undo"){
+      const A = anatState();
+      if(!A.hist.length){ anatMsg(root, "No hay cambios para deshacer."); return; }
+      anatAsk(root, "¿Deshacer el último cambio guardado?", ()=>{
+        const last = A.hist.pop(); if(last.prev) A.corr[last.k] = last.prev; else delete A.corr[last.k];
+        st.edit = false; st.draft = null; saveState(); anatRefreshAll(); anatMsg(root, "Último cambio deshecho.");
+      });
+    } else if(a === "resetall"){
+      const A = anatState();
+      if(!Object.keys(A.corr).length){ anatMsg(root, "El modelo ya está en la versión por defecto."); return; }
+      anatAsk(root, `¿Restablecer TODO el modelo? Se borrarán ${Object.keys(A.corr).length} corrección(es) tuyas y vuelve la detección automática.`, ()=>{
+        A.corr = {}; A.hist = []; st.edit = false; st.draft = null; saveState(); anatRefreshAll(); anatMsg(root, "Modelo restablecido por defecto.");
+      });
+    } else if(a === "ask-yes" || a === "ask-no"){
+      const f = root._ask; root._ask = null; anatMsg(root, "");
+      if(f) (a === "ask-yes" ? f.yes : f.no) && (a === "ask-yes" ? f.yes() : f.no());
+    }
+    return;
+  }
+  const it = t.closest(".anat-itabs button"); if(it){ st.tab = it.dataset.t; anatPaint(root, "noturn"); return; }
+  const eb = t.closest(".anat-exbtn"); if(eb){ const [r, i] = eb.dataset.ex.split(":"); ANAT.active = { r, idx:+i }; anatRefreshAll(); return; }
+  const mEl = t.closest("[data-m]");
+  if(mEl){
+    const k = mEl.dataset.m;
+    if(st.edit && st.draft && (mEl.classList.contains("am") || mEl.classList.contains("anat-chip"))){
+      const d = st.draft, inP = d.p.indexOf(k), inS = d.s.indexOf(k);
+      if(inP >= 0){ d.p.splice(inP, 1); d.s.push(k); } else if(inS >= 0){ d.s.splice(inS, 1); } else d.p.push(k);
+      st.sel = k; anatPaint(root, "noturn"); return;
+    }
+    st.sel = k; if(mEl.classList.contains("anat-chip")){ const v = ANAT_M[k].v; if(v && !v[st.view]) anatTurn(root, v.f ? "f" : "b"); }
+    anatPaint(root, "noturn");
+  }
+}
+// ---- Seguimiento del ejercicio activo al desplazarse por Rutina A / B ----
+let _anatRaf = 0;
+function anatTrack(){
+  if(_currentView !== "rutinaA" && _currentView !== "rutinaB") return;
+  const cards = document.querySelectorAll(`#view-${_currentView} .ex-card[data-idx]`); if(!cards.length) return;
+  const refY = window.innerHeight * 0.4; let best = null, bd = Infinity;
+  cards.forEach(c=>{ const r = c.getBoundingClientRect(); const d = (r.top <= refY && r.bottom >= refY) ? 0 : Math.min(Math.abs(r.top - refY), Math.abs(r.bottom - refY)); if(d < bd){ bd = d; best = c; } });
+  if(!best) return;
+  const a = { r: best.dataset.routine, idx: +best.dataset.idx };
+  if(!ANAT.active || ANAT.active.r !== a.r || ANAT.active.idx !== a.idx){ ANAT.active = a; anatRefreshAll(); }
+}
+function anatTrackSoon(){ if(_anatRaf) return; _anatRaf = requestAnimationFrame(()=>{ _anatRaf = 0; try{ anatTrack(); }catch(e){} }); }
+// ---- Panel flotante + botón + pestaña ----
+const ANAT_TABS = ["muro","rutinaA","rutinaB","calentamiento","tecnica","estandar","biblioteca","registro","semanal"];
+function anatOpenMap(){ try{ return JSON.parse(localStorage.getItem("btc_anat_open") || "{}"); }catch(e){ return {}; } }
+function anatSetOpen(view, v){ const m = anatOpenMap(); m[view] = !!v; try{ localStorage.setItem("btc_anat_open", JSON.stringify(m)); }catch(e){} anatSync(); }
+function anatSync(){
+  const fab = document.getElementById("anatFab"), pan = document.getElementById("anatPanel"); if(!fab || !pan) return;
+  const on = !!anatState().tabs[_currentView];
+  const open = on && !!anatOpenMap()[_currentView];
+  fab.style.display = on ? "" : "none"; fab.classList.toggle("open", open);
+  pan.classList.toggle("open", open);
+  anatLayout();
+  if(open) anatRefreshAll();
+}
+function anatExpanded(){ try{ return localStorage.getItem("btc_anat_exp") === "1"; }catch(e){ return false; } }
+function anatLayout(){
+  const pan = document.getElementById("anatPanel"); if(!pan) return;
+  const open = pan.classList.contains("open"), exp = anatExpanded();
+  const wide = window.innerWidth >= 1100;
+  pan.classList.toggle("expanded", open && exp);
+  pan.classList.toggle("dock-bottom", open && !exp && !wide);
+  document.body.classList.toggle("anat-side", open && !exp && wide);
+  document.body.classList.toggle("anat-bottom", open && !exp && !wide);
+  const b = pan.querySelector(".anat-pexp"); if(b){ b.textContent = exp ? "⤡" : "⤢"; b.title = exp ? "Volver a acoplar junto a las tarjetas" : "Expandir para ver mejor"; }
+  if(open && exp){
+    try{ const p = JSON.parse(localStorage.getItem("btc_anat_pos") || "null"); if(p){ pan.style.left = Math.min(p.x, window.innerWidth - 80) + "px"; pan.style.top = Math.min(p.y, window.innerHeight - 60) + "px"; } }catch(e){}
+    pan.style.bottom = "auto";
+    const mh = document.querySelector(".masthead"); if(mh && !localStorage.getItem("btc_anat_pos")){ pan.style.top = Math.round(mh.getBoundingClientRect().bottom + 8) + "px"; }
+    pan.style.maxHeight = "calc(100vh - " + (parseInt(pan.style.top, 10) + 16) + "px)";
+  } else { pan.style.maxHeight = ""; pan.style.left = ""; pan.style.top = ""; pan.style.bottom = ""; }
+}
+function anatInitUI(){
+  if(document.getElementById("anatFab")) return;
+  const fab = document.createElement("button"); fab.type = "button"; fab.id = "anatFab"; fab.className = "anat-fab"; fab.title = "Anatomía: músculos del ejercicio"; fab.setAttribute("aria-label", "Abrir o cerrar el panel de anatomía");
+  fab.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2.2"/><path d="M8 9.5c1.2-.8 2.6-1.2 4-1.2s2.8.4 4 1.2M8 9.5l-2 5.5M16 9.5l2 5.5M9.5 12.5v3l-1.5 6M14.5 12.5v3l1.5 6M9.5 12.5h5"/></svg>`;
+  fab.addEventListener("click", ()=>anatSetOpen(_currentView, !anatOpenMap()[_currentView]));
+  document.body.appendChild(fab);
+  const pan = document.createElement("div"); pan.id = "anatPanel"; pan.className = "anat-panel";
+  pan.innerHTML = `<div class="anat-phead"><span class="anat-ptitle">Anatomía</span><span class="anat-pbtns"><button type="button" class="anat-pexp" title="Expandir para ver mejor" aria-label="Expandir o contraer">⤢</button><button type="button" class="anat-pclose" title="Cerrar" aria-label="Cerrar">×</button></span></div><div class="anat-pbody"></div>`;
+  document.body.appendChild(pan);
+  pan.querySelector(".anat-pclose").addEventListener("click", ()=>anatSetOpen(_currentView, false));
+  anatMount(pan.querySelector(".anat-pbody"), "panel");
+  // posición recordada (por dispositivo) y arrastre
+  pan.querySelector(".anat-pexp").addEventListener("click", ()=>{ try{ localStorage.setItem("btc_anat_exp", anatExpanded() ? "0" : "1"); }catch(e){} anatLayout(); anatRefreshAll(); });
+  window.addEventListener("resize", anatLayout);
+  const head = pan.querySelector(".anat-phead");
+  head.addEventListener("pointerdown", ev=>{
+    if(ev.target.closest("button") || !pan.classList.contains("expanded")) return;
+    const r = pan.getBoundingClientRect(), dx = ev.clientX - r.left, dy = ev.clientY - r.top;
+    head.setPointerCapture(ev.pointerId); pan.classList.add("drag");
+    const mv = e=>{ const x = Math.min(Math.max(0, e.clientX - dx), window.innerWidth - 60), y = Math.min(Math.max(0, e.clientY - dy), window.innerHeight - 40); pan.style.left = x + "px"; pan.style.top = y + "px"; pan.style.bottom = "auto"; };
+    const up = ()=>{ head.removeEventListener("pointermove", mv); head.removeEventListener("pointerup", up); pan.classList.remove("drag"); try{ localStorage.setItem("btc_anat_pos", JSON.stringify({ x:parseInt(pan.style.left, 10), y:parseInt(pan.style.top, 10) })); }catch(e){} };
+    head.addEventListener("pointermove", mv); head.addEventListener("pointerup", up);
+  });
+  window.addEventListener("scroll", anatTrackSoon, { passive:true });
+  document.addEventListener("click", ev=>{ const c = ev.target.closest && ev.target.closest(".ex-card[data-routine][data-idx]"); if(c && (c.dataset.routine === "rutinaA" || c.dataset.routine === "rutinaB")){ const a = { r:c.dataset.routine, idx:+c.dataset.idx }; if(!ANAT.active || ANAT.active.r !== a.r || ANAT.active.idx !== a.idx){ ANAT.active = a; anatRefreshAll(); } } });
+}
+function anatRenderTab(){
+  const v = document.getElementById("view-anatomia"); if(!v) return;
+  v.innerHTML = `<div class="panel"><div class="panel-head"><h2>Anatomía</h2></div><div class="panel-body"><p class="anat-lead">Explorá los músculos: elegí un ejercicio de tus rutinas o tocá cualquier músculo. Si la app se equivocó con un ejercicio, corregilo con ✎ y lo recordará.</p><div class="anat-tabhost"></div></div></div>`;
+  anatMount(v.querySelector(".anat-tabhost"), "tab");
+}
+function anatInit(){
+  anatState();
+  if(!ANAT.active){ const ex = (STATE.rutinaA && STATE.rutinaA.exercises) || []; if(ex.length) ANAT.active = { r:"rutinaA", idx:0 }; }
+  anatRenderTab(); anatInitUI(); anatSync();
+}
+function renderAnatSettingsSection(){
+  const a = anatState(), names = { muro:"Muro", rutinaA:"Rutina A", rutinaB:"Rutina B", calentamiento:"Calentamiento / Enfriamiento", tecnica:"Técnica y prioridades", estandar:"Estándar de repeticiones", biblioteca:"Biblioteca", registro:"Registro diario", semanal:"Conclusiones semanales" };
+  return `<div class="settings-section">
+    <div class="settings-section-head"><h2>Panel de anatomía</h2></div>
+    <div class="settings-row"><span class="settings-row-label" style="max-width:100%; font-size:11px; color:var(--text-dim); font-weight:400">Elegí en qué pestañas aparece el botón flotante del panel con el modelo anatómico (se abre y se cierra desde ese botón).</span></div>
+    ${ANAT_TABS.map(v=>`<div class="settings-row"><span class="settings-row-label">${names[v]}</span><button class="settings-toggle ${a.tabs[v] ? "on" : ""}" onclick="settingsToggleAnat('${v}')" aria-label="${names[v]}"></button></div>`).join("")}
+  </div>`;
+}
+function settingsToggleAnat(v){ const a = anatState(); a.tabs[v] = !a.tabs[v]; saveState(); renderSettingsModal(); anatSync(); }
+// <<ANAT-END>>
 function renderAll(){
   applyCustomFases();
   document.getElementById("startDate").textContent = STATE.meta.startDate;
@@ -7510,6 +8779,7 @@ function renderAll(){
   renderBiblioteca();
   renderRegistro();
   renderSemanal();
+  try{ anatInit(); }catch(e){ console.error("anat", e); }
 }
 
 // ============================================================
