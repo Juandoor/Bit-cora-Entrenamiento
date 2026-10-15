@@ -6,6 +6,11 @@
 <title>Bitácora de Entrenamiento</title>
 <meta name="application-name" content="Bitácora">
 <meta name="apple-mobile-web-app-title" content="Bitácora">
+<meta name="theme-color" content="#0B0E14">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0E14'/%3E%3Crect x='10' y='29' width='44' height='6' rx='3' fill='%23FF6B5B'/%3E%3Crect x='6' y='20' width='9' height='24' rx='3' fill='%232DD4BF'/%3E%3Crect x='49' y='20' width='9' height='24' rx='3' fill='%232DD4BF'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0E14'/%3E%3Crect x='10' y='29' width='44' height='6' rx='3' fill='%23FF6B5B'/%3E%3Crect x='6' y='20' width='9' height='24' rx='3' fill='%232DD4BF'/%3E%3Crect x='49' y='20' width='9' height='24' rx='3' fill='%232DD4BF'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1676,6 +1681,39 @@
     cursor:pointer; padding:2px 4px; font-family:var(--font-body); font-weight:700;
   }
   .stat-wide .stat-quitar:hover{ color: var(--brick); }
+
+  /* M-3: Time Work distinto por set */
+  .tw-side-btns{ flex-shrink:0; margin-left:auto; display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+  .tw-side-btns .stat-quitar{ margin-left:0; }
+  .stat-tiempowork .tw-side-btns .stat-quitar:first-child:hover{ color: var(--gold-vivid); }
+  .stat-tw-sets{ align-items:flex-start; }
+  .tw-set-list{ display:flex; flex-direction:column; gap:4px; margin-top:2px; }
+  .tw-set-row{ display:flex; align-items:center; gap:10px; }
+  .tw-set-n{
+    min-width:42px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;
+    color: var(--text-dim); font-family: var(--font-body);
+  }
+  .tw-set-row .val{ min-width:56px; padding:1px 6px; border-radius:6px; background: rgba(0,0,0,0.18); }
+
+  /* M-4: texto con formato en la Biblioteca (títulos, negritas, tablas, separadores, ✅) */
+  .bib-md{ line-height:1.6; }
+  .bib-md p{ margin:0 0 12px; }
+  .bib-md strong{ color: var(--text); font-weight:700; }
+  .bib-md .bib-md-h{ margin:18px 0 10px; font-family: var(--font-display, inherit); color: var(--text); line-height:1.25; }
+  .bib-md h2.bib-md-h{ font-size:20px; }
+  .bib-md h3.bib-md-h{ font-size:16px; }
+  .bib-md h4.bib-md-h{ font-size:14px; }
+  .bib-md > .bib-md-h:first-child{ margin-top:0; }
+  .bib-md .bib-md-hr{ border:0; border-top:1px solid var(--line-soft); margin:20px 0; }
+  .bib-md .bib-md-ul{ margin:0 0 14px; padding-left:20px; }
+  .bib-md .bib-md-ul li{ margin:5px 0; }
+  .bib-md .bib-md-ul li.chk{ list-style:none; margin-left:-20px; display:flex; gap:10px; align-items:flex-start; }
+  .bib-md .bib-md-chk{ flex-shrink:0; line-height:1.5; }
+  .bib-md .bib-md-tablewrap{ overflow-x:auto; margin:6px 0 16px; border:1px solid var(--line-soft); border-radius:10px; }
+  .bib-md .bib-md-table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  .bib-md .bib-md-table th{ text-align:left; padding:10px 14px; background: rgba(255,255,255,0.06); color: var(--text); font-weight:700; border-bottom:1px solid var(--line-soft); white-space:nowrap; }
+  .bib-md .bib-md-table td{ padding:10px 14px; border-top:1px solid var(--line-soft); vertical-align:top; }
+  .bib-md .bib-md-table tbody tr:first-child td{ border-top:0; }
   .stat-add-btn-wide{
     width:100%; text-align:left;
     font-family: var(--font-body); font-size:12px; font-weight:600;
@@ -2414,7 +2452,6 @@
     <button class="tab-btn" data-view="rutinaB">Rutina B</button>
     <button class="tab-btn" data-view="calentamiento">Calentamiento / Enfriamiento</button>
     <button class="tab-btn" data-view="tecnica">Técnica y prioridades</button>
-    <button class="tab-btn" data-view="estandar">Estándar de repeticiones</button>
     <button class="tab-btn" data-view="biblioteca">Biblioteca</button>
     <button class="tab-btn" data-view="anatomia">Anatomía</button>
     <button class="tab-btn" data-view="registro">Registro diario</button>
@@ -2433,7 +2470,6 @@
   <div class="view" id="view-rutinaB"></div>
   <div class="view" id="view-calentamiento"></div>
   <div class="view" id="view-tecnica"></div>
-  <div class="view" id="view-estandar"></div>
   <div class="view" id="view-biblioteca"></div>
   <div class="view" id="view-anatomia"></div>
   <div class="view" id="view-registro"></div>
@@ -2864,6 +2900,16 @@ const FASE_ICON_EXTRA = {
 };
 const FASE_ICON_LIBRARY = Object.assign({}, FASE_ICON_BASE, FASE_ICON_EXTRA);
 const FASE_BASE_ORDER = FASE_ORDER.filter(f=>f !== "accesorio");
+// M-6: las 12 categorías de fábrica también se pueden recolorear y cambiar de ícono/emoji.
+// El cambio vive en STATE.fasesBase = { <id>: { color, icon } } (cuenta del usuario); el nombre no se toca.
+const FASE_FACTORY_IDS = FASE_ORDER.slice();
+const FASE_COLOR_FACTORY = Object.assign({}, FASE_COLOR);
+const FASE_BG_FACTORY = Object.assign({}, FASE_BG_SOFT);
+function isFactoryFase(f){ return FASE_FACTORY_IDS.indexOf(f) >= 0; }
+function faseBaseOverride(f){
+  const o = (typeof STATE !== "undefined" && STATE && STATE.fasesBase) ? STATE.fasesBase[f] : null;
+  return (o && typeof o === "object") ? o : null;
+}
 const FASE_COLOR_CHOICES = ["#E8714A","#F08B5B","#D9A24B","#B7D94A","#8FA86B","#4FA3A3","#2DD4BF","#6BA3D6","#5B9DFF","#A98FD6","#C77FB0","#D68FA8","#D14F3D","#FFFFFF"];
 let _customFaseIds = [];
 function faseHexSoft(hex){
@@ -2872,6 +2918,12 @@ function faseHexSoft(hex){
 }
 function isCustomFase(f){ return _customFaseIds.indexOf(f) >= 0; }
 function applyCustomFases(){
+  FASE_FACTORY_IDS.forEach(id=>{
+    FASE_COLOR[id] = FASE_COLOR_FACTORY[id]; FASE_BG_SOFT[id] = FASE_BG_FACTORY[id]; FASE_ICON_PATHS[id] = FASE_ICON_BASE[id];
+    const o = faseBaseOverride(id); if(!o) return;
+    if(o.color){ FASE_COLOR[id] = o.color; FASE_BG_SOFT[id] = faseHexSoft(o.color); }
+    if(o.icon){ FASE_ICON_PATHS[id] = (typeof o.icon === "string" && /^(emo|uni):/.test(o.icon)) ? "__EMO__" + o.icon : (FASE_ICON_LIBRARY[o.icon] || FASE_ICON_BASE[id]); }
+  });
   _customFaseIds.forEach(id=>{ delete FASE_LABELS[id]; delete FASE_COLOR[id]; delete FASE_BG_SOFT[id]; delete FASE_ICON_PATHS[id]; });
   const list = (typeof STATE !== "undefined" && STATE && Array.isArray(STATE.fasesCustom)) ? STATE.fasesCustom : [];
   _customFaseIds = list.map(c=>c.id);
@@ -2890,6 +2942,10 @@ function openFaseModal(id){
   const cur = id ? STATE.fasesCustom.find(c=>c.id === id) : null;
   const used = STATE.fasesCustom.map(c=>c.color);
   const freeColor = FASE_COLOR_CHOICES.find(c=>used.indexOf(c) < 0) || FASE_COLOR_CHOICES[0];
+  if(id && !cur && isFactoryFase(id)){
+    const o = faseBaseOverride(id) || {};
+    _faseDraft = { id, base:true, label:FASE_LABELS[id], color:o.color || FASE_COLOR_FACTORY[id], icon:o.icon || id };
+  } else
   _faseDraft = cur ? { id:cur.id, label:cur.label, color:cur.color, icon:cur.icon }
                    : { id:null, label:"", color:freeColor, icon:"estrella" };
   renderFaseModal();
@@ -2926,12 +2982,13 @@ function renderFaseModal(keepName){
   const icons = Object.keys(FASE_ICON_LIBRARY).map(k=>`<button type="button" class="fase-pick-ic ${d.icon === k ? "on" : ""}" style="${d.icon === k ? `color:${d.color};border-color:${d.color}` : ""}" onclick="faseDraftSet('icon','${k}')" title="${k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${FASE_ICON_LIBRARY[k]}</svg></button>`).join("");
   const sw = FASE_COLOR_CHOICES.map(c=>`<button type="button" class="fase-pick-sw ${d.color.toLowerCase() === c.toLowerCase() ? "on" : ""}" style="background:${c}" onclick="faseDraftSet('color','${c}')" aria-label="${c}"></button>`).join("");
   const editing = !!d.id;
+  const isBase = !!d.base;
   box.innerHTML = `
     <button class="timer-close-btn" onclick="closeFaseModal()" aria-label="Cerrar">×</button>
     <div class="add-ex-modal-head"><h3>${editing ? nl("Editar categoría","Edit category") : nl("Nueva categoría","New category")}</h3></div>
     <div class="add-ex-modal-body">
       <label class="add-ex-field"><span>${nl("Nombre","Name")}</span>
-        <input type="text" id="faseName" maxlength="28" value="${escapeHtml(nameVal)}" placeholder="${nl("Ej: Yoga, Natación, Movilidad…","E.g. Yoga, Swimming, Mobility…")}" oninput="faseDraftSet('label', this.value)"></label>
+        <input type="text" id="faseName" maxlength="28" ${isBase ? "readonly" : ""} value="${escapeHtml(nameVal)}" placeholder="${nl("Ej: Yoga, Natación, Movilidad…","E.g. Yoga, Swimming, Mobility…")}" oninput="faseDraftSet('label', this.value)"></label>
       <div class="add-ex-field"><span>${nl("Ícono","Icon")}</span><div class="fase-pick-grid">${icons}</div></div>
       <div class="add-ex-field"><span>${nl("Emojis (en vez de un ícono)","Emojis (instead of an icon)")}</span><div class="fase-pick-grid fase-pick-emo">${faseEmojiPickerHtml(d)}</div></div>
       <div class="add-ex-field"><span>${nl("Color","Color")}</span>
@@ -2940,7 +2997,9 @@ function renderFaseModal(keepName){
         <div class="fase-legend" style="margin:0"><span class="fase-legend-btn" style="cursor:default"><span class="fase-icon-badge" style="color:${d.color}">${faseIconMarkupFromKey(d.icon)}</span><span class="fase-legend-label" style="--fase-glow:${d.color}">${escapeHtml((nameVal || "").trim() || nl("Nueva categoría","New category"))}</span></span></div></div>
     </div>
     <div class="add-ex-modal-actions">
-      ${editing ? `<button class="muro-btn" style="margin-right:auto;color:var(--brick);border-color:var(--brick)" onclick="deleteFaseCustom('${d.id}')">${nl("Eliminar","Delete")}</button>` : ""}
+      ${isBase
+        ? (faseBaseOverride(d.id) ? `<button class="muro-btn" style="margin-right:auto" onclick="resetFaseBase('${d.id}')">${nl("Volver al original","Restore original")}</button>` : "")
+        : (editing ? `<button class="muro-btn" style="margin-right:auto;color:var(--brick);border-color:var(--brick)" onclick="deleteFaseCustom('${d.id}')">${nl("Eliminar","Delete")}</button>` : "")}
       <button class="muro-btn" onclick="closeFaseModal()">${nl("Cancelar","Cancel")}</button>
       <button class="muro-btn primary" onclick="saveFaseModal()">${editing ? nl("Guardar","Save") : nl("Crear categoría","Create category")}</button>
     </div>`;
@@ -2949,6 +3008,18 @@ function renderFaseModal(keepName){
 function rerenderRoutines(){ ["rutinaA","rutinaB"].forEach(k=>{ if(document.getElementById(`view-${k}`)) renderRoutine(k); }); }
 function saveFaseModal(){
   const d = _faseDraft; if(!d) return;
+  if(d.base){
+    if(!STATE.fasesBase || typeof STATE.fasesBase !== "object") STATE.fasesBase = {};
+    const sameColor = String(d.color).toLowerCase() === String(FASE_COLOR_FACTORY[d.id]).toLowerCase();
+    const sameIcon = d.icon === d.id;
+    if(sameColor && sameIcon) delete STATE.fasesBase[d.id];
+    else STATE.fasesBase[d.id] = { color: d.color, icon: d.icon };
+    saveState();
+    closeFaseModal();
+    applyCustomFases();
+    rerenderRoutines();
+    return;
+  }
   const label = (document.getElementById("faseName").value || "").trim();
   if(!label){ document.getElementById("faseName").focus(); return; }
   if(!Array.isArray(STATE.fasesCustom)) STATE.fasesCustom = [];
@@ -2957,6 +3028,13 @@ function saveFaseModal(){
   } else {
     STATE.fasesCustom.push({ id: uid("fase"), label, color: d.color, icon: d.icon });
   }
+  saveState();
+  closeFaseModal();
+  applyCustomFases();
+  rerenderRoutines();
+}
+function resetFaseBase(id){
+  if(STATE.fasesBase) delete STATE.fasesBase[id];
   saveState();
   closeFaseModal();
   applyCustomFases();
@@ -3124,7 +3202,7 @@ let _lkClip = null, _lkOpenTimer = null, _lkCloseTimer = null, _lkAnchor = null,
 function lkStore(){ if(!STATE.tecnica) STATE.tecnica = {}; if(!Array.isArray(STATE.tecnica.enlaces)) STATE.tecnica.enlaces = []; return STATE.tecnica.enlaces; }
 function lkExId(ex){ if(!ex.lid) ex.lid = uid("x"); return ex.lid; }
 function lkRoutineLabel(r){ return r === "rutinaA" ? "Rutina A" : (r === "rutinaB" ? "Rutina B" : r); }
-function lkTabLabel(v){ const b = document.querySelector(`.tab-btn[data-view="${v}"]`); return b ? b.textContent.trim() : v; }
+function lkTabLabel(v){ if(v === "estandar") v = "biblioteca"; const b = document.querySelector(`.tab-btn[data-view="${v}"]`); return b ? b.textContent.trim() : v; }
 function lkFindEx(r, x){ const arr = (STATE[r] && STATE[r].exercises) || []; const idx = arr.findIndex(e=>e.lid === x); return idx >= 0 ? { ex: arr[idx], idx } : null; }
 function lkSame(a, b){
   if(!a || !b || a.t !== b.t) return false;
@@ -3251,7 +3329,7 @@ document.addEventListener("click", ev=>{
 document.addEventListener("keydown", ev=>{ if(ev.key === "Escape" && _lkConn) lkConnEnd(); });
 // A-1e: botón "🔗 Links" dentro de cada pestaña sin anclas propias (Muro, Calentamiento, Técnica, Estándar, Registro, Semanal),
 // en el primer encabezado de panel de la pestaña. Se vuelve a poner solo si la pestaña se redibuja.
-const LK_TAB_BTN_VIEWS = ["muro","calentamiento","tecnica","estandar","anatomia","registro","semanal"];
+const LK_TAB_BTN_VIEWS = ["muro","calentamiento","tecnica","anatomia","registro","semanal"];
 function lkInjectTabBtns(){
   LK_TAB_BTN_VIEWS.forEach(v=>{
     const root = document.getElementById("view-" + v); if(!root) return;
@@ -4307,14 +4385,38 @@ function extraStatsBlock(ex, routineKey, idx){
     html += `<button class="stat-add-btn-wide" onclick="addPreparacion('${routineKey}',${idx})">+ Agregar Preparación</button>`;
   }
   if(ex.stats && ex.stats.tiempoWork !== undefined){
-    html += `<div class="stat-wide stat-tiempowork">
-      <span class="stat-wide-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12M6 21h12M6 3c0 6 6 7 6 9s-6 3-6 9M18 3c0 6-6 7-6 9s6 3 6 9"/></svg></span>
-      <div class="stat-wide-body">
-        <label>Time Work</label>
-        <span class="val" contenteditable="true" data-field="tiempoWork" data-placeholder="—">${escapeHtml(ex.stats.tiempoWork)}</span>
-      </div>
-      <button class="stat-quitar" onclick="removeTiempoWork('${routineKey}',${idx})" title="Quitar tiempo work">Quitar</button>
-    </div>`;
+    const twIcon = `<span class="stat-wide-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12M6 21h12M6 3c0 6 6 7 6 9s-6 3-6 9M18 3c0 6-6 7-6 9s6 3 6 9"/></svg></span>`;
+    if(Array.isArray(ex.stats.tiempoWorkSets)){
+      // M-3: un Time Work distinto para cada set
+      const n = Math.max(1, parseInt(ex.stats.series, 10) || 1);
+      let rows = "";
+      for(let i=0;i<n;i++){
+        rows += `<div class="tw-set-row"><span class="tw-set-n">Set ${i+1}</span><span class="val" contenteditable="true" data-twset="${i}" data-placeholder="—">${escapeHtml(ex.stats.tiempoWorkSets[i]||"")}</span></div>`;
+      }
+      html += `<div class="stat-wide stat-tiempowork stat-tw-sets">
+        ${twIcon}
+        <div class="stat-wide-body">
+          <label>Time Work por set</label>
+          <div class="tw-set-list">${rows}</div>
+        </div>
+        <div class="tw-side-btns">
+          <button class="stat-quitar" onclick="twSetsOff('${routineKey}',${idx})" title="Usar el mismo Time Work en todos los sets">Igual en todos</button>
+          <button class="stat-quitar" onclick="removeTiempoWork('${routineKey}',${idx})" title="Quitar tiempo work">Quitar</button>
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="stat-wide stat-tiempowork">
+        ${twIcon}
+        <div class="stat-wide-body">
+          <label>Time Work</label>
+          <span class="val" contenteditable="true" data-field="tiempoWork" data-placeholder="—">${escapeHtml(ex.stats.tiempoWork)}</span>
+        </div>
+        <div class="tw-side-btns">
+          <button class="stat-quitar" onclick="twSetsOn('${routineKey}',${idx})" title="Avanzado: poner un Time Work distinto en cada set">Avanzado</button>
+          <button class="stat-quitar" onclick="removeTiempoWork('${routineKey}',${idx})" title="Quitar tiempo work">Quitar</button>
+        </div>
+      </div>`;
+    }
   } else {
     html += `<button class="stat-add-btn-wide" onclick="addTiempoWork('${routineKey}',${idx})">+ Agregar Time Work</button>`;
   }
@@ -4356,6 +4458,23 @@ function addTiempoWork(routineKey, idx){
 }
 function removeTiempoWork(routineKey, idx){
   delete STATE[routineKey].exercises[idx].stats.tiempoWork;
+  delete STATE[routineKey].exercises[idx].stats.tiempoWorkSets;
+  saveState();
+  renderRoutine(routineKey);
+}
+// M-3: Time Work distinto por set. tiempoWork queda como valor base (y para sets en blanco).
+function twSetsOn(routineKey, idx){
+  const stats = STATE[routineKey].exercises[idx].stats;
+  const n = Math.max(1, parseInt(stats.series, 10) || 1);
+  stats.tiempoWorkSets = Array.from({length:n}, ()=> stats.tiempoWork || "");
+  saveState();
+  renderRoutine(routineKey);
+}
+function twSetsOff(routineKey, idx){
+  const stats = STATE[routineKey].exercises[idx].stats;
+  const first = (stats.tiempoWorkSets || []).find(v => String(v||"").trim() !== "");
+  if(first !== undefined) stats.tiempoWork = first;
+  delete stats.tiempoWorkSets;
   saveState();
   renderRoutine(routineKey);
 }
@@ -4583,7 +4702,7 @@ function fasesLegend(routineKey){
         <span class="fase-icon-badge" style="color:${colorVar}">${faseIconSvg(f)}</span>
         <span class="fase-legend-label" style="--fase-glow:${colorVar}">${escapeHtml(FASE_LABELS[f])}</span>
       </button>`;
-      return isCustomFase(f)
+      return (isCustomFase(f) || isFactoryFase(f))
         ? `<span class="fase-legend-wrap">${btn}<button type="button" class="fase-legend-edit" onclick="openFaseModal('${f}')" title="${nl("Editar categoría","Edit category")}" aria-label="${nl("Editar categoría","Edit category")}">✎</button></span>`
         : btn;
     }).join("")}
@@ -4613,7 +4732,7 @@ function renderRoutine(routineKey){
   r.exercises.forEach((ex, i)=>{
     const fase = ex.fase || "fuerza";
     if(fase !== lastFase){
-      exHtml += `<div class="fase-divider ${fase}" id="fdiv-${routineKey}-${fase}"><span class="dot"${isCustomFase(fase) ? ` style="background:${faseColorFor(fase)}"` : ""}></span>${escapeHtml(FASE_LABELS[fase] || fase)}</div>`;
+      exHtml += `<div class="fase-divider ${fase}" id="fdiv-${routineKey}-${fase}"><span class="dot"${(isCustomFase(fase) || (isFactoryFase(fase) && faseBaseOverride(fase) && faseBaseOverride(fase).color)) ? ` style="background:${faseColorFor(fase)}"` : ""}></span>${escapeHtml(FASE_LABELS[fase] || fase)}</div>`;
       lastFase = fase;
     }
     exHtml += exerciseCard(ex, routineKey, i);
@@ -4671,6 +4790,15 @@ function onEditableBlur(e){
       saveState();
       return;
     }
+    if(el.dataset.twset !== undefined){
+      if(!ex.stats) ex.stats = {};
+      if(!Array.isArray(ex.stats.tiempoWorkSets)) ex.stats.tiempoWorkSets = [];
+      const i = parseInt(el.dataset.twset, 10);
+      while(ex.stats.tiempoWorkSets.length <= i) ex.stats.tiempoWorkSets.push("");
+      ex.stats.tiempoWorkSets[i] = el.innerText.trim();
+      saveState();
+      return;
+    }
     const field = el.dataset.field;
     if(field === "notas"){
       ex.notas = el.innerText.trim();
@@ -4680,6 +4808,12 @@ function onEditableBlur(e){
       ex.reglasProgresion = el.innerText.trim();
     } else if(ex.stats && field in ex.stats){
       ex.stats[field] = el.innerText.trim();
+      // si cambia la cantidad de sets, se redibujan las filas de Time Work por set (no mientras se escribe)
+      if(field === "series" && Array.isArray(ex.stats.tiempoWorkSets) && !_autoCommit){
+        saveState();
+        renderRoutine(routineKey);
+        return;
+      }
     } else if(field === "nombre"){
       ex.nombre = el.innerText.trim();
     }
@@ -6159,12 +6293,68 @@ function bibData(){
     t.biblioteca = JSON.parse(JSON.stringify((DEFAULT_DATA.tecnica && DEFAULT_DATA.tecnica.biblioteca) || { cards: [] }));
   }
   if(!t.biblioteca.privada || !Array.isArray(t.biblioteca.privada.cards)) t.biblioteca.privada = { cards: [] };
+  // N-1: las tarjetas de la ex pestaña "Estándar de repeticiones" pasan a la Biblioteca (conserva lo editado por el usuario)
+  try{
+    if(t.estandar && Array.isArray(t.estandar.cards)){
+      const hoy = new Date().toISOString().slice(0,10);
+      t.estandar.cards.forEach(c=>{
+        if(!c || !c.id || t.biblioteca.cards.some(x=>x.id === c.id)) return;
+        t.biblioteca.cards.push({ id:c.id, titulo:c.titulo || "", contenido:c.contenido || "", fuente:"Estándar de repeticiones", tipo:"Texto", categoria:"Artículo", autor:"", etiquetas:"potencia, repeticiones", creado:hoy, modificado:hoy });
+      });
+      delete t.estandar;
+    }
+  }catch(e){ console.error("Error migrando Estándar de repeticiones a la Biblioteca", e); }
   // Tarjetas generales nuevas que trae data.js: se agregan a la cuenta existente por id (sin pisar nada de lo editado)
   try{
     const defs = (DEFAULT_DATA.tecnica && DEFAULT_DATA.tecnica.biblioteca && DEFAULT_DATA.tecnica.biblioteca.cards) || [];
     defs.forEach(dc=>{ if(!t.biblioteca.cards.some(c=>c.id === dc.id)) t.biblioteca.cards.push(JSON.parse(JSON.stringify(dc))); });
   }catch(e){ console.error("Error agregando tarjetas nuevas de la Biblioteca", e); }
   return t.biblioteca;
+}
+// M-4: texto con formato (títulos, negritas, tablas, separadores, ✅) para tarjetas con formato:"md"
+let _bibEditMd = {};
+function bibMdInline(s){
+  return escapeHtml(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+}
+function bibMdToHtml(src){
+  const lines = String(src || "").split("\n");
+  let out = "", i = 0, para = [], list = [];
+  const flushPara = ()=>{ if(para.length){ out += `<p>${para.map(bibMdInline).join("<br>")}</p>`; para = []; } };
+  const flushList = ()=>{
+    if(list.length){
+      out += `<ul class="bib-md-ul">${list.map(t=>{
+        const chk = t.startsWith("✅");
+        return `<li class="${chk ? "chk" : ""}">${chk ? `<span class="bib-md-chk">✅</span>${bibMdInline(t.slice(1).trim())}` : bibMdInline(t)}</li>`;
+      }).join("")}</ul>`;
+      list = [];
+    }
+  };
+  const cells = l => l.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map(x=>x.trim());
+  while(i < lines.length){
+    const l = lines[i];
+    if(!l.trim()){ flushPara(); flushList(); i++; continue; }
+    if(/^---+\s*$/.test(l)){ flushPara(); flushList(); out += `<hr class="bib-md-hr">`; i++; continue; }
+    let m = l.match(/^(#{1,3})\s+(.*)$/);
+    if(m){ flushPara(); flushList(); const n = m[1].length + 1; out += `<h${n} class="bib-md-h">${bibMdInline(m[2])}</h${n}>`; i++; continue; }
+    if(/^\|/.test(l.trim())){
+      flushPara(); flushList();
+      const rows = [];
+      while(i < lines.length && /^\|/.test(lines[i].trim())){ rows.push(lines[i]); i++; }
+      const head = cells(rows[0]);
+      const body = rows.slice(1).filter(r=>!/^\|?\s*:?-{2,}/.test(r.trim())).map(cells);
+      out += `<div class="bib-md-tablewrap"><table class="bib-md-table"><thead><tr>${head.map(c=>`<th>${bibMdInline(c)}</th>`).join("")}</tr></thead><tbody>${body.map(r=>`<tr>${r.map(c=>`<td>${bibMdInline(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+      continue;
+    }
+    m = l.match(/^\s*[-*]\s+(.*)$/);
+    if(m){ flushPara(); list.push(m[1]); i++; continue; }
+    flushList(); para.push(l); i++;
+  }
+  flushPara(); flushList();
+  return out;
+}
+function bibToggleMd(id){
+  _bibEditMd[id] = !_bibEditMd[id];
+  renderBiblioteca();
 }
 function bibFind(id){
   const d = bibData();
@@ -6354,7 +6544,7 @@ function renderBiblioteca(){
     main = `
     <div class="bib-main">
       <div class="bib-main-bar"><h3>${f.priv ? nl("Mi biblioteca privada","My private library") : nl("Mi biblioteca","My library")}</h3>
-        <div class="bib-bar-btns">${f.priv ? `<button class="bib-btn danger" onclick="bibDelete('${id}')">${nl("Eliminar","Delete")}</button>` : ""}<button class="bib-btn" onclick="bibSelect('${id}')">${nl("Cerrar","Close")}</button></div></div>
+        <div class="bib-bar-btns">${sel.formato === "md" ? `<button class="bib-btn" onclick="bibToggleMd('${id}')">${_bibEditMd[id] ? nl("Ver con formato","View formatted") : nl("Editar texto","Edit text")}</button>` : ""}${f.priv ? `<button class="bib-btn danger" onclick="bibDelete('${id}')">${nl("Eliminar","Delete")}</button>` : ""}<button class="bib-btn" onclick="bibSelect('${id}')">${nl("Cerrar","Close")}</button></div></div>
       <div class="bib-load">
         <input id="bibAddr" class="bib-input" value="${escapeHtml(sel.url || "")}" placeholder="${nl("Pegá una dirección (URL) o la ruta de un archivo para completar la ficha","Paste an address (URL) or a file path to fill in the details")}"
           onkeydown="if(event.key==='Enter'){ bibApplyAddress('${id}', this.value); }" onpaste="var el=this; setTimeout(function(){ bibApplyAddress('${id}', el.value); }, 0)">
@@ -6364,7 +6554,9 @@ function renderBiblioteca(){
         <div class="bib-msg" id="bibMsg">${escapeHtml(_bibMsg)}</div>
       </div>
       ${tecnicaCollapsibleOpen("bib_" + id, `<h2 contenteditable="true" data-key="${k}.titulo">${escapeHtml(sel.titulo)}</h2>`)}
-        <div class="callout" style="line-height:1.55;" contenteditable="true" data-ph="${nl("Escribí o pegá el contenido acá…","Write or paste the content here…")}" data-key="${k}.contenido">${nl2br(sel.contenido)}</div>
+        ${(sel.formato === "md" && !_bibEditMd[id])
+          ? `<div class="callout bib-md">${bibMdToHtml(sel.contenido)}</div>`
+          : `<div class="callout" style="line-height:1.55;" contenteditable="true" data-ph="${nl("Escribí o pegá el contenido acá…","Write or paste the content here…")}" data-key="${k}.contenido">${nl2br(sel.contenido)}</div>`}
       ${TECNICA_COLLAPSIBLE_CLOSE}
     </div>`;
     const ed = (field, label) => `<div class="bib-meta-row"><span>${label}</span><span contenteditable="true" data-ph="—" data-key="${k}.${field}">${escapeHtml(sel[field] || "")}</span></div>`;
@@ -6914,16 +7106,6 @@ document.addEventListener("keydown", ev=>{
 });
 window.addEventListener("resize", ()=>{ if(document.getElementById("bibFlLayer")) flRedraw(); });
 
-function renderEstandar(){
-  const container = document.getElementById("view-estandar");
-  if(!container) return;
-  const cards = (STATE.tecnica && STATE.tecnica.estandar && STATE.tecnica.estandar.cards) || [];
-  container.innerHTML = cards.map((cd,i)=>`
-  ${tecnicaCollapsibleOpen("est_"+cd.id, `<h2 contenteditable="true" data-key="tecnica.estandar.cards.${i}.titulo">${escapeHtml(cd.titulo)}</h2>`)}
-      <div class="callout" contenteditable="true" data-key="tecnica.estandar.cards.${i}.contenido">${nl2br(cd.contenido)}</div>
-  ${TECNICA_COLLAPSIBLE_CLOSE}`).join("\n");
-  attachTecnicaEditableTitles(container);
-}
 function renderTecnica(){
   const t = STATE.tecnica;
   const container = document.getElementById("view-tecnica");
@@ -8026,7 +8208,7 @@ function renderMuro(){
 // app: al abrirla vuelve a la misma pestaña y al mismo punto donde la dejaste.
 const _scrollPositions = {};          // copia en memoria de la sesión (más fresca que STATE)
 let _currentView = "rutinaA";         // se corrige al arrancar con STATE.ui.vista
-const VISTAS_VALIDAS = ["muro","rutinaA","rutinaB","calentamiento","tecnica","estandar","biblioteca","anatomia","registro","semanal"];
+const VISTAS_VALIDAS = ["muro","rutinaA","rutinaB","calentamiento","tecnica","biblioteca","anatomia","registro","semanal"];
 
 function ensureUiState(){
   if(!STATE.ui || typeof STATE.ui !== "object") STATE.ui = {};
@@ -8090,6 +8272,7 @@ function restoreScrollFor(viewKey){
 }
 
 function showView(viewKey){
+  if(viewKey === "estandar") viewKey = "biblioteca"; // N-1: la pestaña "Estándar de repeticiones" pasó a la Biblioteca
   if(!VISTAS_VALIDAS.includes(viewKey)) viewKey = "rutinaA";
   if(regLeaveGuard(viewKey)) return;
   if(_currentView){
@@ -8689,7 +8872,7 @@ function anatTrack(){
 }
 function anatTrackSoon(){ if(_anatRaf) return; _anatRaf = requestAnimationFrame(()=>{ _anatRaf = 0; try{ anatTrack(); }catch(e){} }); }
 // ---- Panel flotante + botón + pestaña ----
-const ANAT_TABS = ["muro","rutinaA","rutinaB","calentamiento","tecnica","estandar","biblioteca","registro","semanal"];
+const ANAT_TABS = ["muro","rutinaA","rutinaB","calentamiento","tecnica","biblioteca","registro","semanal"];
 function anatOpenMap(){ try{ return JSON.parse(localStorage.getItem("btc_anat_open") || "{}"); }catch(e){ return {}; } }
 function anatSetOpen(view, v){ const m = anatOpenMap(); m[view] = !!v; try{ localStorage.setItem("btc_anat_open", JSON.stringify(m)); }catch(e){} anatSync(); }
 function anatSync(){
@@ -8755,7 +8938,7 @@ function anatInit(){
   anatRenderTab(); anatInitUI(); anatSync();
 }
 function renderAnatSettingsSection(){
-  const a = anatState(), names = { muro:"Muro", rutinaA:"Rutina A", rutinaB:"Rutina B", calentamiento:"Calentamiento / Enfriamiento", tecnica:"Técnica y prioridades", estandar:"Estándar de repeticiones", biblioteca:"Biblioteca", registro:"Registro diario", semanal:"Conclusiones semanales" };
+  const a = anatState(), names = { muro:"Muro", rutinaA:"Rutina A", rutinaB:"Rutina B", calentamiento:"Calentamiento / Enfriamiento", tecnica:"Técnica y prioridades", biblioteca:"Biblioteca", registro:"Registro diario", semanal:"Conclusiones semanales" };
   return `<div class="settings-section">
     <div class="settings-section-head"><h2>Panel de anatomía</h2></div>
     <div class="settings-row"><span class="settings-row-label" style="max-width:100%; font-size:11px; color:var(--text-dim); font-weight:400">Elegí en qué pestañas aparece el botón flotante del panel con el modelo anatómico (se abre y se cierra desde ese botón).</span></div>
@@ -8774,7 +8957,6 @@ function renderAll(){
   renderRoutine("rutinaB");
   renderCalentamiento();
   renderTecnica();
-  renderEstandar();
   try{ _bibSel = (STATE.ui && STATE.ui.bibSel) || _bibSel; }catch(e){}
   renderBiblioteca();
   renderRegistro();
@@ -9728,6 +9910,14 @@ function cardSeqCue(phase){
 
 }
 
+// Fija el Time Work del set que está por empezar (índice = sets ya hechos)
+function cardSeqApplySetWork(r){
+  const i = Math.min(r.setsTotal - 1, Math.max(0, r.setsTotal - r.setsRemaining));
+  const s = r.workSecs ? (r.workSecs[i] || 0) : r.workSecBase;
+  r.workSec = s;
+  r.workTimed = s > 0;
+}
+
 function startCardSeq(routineKey, idx){
   if(cardSeqRun && cardSeqRun.phase !== "done" && (cardSeqRun.routineKey !== routineKey || cardSeqRun.idx !== idx)){
     if(!confirm("Ya hay una secuencia corriendo en otro ejercicio. ¿Detenerla e iniciar esta?")) return;
@@ -9739,14 +9929,22 @@ function startCardSeq(routineKey, idx){
   const restSec = stats.descanso !== undefined ? parseSecs(stats.descanso) : 0;
   const coolSec = stats.enfriamiento !== undefined ? parseSecs(stats.enfriamiento) : 0;
   const setsTotal = Math.max(1, parseInt(stats.series, 10) || 1);
+  // M-3: Time Work por set (un set en blanco usa el Time Work base de la tarjeta)
+  const workSecs = (stats.tiempoWork !== undefined && Array.isArray(stats.tiempoWorkSets))
+    ? Array.from({length:setsTotal}, (_,i)=>{
+        const v = stats.tiempoWorkSets[i];
+        return (v !== undefined && String(v).trim() !== "") ? parseSecs(v) : workSec;
+      })
+    : null;
   const workTimed = workSec > 0;
 
   clearInterval(cardSeqTickHandle);
   cardSeqRun = {
     routineKey, idx, setsTotal, setsRemaining: setsTotal,
-    prepSec, workSec, restSec, coolSec, workTimed,
+    prepSec, workSec, restSec, coolSec, workTimed, workSecs, workSecBase: workSec,
     phase: null, remaining: 0, endTime: null, paused: false, _countdownFiredFor: null
   };
+  cardSeqApplySetWork(cardSeqRun);
   if(prepSec > 0){
     cardSeqRun.phase = "prep";
     cardSeqRun.remaining = prepSec;
@@ -9792,6 +9990,7 @@ function cardSeqAdvance(){
   r._countdownFiredFor = null;
   if(r.phase === "prep"){
     r.phase = "work";
+    cardSeqApplySetWork(r);
     if(r.workTimed){ r.remaining = r.workSec; r.endTime = Date.now()+r.workSec*1000; }
     else { r.remaining = 0; r.endTime = null; }
     cardSeqCue("work");
@@ -9820,6 +10019,7 @@ function cardSeqAdvance(){
       } else { cardSeqFinish(); return; }
     } else {
       r.phase = "work";
+      cardSeqApplySetWork(r);
       if(r.workTimed){ r.remaining = r.workSec; r.endTime = Date.now()+r.workSec*1000; }
       else { r.remaining = 0; r.endTime = null; }
       cardSeqCue("work");
@@ -10345,7 +10545,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   // Volver a la pestaña y al punto de scroll donde se cerró la app por última vez
   {
     const ui = ensureUiState();
-    const vista = VISTAS_VALIDAS.includes(ui.vista) ? ui.vista : "rutinaA";
+    const vista = ui.vista === "estandar" ? "biblioteca" : (VISTAS_VALIDAS.includes(ui.vista) ? ui.vista : "rutinaA");
     _currentView = vista;
     showView(vista);
   }
@@ -10415,6 +10615,15 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   });
 });
 
+</script>
+<script>
+// N-3: PWA — instalable y con modo sin conexión (requiere sw.js, manifest.webmanifest e íconos junto a index.html)
+(function(){
+  if(!("serviceWorker" in navigator) || !/^https?:$/.test(location.protocol)) return;
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js").catch(function(e){ console.warn("Service worker no registrado", e); });
+  });
+})();
 </script>
 </body>
 </html>
