@@ -2415,6 +2415,47 @@
   .fl-hint{ flex-basis:100%; font-size:11.5px; color:var(--text-dim); }
   .fl-hl{ outline:2px solid var(--flc, #FFB454); outline-offset:3px; border-radius:12px; box-shadow:0 0 0 5px color-mix(in srgb, var(--flc, #FFB454) 22%, transparent), 0 0 24px color-mix(in srgb, var(--flc, #FFB454) 45%, transparent); transition: box-shadow .15s, outline-color .15s; }
   .bib-fl-layer .fl-anch{ opacity:.55; }
+
+  /* O-1: calidad de la alimentación (1-5) + tipo de comida */
+  .comida-box{ border:1px solid var(--line-soft, rgba(255,255,255,.14)); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:8px; transition:border-color .2s, background .2s; }
+  .comida-box.has-cal{ border-color: var(--cq); background: color-mix(in srgb, var(--cq) 10%, transparent); box-shadow: inset 3px 0 0 var(--cq); }
+  .comida-box.has-cal > input{ border-color: color-mix(in srgb, var(--cq) 60%, transparent); }
+  .comida-scale{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .comida-cap{ font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-dim); font-weight:700; margin-right:2px; }
+  .comida-dot{ width:28px; height:28px; border-radius:50%; border:1.5px solid var(--c); background:transparent; color:var(--c); font-weight:700; font-size:12px; cursor:pointer; padding:0; transition:transform .12s, background .12s; }
+  .comida-dot:hover{ transform:translateY(-2px); }
+  .comida-dot.active{ background:var(--c); color:#10150c; box-shadow:0 0 0 2px var(--surface, #1b2a24), 0 0 0 3.5px var(--c); }
+  .comida-lvl{ font-size:12px; color:var(--text-soft); margin-left:4px; }
+  .comida-tipos{ display:flex; flex-wrap:wrap; gap:6px; }
+  .comida-tipo{ display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; border:1px solid var(--line-soft, rgba(255,255,255,.18)); background:transparent; color:var(--text-soft); font-size:12px; cursor:pointer; }
+  .comida-tipo:hover{ border-color: var(--teal); }
+  .comida-tipo.on{ background:rgba(45,212,191,.16); border-color: var(--teal); color: var(--text); }
+  .comida-pill{ display:inline-flex; align-items:center; gap:6px; padding:2px 10px; border-radius:999px; font-size:12px; font-weight:700; color:var(--c); border:1px solid var(--c); background:color-mix(in srgb, var(--c) 14%, transparent); margin-right:6px; }
+  .comida-pill i{ width:8px; height:8px; border-radius:50%; background:var(--c); display:inline-block; }
+  .comida-ico{ display:inline-flex; vertical-align:middle; color: var(--teal); margin-right:4px; }
+  .comida-txt{ margin-top:4px; }
+  .tracker-day.haslog.has-cq::after{ color: var(--cq); opacity:1; font-size:8px; text-shadow:0 0 2px rgba(0,0,0,.85); }
+
+  /* P-1: lupa flotante a la izquierda cuando el buscador sale de la pantalla */
+  .panel-search-slot{ position:relative; margin-bottom:16px; }
+  .panel-search-slot > .panel-search{ margin-bottom:0; }
+  .panel-search.ps-float{ position:fixed; left:14px; top:calc(env(safe-area-inset-top, 0px) + 92px); z-index:120; width:46px; animation: psPop .18s ease-out; }
+  .panel-search.ps-float .panel-search-box{ width:46px; height:46px; padding:0; justify-content:center; border-radius:50%; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,.45); background: color-mix(in srgb, var(--surface-2) 88%, transparent); backdrop-filter: blur(8px); }
+  .panel-search.ps-float .panel-search-box svg{ width:18px; height:18px; color: var(--text); }
+  .panel-search.ps-float:not(.ps-open) .panel-search-input{ display:none; }
+  .panel-search.ps-float:not(.ps-open) .panel-search-clear{ display:none !important; }
+  .panel-search.ps-float.ps-open{ width:min(440px, calc(100vw - 28px)); animation:none; }
+  .panel-search.ps-float.ps-open .panel-search-box{ width:100%; height:auto; padding:10px 14px; justify-content:flex-start; border-radius: var(--radius); cursor:text; }
+  @keyframes psPop{ from{ opacity:0; transform:scale(.7); } to{ opacity:1; transform:scale(1); } }
+
+  /* Q-1: cálculo de reps y Time Work a partir del BPM y el tempo */
+  .qcalc-slot{ margin:8px 14px 4px; }
+  .qcalc-slot:empty{ display:none; }
+  .qcalc-chip{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:7px 12px; border-radius:10px; border:1px dashed var(--teal); background:rgba(45,212,191,.08); font-size:12.5px; color:var(--text-soft); line-height:1.35; }
+  .qcalc-chip b{ color:var(--text); }
+  .qcalc-chip .qcalc-ico{ display:inline-flex; color:var(--teal); }
+  .qcalc-btn{ margin-left:auto; padding:3px 12px; border-radius:999px; border:1px solid var(--teal); background:transparent; color:var(--teal); font-size:12px; font-weight:700; cursor:pointer; }
+  .qcalc-btn:hover{ background:var(--teal); color:#08201d; }
 </style>
 </head>
 
@@ -4356,6 +4397,127 @@ window.addEventListener("beforeunload", function(e){
   }
 });
 
+// ============================================================
+// Q-1: la app calcula reps y Time Work a partir del BPM y el tempo.
+//   segundos por rep = (suma del tempo, ej. 2-1-3 = 6) x 60 / BPM
+//   Time Work = reps x segundos por rep   (y al revés)
+// Modo mixto: completa solo si la casilla está vacía; si ya hay un valor del usuario, solo sugiere.
+// ============================================================
+const _QC = {}; // estado transitorio por tarjeta (no se guarda): { last:"reps"|"tw", note:{...} }
+function qcalcNum(v){
+  const m = String(v == null ? "" : v).trim().match(/^(\d+(?:[.,]\d+)?)\s*(?:reps?\.?)?$/i);
+  return m ? parseFloat(m[1].replace(",", ".")) : 0;
+}
+function qcalcSecPerRep(stats){
+  if(!stats) return 0;
+  const bpmM = String(stats.bpm == null ? "" : stats.bpm).match(/(\d+(?:[.,]\d+)?)/);
+  const bpm = bpmM ? parseFloat(bpmM[1].replace(",", ".")) : 0;
+  if(!(bpm > 0)) return 0;
+  const parts = String(stats.tempo == null ? "" : stats.tempo).split("/")[0].split(/[-–—]/);
+  if(parts.length < 2) return 0;
+  let sum = 0;
+  for(const p of parts){
+    const m = p.trim().match(/^(\d+(?:[.,]\d+)?)$/);
+    if(!m) return 0; // tempo con letras (p. ej. "X"): no se puede calcular
+    sum += parseFloat(m[1].replace(",", "."));
+  }
+  return sum > 0 ? sum * 60 / bpm : 0;
+}
+function qcalcFmtSecs(n){ n = Math.round(n); return n === 1 ? "1 segundo" : n + " segundos"; }
+function qcalcFmtNum(n){ return String(Math.round(n * 10) / 10).replace(".", ","); }
+function qcalcHasTW(ex){ return !!(ex && ex.stats && ex.stats.tiempoWork !== undefined && !Array.isArray(ex.stats.tiempoWorkSets)); }
+function qcalcChipHtml(ex, rk, idx){
+  if(!ex || !ex.stats) return "";
+  const q = _QC[rk + ":" + idx];
+  if(!q) return "";
+  const spr = qcalcSecPerRep(ex.stats);
+  if(!spr || !qcalcHasTW(ex)) return "";
+  const ico = `<span class="qcalc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></span>`;
+  const sprTxt = qcalcFmtNum(spr) + " s por rep";
+  if(q.note){
+    const n = q.note;
+    const txt = n.what === "tw"
+      ? `Time Work calculado: <b>${qcalcFmtSecs(parseSecs(ex.stats.tiempoWork))}</b> (${escapeHtml(String(ex.stats.reps))} reps × ${sprTxt})`
+      : `Reps calculadas: <b>${escapeHtml(String(ex.stats.reps))}</b> (${qcalcFmtSecs(parseSecs(ex.stats.tiempoWork))} ÷ ${sprTxt})`;
+    return `<div class="qcalc-chip">${ico}<span>${txt}</span><button type="button" class="qcalc-btn" onclick="qcalcUndo('${rk}',${idx})">Deshacer</button></div>`;
+  }
+  const reps = qcalcNum(ex.stats.reps);
+  const tw = parseSecs(ex.stats.tiempoWork);
+  if(q.last === "tw"){
+    if(!(tw > 0)) return "";
+    const calc = Math.round(tw / spr);
+    if(calc < 1 || calc === reps) return "";
+    return `<div class="qcalc-chip">${ico}<span>${qcalcFmtSecs(tw)} ÷ ${sprTxt} ≈ <b>${calc} reps</b></span><button type="button" class="qcalc-btn" onclick="qcalcApply('${rk}',${idx},'reps')">Aplicar</button></div>`;
+  }
+  if(!(reps > 0)) return "";
+  const calcTW = Math.round(reps * spr);
+  if(Math.abs(calcTW - tw) <= 1) return "";
+  return `<div class="qcalc-chip">${ico}<span>${escapeHtml(String(ex.stats.reps))} reps × ${sprTxt} = <b>${qcalcFmtSecs(calcTW)}</b></span><button type="button" class="qcalc-btn" onclick="qcalcApply('${rk}',${idx},'tw')">Aplicar</button></div>`;
+}
+function qcalcRender(rk, idx){
+  const card = document.querySelector(`.ex-card[data-routine="${rk}"][data-idx="${idx}"]`);
+  if(!card) return;
+  const slot = card.querySelector("[data-qcalc]");
+  if(slot) slot.innerHTML = qcalcChipHtml(STATE[rk].exercises[idx], rk, idx);
+}
+function qcalcSetField(rk, idx, field, value){
+  const ex = STATE[rk].exercises[idx];
+  ex.stats[field] = value;
+  const card = document.querySelector(`.ex-card[data-routine="${rk}"][data-idx="${idx}"]`);
+  const el = card && card.querySelector(`[data-field="${field}"]`);
+  if(el) el.innerText = value;
+}
+function qcalcAfterEdit(rk, idx, field){
+  const ex = STATE[rk] && STATE[rk].exercises[idx];
+  if(!ex || !ex.stats) return;
+  const key = rk + ":" + idx;
+  const q = _QC[key] || (_QC[key] = {});
+  if(field === "tiempoWork") q.last = "tw";
+  else if(field === "reps") q.last = "reps";
+  else if(!q.last) q.last = "reps";
+  q.note = null;
+  const spr = qcalcSecPerRep(ex.stats);
+  if(spr && qcalcHasTW(ex)){
+    const repsRaw = String(ex.stats.reps == null ? "" : ex.stats.reps).trim();
+    const twRaw = String(ex.stats.tiempoWork == null ? "" : ex.stats.tiempoWork).trim();
+    const reps = qcalcNum(repsRaw);
+    const tw = parseSecs(twRaw);
+    if(!twRaw && reps > 0){
+      qcalcSetField(rk, idx, "tiempoWork", qcalcFmtSecs(reps * spr));
+      q.note = { what:"tw", prev:"" };
+      saveState();
+    } else if(!repsRaw && twRaw && tw > 0 && Math.round(tw / spr) >= 1){
+      qcalcSetField(rk, idx, "reps", String(Math.round(tw / spr)));
+      q.note = { what:"reps", prev:"" };
+      saveState();
+    }
+  }
+  qcalcRender(rk, idx);
+}
+function qcalcApply(rk, idx, what){
+  const ex = STATE[rk] && STATE[rk].exercises[idx];
+  if(!ex || !ex.stats) return;
+  const spr = qcalcSecPerRep(ex.stats);
+  if(!spr) return;
+  if(what === "tw"){
+    const reps = qcalcNum(ex.stats.reps);
+    if(reps > 0) qcalcSetField(rk, idx, "tiempoWork", qcalcFmtSecs(reps * spr));
+  } else {
+    const tw = parseSecs(ex.stats.tiempoWork);
+    if(tw > 0) qcalcSetField(rk, idx, "reps", String(Math.max(1, Math.round(tw / spr))));
+  }
+  saveState();
+  qcalcRender(rk, idx);
+}
+function qcalcUndo(rk, idx){
+  const q = _QC[rk + ":" + idx];
+  if(!q || !q.note) return;
+  qcalcSetField(rk, idx, q.note.what === "tw" ? "tiempoWork" : "reps", q.note.prev);
+  q.note = null;
+  saveState();
+  qcalcRender(rk, idx);
+}
+
 // ---------- exercise card markup ----------
 function statBlock(stats){
   const labels = {series:"Sets", reps:"Reps", descanso:"Descanso", bpm:"BPM", tempo:"Tempo", enfriamiento:"Enfriam."};
@@ -4550,6 +4712,7 @@ function exerciseCard(ex, routineKey, idx){
     </div>
     <div class="ex-stats">${statBlock(ex.stats)}${estiStatHtml}<button type="button" class="stat stat-links ${lkCountEx(routineKey, ex) ? "has" : ""}" data-lk-r="${routineKey}" data-lk-i="${idx}" title="Links de este ejercicio"><label>Links</label><span class="val">🔗 <span class="lk-n">${lkCountEx(routineKey, ex)}</span></span></button></div>
     <div class="ex-stats ex-stats-extra">${extraStatsBlock(ex, routineKey, idx)}</div>
+    <div class="qcalc-slot" data-qcalc>${qcalcChipHtml(ex, routineKey, idx)}</div>
     <div class="ex-seq-wrap">${cardSeqBlockHtml(routineKey, idx, ex)}</div>
     <div class="ex-notes-row">
       <div class="ex-notes-toggle" onclick="toggleNotes(this,'ejec_${timerId}')">
@@ -4818,6 +4981,7 @@ function onEditableBlur(e){
       ex.nombre = el.innerText.trim();
     }
     saveState();
+    if(field === "reps" || field === "bpm" || field === "tempo" || field === "tiempoWork") qcalcAfterEdit(routineKey, idx, field);
     return;
   }
   if(el.dataset.routineField){
@@ -5178,7 +5342,7 @@ const PANEL_SEARCH_PLACEHOLDERS = {
 function panelSearchHtml(panelKey){
   const ph = PANEL_SEARCH_PLACEHOLDERS[panelKey] || "Buscar…";
   return `
-  <div class="panel-search" data-panel-search="${panelKey}">
+  <div class="panel-search-slot"><div class="panel-search" data-panel-search="${panelKey}">
     <div class="panel-search-box">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       <input type="text" class="panel-search-input" placeholder="${ph}" autocomplete="off" spellcheck="false"
@@ -5188,7 +5352,7 @@ function panelSearchHtml(panelKey){
       <button type="button" class="panel-search-clear" onclick="clearPanelSearch('${panelKey}')" aria-label="Limpiar búsqueda">×</button>
     </div>
     <div class="panel-search-dropdown" id="search-dropdown-${panelKey}" hidden></div>
-  </div>`;
+  </div></div>`;
 }
 
 function initPanelSearch(panelKey){
@@ -5348,6 +5512,7 @@ function selectPanelSearchResult(panelKey, i){
   const input = document.querySelector(`.panel-search[data-panel-search="${panelKey}"] .panel-search-input`);
   if(input) input.blur();
   scrollToSearchTarget(item.el);
+  psCollapse(document.querySelector(`.panel-search[data-panel-search="${panelKey}"]`));
 }
 
 function scrollToSearchTarget(el){
@@ -5382,6 +5547,61 @@ document.addEventListener("click", (e)=>{
       closePanelSearchDropdown(ps.dataset.panelSearch);
     }
   });
+});
+
+// ============================================================
+// P-1: si el buscador sale de la pantalla (scroll hacia abajo), queda solo la lupa
+// a la izquierda; un clic la despliega. Al volver a su lugar original, el buscador
+// regresa solo, ya visible.
+// ============================================================
+function psCollapse(ps){
+  if(!ps) return;
+  ps.classList.remove("ps-open");
+  closePanelSearchDropdown(ps.dataset.panelSearch);
+  const inp = ps.querySelector(".panel-search-input");
+  if(inp && document.activeElement === inp) inp.blur();
+}
+function psUpdateFloating(){
+  document.querySelectorAll(".panel-search-slot").forEach(slot=>{
+    const ps = slot.firstElementChild;
+    if(!ps) return;
+    const hidden = slot.offsetParent === null;
+    const past = !hidden && slot.getBoundingClientRect().bottom < 0;
+    const floating = ps.classList.contains("ps-float");
+    if(past && !floating){
+      slot.style.height = slot.offsetHeight + "px"; // conserva el hueco para que el contenido no salte
+      ps.classList.add("ps-float");
+    } else if(!past && floating){
+      ps.classList.remove("ps-float", "ps-open");
+      slot.style.height = "";
+      closePanelSearchDropdown(ps.dataset.panelSearch);
+    }
+  });
+}
+let _psTick = false;
+function psSchedule(){
+  if(_psTick) return;
+  _psTick = true;
+  requestAnimationFrame(()=>{ _psTick = false; psUpdateFloating(); });
+}
+window.addEventListener("scroll", psSchedule, { passive:true });
+window.addEventListener("resize", psSchedule);
+document.addEventListener("click", (e)=>{
+  const box = e.target.closest && e.target.closest(".panel-search.ps-float:not(.ps-open) .panel-search-box");
+  if(box){
+    const ps = box.closest(".panel-search");
+    ps.classList.add("ps-open");
+    const inp = ps.querySelector(".panel-search-input");
+    if(inp) setTimeout(()=>inp.focus(), 30);
+    return;
+  }
+  document.querySelectorAll(".panel-search.ps-float.ps-open").forEach(ps=>{
+    if(!ps.contains(e.target)) psCollapse(ps);
+  });
+});
+document.addEventListener("keydown", (e)=>{
+  if(e.key !== "Escape") return;
+  document.querySelectorAll(".panel-search.ps-float.ps-open").forEach(psCollapse);
 });
 
 // ============================================================
@@ -6296,7 +6516,7 @@ function bibData(){
   // N-1: las tarjetas de la ex pestaña "Estándar de repeticiones" pasan a la Biblioteca (conserva lo editado por el usuario)
   try{
     if(t.estandar && Array.isArray(t.estandar.cards)){
-      const hoy = new Date().toISOString().slice(0,10);
+      const hoy = localISODate();
       t.estandar.cards.forEach(c=>{
         if(!c || !c.id || t.biblioteca.cards.some(x=>x.id === c.id)) return;
         t.biblioteca.cards.push({ id:c.id, titulo:c.titulo || "", contenido:c.contenido || "", fuente:"Estándar de repeticiones", tipo:"Texto", categoria:"Artículo", autor:"", etiquetas:"potencia, repeticiones", creado:hoy, modificado:hoy });
@@ -7170,10 +7390,15 @@ function renderTecnica(){
 // Se auto-completa con cada registro guardado en el formulario de abajo
 // (matcheando por fecha). Los días sin registro se pueden marcar a mano.
 // ============================================================
+// N-6: fecha de HOY en hora local (toISOString usa UTC y, de noche en Argentina, daba el día siguiente)
+function localISODate(d){
+  d = d || new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
 function isoAddDays(iso, n){
   const d = new Date(iso + "T12:00:00");
   d.setDate(d.getDate() + n);
-  return d.toISOString().slice(0,10);
+  return localISODate(d);
 }
 function trackerDayNum(iso){
   return new Date(iso + "T12:00:00").getDate();
@@ -7189,15 +7414,18 @@ function syncTrackerFromLogs(){
   const t = STATE.tracker;
   if(!t || !t.days) return;
   const byDate = {};
-  STATE.logs.daily.forEach(l=>{ byDate[l.date] = l.routine; });
+  const calByDate = {};
+  STATE.logs.daily.forEach(l=>{ byDate[l.date] = l.routine; calByDate[l.date] = l.comidaCal || null; });
   t.days.forEach((day, i)=>{
     const dateStr = isoAddDays(t.startDate, i);
     day.date = dateStr;
     if(byDate[dateStr] !== undefined){
       day.status = byDate[dateStr];
       day.hasLog = true;
+      day.comidaCal = calByDate[dateStr] || null;
     } else {
       day.hasLog = false;
+      day.comidaCal = null;
     }
   });
 }
@@ -7290,7 +7518,7 @@ function createOrUpdateTracker(){
   }
   const nombre = (nombreEl.value || "").trim() || "Ciclo de entrenamiento";
   const semanas = Math.max(1, parseInt(semanasEl.value) || 1);
-  const startDate = startEl.value || new Date().toISOString().slice(0,10);
+  const startDate = startEl.value || localISODate();
   const totalDays = semanas * 7;
 
   // Preserva marcas manuales (días sin registro de tarjeta) cuya fecha
@@ -7344,7 +7572,7 @@ function renderTrackerPanel(){
         </div>
         <div class="form-field">
           <label>Fecha de inicio</label>
-          ${dateTextFieldHtml("trackerStart", new Date().toISOString().slice(0,10))}
+          ${dateTextFieldHtml("trackerStart", localISODate())}
         </div>
       </div>
       <button class="primary-btn" onclick="createOrUpdateTracker()">Crear tracker</button>
@@ -7376,7 +7604,7 @@ function renderTrackerPanel(){
         }
         const day = t.days[idx];
         const cls = trackerStatusClass(day.status);
-        daysHtml.push(`<div class="tracker-day ${cls} ${day.hasLog ? "haslog" : ""}" onclick="cycleTrackerDay(${idx})" title="${day.date}${day.hasLog ? " · con registro" : " · click para marcar"}">
+        daysHtml.push(`<div class="tracker-day ${cls} ${day.hasLog ? "haslog" : ""} ${day.comidaCal ? "has-cq" : ""}" ${day.comidaCal ? `style="--cq:${(comidaLevel(day.comidaCal) || {}).c}"` : ""} onclick="cycleTrackerDay(${idx})" title="${day.date}${day.hasLog ? " · con registro" : " · click para marcar"}">
           <span class="num">${trackerDayNum(day.date)}</span>
           <span class="wd">${trackerWeekdayShort(day.date)}</span>
         </div>`);
@@ -7487,7 +7715,7 @@ function renderRegistro(){
       <div class="form-grid">
         <div class="form-field">
           <label>Fecha</label>
-          <input type="date" id="newLogDate" value="${new Date().toISOString().slice(0,10)}">
+          ${dateTextFieldHtml("newLogDate", localISODate())}
         </div>
         <div class="form-field">
           <label>Rutina realizada</label>
@@ -7510,9 +7738,9 @@ function renderRegistro(){
           <label>Sueño (horas)</label>
           <input type="text" id="newLogSueno" placeholder="ej. 7h">
         </div>
-        <div class="form-field">
+        <div class="form-field" style="grid-column:1 / -1">
           <label>Alimentación del día</label>
-          <input type="text" id="newLogComida" placeholder="ej. buena / liviana / poca proteína">
+          ${comidaFieldHtml("new", "newLogComida", "", null, [])}
         </div>
       </div>
       <div class="form-field" style="margin-bottom:14px">
@@ -7548,6 +7776,79 @@ function renderRegistro(){
   attachEditLogHandlers();
 }
 
+// ============================================================
+// O-1: calidad de la alimentación (1-5, pinta la casilla) + tipo de comida (íconos, sin color)
+// ============================================================
+const COMIDA_LEVELS = [
+  {n:1, label:"Muy mala", c:"#EF4444"}, {n:2, label:"Mala", c:"#F97316"}, {n:3, label:"Regular", c:"#EAB308"},
+  {n:4, label:"Buena", c:"#84CC16"}, {n:5, label:"Muy buena", c:"#22C55E"}
+];
+const COMIDA_TIPOS = [
+  {id:"completa", label:"Completa", svg:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/>'},
+  {id:"liviana", label:"Liviana", svg:'<path d="M5 19c0-8 5-13 14-14 0 9-5 14-14 14z"/><path d="M5 19l8-8"/>'},
+  {id:"procesada", label:"Procesada", svg:'<path d="M4 8l8-4 8 4v8l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v8"/>'},
+  {id:"poca", label:"Poca cantidad", svg:'<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>'},
+  {id:"excesiva", label:"Excesiva", svg:'<circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/>'}
+];
+function comidaLevel(n){ return COMIDA_LEVELS.find(L=>String(L.n) === String(n)) || null; }
+function comidaIcon(t){ return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${t.svg}</svg>`; }
+function comidaFieldHtml(prefix, inputId, texto, cal, tipos){
+  const L = comidaLevel(cal);
+  tipos = Array.isArray(tipos) ? tipos : [];
+  const dots = COMIDA_LEVELS.map(x=>`<button type="button" class="comida-dot ${L && L.n === x.n ? "active" : ""}" data-val="${x.n}" style="--c:${x.c}" title="${x.n} · ${x.label}" onclick="comidaPick('${prefix}', ${x.n})">${x.n}</button>`).join("");
+  const chips = COMIDA_TIPOS.map(t=>`<button type="button" class="comida-tipo ${tipos.includes(t.id) ? "on" : ""}" data-tipo="${t.id}" onclick="comidaTipoToggle('${prefix}', '${t.id}')">${comidaIcon(t)}<span>${t.label}</span></button>`).join("");
+  return `<div class="comida-box ${L ? "has-cal" : ""}" id="${prefix}ComidaBox" ${L ? `style="--cq:${L.c}"` : ""}>
+    <input type="text" id="${inputId}" value="${escapeHtml(texto || "")}" placeholder="ej. buena / liviana / poca proteína">
+    <div class="comida-scale"><span class="comida-cap">Calidad</span>${dots}<span class="comida-lvl" id="${prefix}ComidaLvl">${L ? escapeHtml(L.label) : "Sin marcar"}</span></div>
+    <div class="comida-tipos">${chips}</div>
+  </div>`;
+}
+function comidaPaint(prefix){
+  const box = document.getElementById(prefix + "ComidaBox"); if(!box) return;
+  const a = box.querySelector(".comida-dot.active");
+  const L = a ? comidaLevel(a.dataset.val) : null;
+  box.classList.toggle("has-cal", !!L);
+  if(L) box.style.setProperty("--cq", L.c); else box.style.removeProperty("--cq");
+  const lbl = document.getElementById(prefix + "ComidaLvl");
+  if(lbl) lbl.textContent = L ? L.label : "Sin marcar";
+}
+function comidaPick(prefix, n){
+  const box = document.getElementById(prefix + "ComidaBox"); if(!box) return;
+  const cur = box.querySelector(".comida-dot.active");
+  const same = cur && String(cur.dataset.val) === String(n);
+  box.querySelectorAll(".comida-dot").forEach(d=>d.classList.remove("active"));
+  if(!same){ const d = box.querySelector(`.comida-dot[data-val="${n}"]`); if(d) d.classList.add("active"); }
+  comidaPaint(prefix);
+  if(prefix === "new" && typeof saveRegistroDraft === "function") saveRegistroDraft();
+}
+function comidaTipoToggle(prefix, id){
+  const box = document.getElementById(prefix + "ComidaBox"); if(!box) return;
+  const chip = box.querySelector(`.comida-tipo[data-tipo="${id}"]`);
+  if(chip) chip.classList.toggle("on");
+  if(prefix === "new" && typeof saveRegistroDraft === "function") saveRegistroDraft();
+}
+function comidaRead(prefix){
+  const box = document.getElementById(prefix + "ComidaBox");
+  if(!box) return { cal:null, tipos:[] };
+  const a = box.querySelector(".comida-dot.active");
+  return { cal: a ? a.dataset.val : null, tipos: Array.from(box.querySelectorAll(".comida-tipo.on")).map(c=>c.dataset.tipo) };
+}
+function comidaApply(prefix, cal, tipos){
+  const box = document.getElementById(prefix + "ComidaBox"); if(!box) return;
+  box.querySelectorAll(".comida-dot").forEach(d=>d.classList.toggle("active", !!cal && String(d.dataset.val) === String(cal)));
+  const ts = Array.isArray(tipos) ? tipos : [];
+  box.querySelectorAll(".comida-tipo").forEach(c=>c.classList.toggle("on", ts.includes(c.dataset.tipo)));
+  comidaPaint(prefix);
+}
+function comidaViewHtml(entry){
+  const L = comidaLevel(entry.comidaCal);
+  const tipos = (entry.comidaTipos || []).map(id=>COMIDA_TIPOS.find(t=>t.id === id)).filter(Boolean);
+  const pill = L ? `<span class="comida-pill" style="--c:${L.c}"><i></i>${L.n} · ${escapeHtml(L.label)}</span>` : "";
+  const ics = tipos.map(t=>`<span class="comida-ico" title="${t.label}">${comidaIcon(t)}</span>`).join("");
+  const txt = entry.comida ? `<div class="comida-txt">${escapeHtml(entry.comida)}</div>` : ((!L && !tipos.length) ? "—" : "");
+  return pill + ics + txt;
+}
+
 function entryToHtml(entry){
   if(entry.id === _editingLogId) return editLogHtml(entry);
   const typeLabel = {A:"Rutina A", B:"Rutina B", Descanso:"Descanso", Otro:"Otra actividad"}[entry.routine] || entry.routine;
@@ -7561,7 +7862,7 @@ function entryToHtml(entry){
       <div class="log-field"><label>Energía</label><div class="v">${entry.energia ? entry.energia+"/5" : "—"}</div></div>
       <div class="log-field"><label>Fatiga</label><div class="v">${fatigaMiniHtml(entry.fatiga)}</div></div>
       <div class="log-field"><label>Sueño</label><div class="v">${escapeHtml(entry.sueno||"—")}</div></div>
-      <div class="log-field"><label>Alimentación</label><div class="v">${escapeHtml(entry.comida||"—")}</div></div>
+      <div class="log-field"><label>Alimentación</label><div class="v">${comidaViewHtml(entry)}</div></div>
     </div>
     ${entry.notas ? `<div class="log-notes"><label style="font-size:10px;text-transform:uppercase;color:var(--text-dim);font-weight:700">Notas</label><div class="v">${nl2br(entry.notas)}</div></div>` : ""}
     <div style="padding:0 16px 14px; text-align:right">
@@ -7602,11 +7903,13 @@ function readRegistroForm(noTrim){
     fatiga: fa ? fa.dataset.val : null,
     sueno: t(document.getElementById("newLogSueno").value),
     comida: t(document.getElementById("newLogComida").value),
+    comidaCal: comidaRead("new").cal,
+    comidaTipos: comidaRead("new").tipos,
     notas: t(document.getElementById("newLogNotas").value)
   };
 }
 function registroDraftHasContent(d){
-  return !!(d && (d.energia || d.fatiga || d.sueno || d.comida || d.notas));
+  return !!(d && (d.energia || d.fatiga || d.sueno || d.comida || d.comidaCal || (d.comidaTipos && d.comidaTipos.length) || d.notas));
 }
 function loadRegistroDraft(){
   try{ const raw = localStorage.getItem(REG_DRAFT_KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
@@ -7626,8 +7929,9 @@ function saveRegistroDraft(){
 function applyRegistroDraft(d){
   if(!d) return;
   const set = (id, v) => { const el = document.getElementById(id); if(el && v != null) el.value = v; };
-  set("newLogDate", d.date); set("newLogRoutine", d.routine);
+  set("newLogDate", d.date); if(d.date != null && document.getElementById("newLogDateTxt")) dateTextFromPicker("newLogDate"); set("newLogRoutine", d.routine);
   set("newLogSueno", d.sueno); set("newLogComida", d.comida); set("newLogNotas", d.notas);
+  comidaApply("new", d.comidaCal, d.comidaTipos);
   [["scaleEnergia", d.energia], ["scaleFatiga", d.fatiga]].forEach(([id, v])=>{
     if(!v) return;
     const dot = document.querySelector(`#${id} .scale-dot[data-val="${v}"]`);
@@ -7664,6 +7968,8 @@ document.addEventListener("keydown", function(e){
 }, true);
 function initRegistroForm(){
   applyRegistroDraft(loadRegistroDraft());
+  const dTxt = document.getElementById("newLogDateTxt");
+  if(dTxt){ dTxt.addEventListener("input", saveRegistroDraft); dTxt.addEventListener("blur", saveRegistroDraft); }
   ["newLogDate","newLogRoutine","newLogSueno","newLogComida","newLogNotas"].forEach(id=>{
     const el = document.getElementById(id);
     if(!el) return;
@@ -7685,7 +7991,9 @@ function commitLog(f){
     routine: f.routine,
     energia: f.energia || null,
     fatiga: f.fatiga || null,
-    sueno: f.sueno || "", comida: f.comida || "", notas: f.notas || ""
+    sueno: f.sueno || "", comida: f.comida || "",
+    comidaCal: f.comidaCal || null, comidaTipos: Array.isArray(f.comidaTipos) ? f.comidaTipos : [],
+    notas: f.notas || ""
   });
   clearRegistroDraft();
   _regFollowUp = false;
@@ -7866,7 +8174,7 @@ function editLogHtml(e){
         <div class="form-field"><label>Energía (1-5)</label><div class="scale-row" id="scaleEditEnergia">${dots(e.energia)}</div></div>
         <div class="form-field"><label>Fatiga / dolor muscular (1-5)</label>${fatigaScaleHtml("scaleEditFatiga", e.fatiga)}</div>
         <div class="form-field"><label>Sueño (horas)</label><input type="text" id="editLogSueno" value="${escapeHtml(e.sueno || "")}"></div>
-        <div class="form-field"><label>Alimentación del día</label><input type="text" id="editLogComida" value="${escapeHtml(e.comida || "")}"></div>
+        <div class="form-field" style="grid-column:1 / -1"><label>Alimentación del día</label>${comidaFieldHtml("edit", "editLogComida", e.comida, e.comidaCal, e.comidaTipos)}</div>
       </div>
       <div class="form-field" style="margin-bottom:14px"><label>Notas</label><textarea id="editLogNotas">${escapeHtml(e.notas || "")}</textarea></div>
       <div class="log-edit-actions">
@@ -7910,6 +8218,9 @@ function saveEditLog(id){
   entry.fatiga = fa ? fa.dataset.val : null;
   entry.sueno = document.getElementById("editLogSueno").value.trim();
   entry.comida = document.getElementById("editLogComida").value.trim();
+  const cm = comidaRead("edit");
+  entry.comidaCal = cm.cal || null;
+  entry.comidaTipos = cm.tipos;
   entry.notas = document.getElementById("editLogNotas").value.trim();
   entry.editedAt = new Date().toISOString();
   _editingLogId = null;
@@ -8273,6 +8584,7 @@ function restoreScrollFor(viewKey){
 
 function showView(viewKey){
   if(viewKey === "estandar") viewKey = "biblioteca"; // N-1: la pestaña "Estándar de repeticiones" pasó a la Biblioteca
+  setTimeout(psUpdateFloating, 80); setTimeout(psUpdateFloating, 450); // P-1
   if(!VISTAS_VALIDAS.includes(viewKey)) viewKey = "rutinaA";
   if(regLeaveGuard(viewKey)) return;
   if(_currentView){
@@ -8309,7 +8621,7 @@ function exportJSON(){
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `bitacora_entrenamiento_${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `bitacora_entrenamiento_${localISODate()}.json`;
   a.click();
   URL.revokeObjectURL(url);
   try{ localStorage.setItem("btc_lastExport", String(Date.now())); }catch(e){}
