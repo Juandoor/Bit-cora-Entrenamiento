@@ -844,7 +844,7 @@
   }
   .form-field textarea{ resize:vertical; min-height:60px; }
   /* L-C: las notas del registro diario son más altas y crecen hacia abajo al escribir */
-  #newLogNotas, #editLogNotas{ min-height:140px; max-height:80vh; overflow-y:auto; line-height:1.5; }
+  #newLogNotas, #editLogNotas{ min-height:var(--notas-minh, 140px); max-height:80vh; overflow-y:auto; line-height:1.5; font-size:var(--notas-fs, 13.5px); }
   .form-field input::placeholder, .form-field textarea::placeholder{ color: var(--text-dim); }
   /* Campo de fecha editable dígito a dígito */
   .date-text-wrap{ position:relative; display:flex; align-items:stretch; gap:6px; }
@@ -1141,6 +1141,8 @@
   .dock-pill:hover::before, .dock-pill:focus-visible::before{ opacity:1; }
   .dock-pill.lg{ top: calc(var(--dock-h, 200px) - 2px); }
   body.dock-hd-show .dock-pill.hd, body.dock-leg-show .dock-pill.lg{ opacity:1; pointer-events:auto; }
+  /* Q-5: con el panelhead abierto, su pastilla desaparece; vuelve al cerrarse */
+  body.hdr-collapsed.hdr-open .dock-pill.hd{ opacity:0; pointer-events:none; }
   body.hdr-collapsed:not(.hdr-open) .dock-pill.lg{ top:0; }
   body.dock-leg-show.hdr-collapsed:not(.hdr-open) .dock-pill.hd{ left: calc(50% - 70px); }
   body.dock-leg-show.hdr-collapsed:not(.hdr-open) .dock-pill.lg{ left: calc(50% + 6px); }
@@ -2456,6 +2458,76 @@
   .qcalc-chip .qcalc-ico{ display:inline-flex; color:var(--teal); }
   .qcalc-btn{ margin-left:auto; padding:3px 12px; border-radius:999px; border:1px solid var(--teal); background:transparent; color:var(--teal); font-size:12px; font-weight:700; cursor:pointer; }
   .qcalc-btn:hover{ background:var(--teal); color:#08201d; }
+
+  /* ===== Calculadora (Q-2/Q-3/Q-4): FAB a la izquierda + ventana con teclado, entrenamiento y tabla de unidades ===== */
+  .calc-fab{ position:fixed; left:20px; bottom:168px; z-index:80; width:48px; height:48px; border-radius:50%; border:none; background:var(--gold-vivid,#FFB454); color:#2a1d06; box-shadow:0 6px 18px rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform .15s, box-shadow .15s; }
+  .calc-fab:hover{ transform:scale(1.07); box-shadow:0 8px 22px rgba(0,0,0,0.42); }
+  .calc-fab:active{ transform:scale(0.96); }
+  .calc-fab svg{ width:24px; height:24px; }
+  .calc-overlay{ display:none; position:fixed; inset:0; z-index:230; background:rgba(8,10,9,0.62); align-items:center; justify-content:center; padding:16px; }
+  .calc-overlay.open{ display:flex; }
+  .calc-modal{ width:min(940px,100%); max-height:92vh; overflow:auto; background:var(--surface); border:1px solid var(--line-soft); border-radius:var(--radius); box-shadow:0 20px 60px rgba(0,0,0,0.5); position:relative; }
+  .calc-head{ display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid var(--line-soft); }
+  .calc-head h3{ margin:0; font-size:16px; flex:1; }
+  .calc-x{ width:30px; height:30px; border-radius:50%; background:rgba(0,0,0,0.22); border:1px solid rgba(255,255,255,0.15); color:inherit; cursor:pointer; font-size:16px; line-height:1; }
+  .calc-body{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:0; }
+  .calc-left, .calc-right{ padding:16px 18px; min-width:0; }
+  .calc-right{ border-left:1px solid var(--line-soft); }
+  .calc-disp{ background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:10px 14px; text-align:right; margin-bottom:10px; min-height:70px; }
+  .calc-expr{ font-size:15px; color:var(--text-soft); min-height:20px; word-break:break-all; }
+  .calc-res{ font-size:30px; font-weight:700; line-height:1.2; word-break:break-all; }
+  .calc-keys{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+  .calc-key{ padding:11px 0; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.06); color:inherit; font-size:17px; font-weight:600; cursor:pointer; }
+  .calc-key:hover{ background:rgba(255,255,255,0.12); }
+  .calc-key.op{ color:var(--gold-vivid,#FFB454); }
+  .calc-key.eq{ grid-column:1/-1; background:var(--teal); color:#08201d; border-color:transparent; }
+  .calc-key.clr{ color:var(--coral); }
+  .calc-sec{ margin-top:14px; padding-top:12px; border-top:1px solid var(--line-soft); }
+  .calc-sec h4, .calc-right h4{ margin:0 0 8px; font-size:13px; color:var(--text-soft); text-transform:uppercase; letter-spacing:.04em; }
+  .calc-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .calc-field label{ display:block; font-size:11px; color:var(--text-soft); margin-bottom:3px; }
+  .calc-field input, .calc-field select{ width:100%; box-sizing:border-box; padding:7px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.14); background:rgba(0,0,0,0.25); color:inherit; font-size:14px; }
+  .calc-outs{ margin-top:10px; display:flex; flex-direction:column; gap:5px; }
+  .calc-out{ display:flex; justify-content:space-between; gap:10px; padding:6px 10px; border-radius:8px; background:rgba(255,255,255,0.05); font-size:13px; cursor:pointer; }
+  .calc-out:hover{ background:rgba(255,255,255,0.1); }
+  .calc-out b{ color:var(--teal); white-space:nowrap; }
+  .calc-hint{ font-size:12px; color:var(--text-soft); margin-top:6px; }
+  .calc-cats{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .calc-cat{ padding:5px 12px; border-radius:999px; border:1px solid rgba(255,255,255,0.14); background:transparent; color:inherit; font-size:12px; font-weight:700; cursor:pointer; }
+  .calc-cat.on{ background:var(--gold-vivid,#FFB454); color:#2a1d06; border-color:transparent; }
+  .calc-units{ width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+  .calc-units td{ padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.07); }
+  .calc-units tr{ cursor:pointer; }
+  .calc-units tr:hover td{ background:rgba(255,255,255,0.06); }
+  .calc-units td:last-child{ text-align:right; font-weight:700; }
+  .calc-units tr.src td{ color:var(--teal); }
+  @media (max-width:760px){ .calc-body{ grid-template-columns:1fr; } .calc-right{ border-left:none; border-top:1px solid var(--line-soft); } .calc-fab{ left:14px; bottom:168px; } }
+  @media print{ .calc-fab, .calc-overlay{ display:none !important; } }
+
+/* U-1: ayuda bajo "Rutina realizada" (rutina sugerida según el día) */
+.field-hint{ display:block; margin-top:5px; font-size:11.5px; color:var(--text-dim); letter-spacing:.01em; min-height:1em; }
+.field-hint-link{ color:var(--accent, #e8744f); text-decoration:underline; cursor:pointer; }
+
+/* U-2: engranaje del Registro diario, menú avanzado en Ajustes y campos ocultables */
+.reg-toolbar{ position:relative; display:flex; justify-content:flex-end; margin:0 0 10px; }
+.reg-gear{ width:38px; height:38px; display:grid; place-items:center; border-radius:10px; border:1px solid var(--line); background:var(--surface-2); color:var(--text-soft); cursor:pointer; transition:color .15s, background .15s; }
+.reg-gear svg{ width:20px; height:20px; transition:transform .25s; }
+.reg-gear:hover, .reg-gear.on{ color:var(--text); background:var(--surface-3); }
+.reg-gear.on svg{ transform:rotate(60deg); }
+.reg-gear-pop{ position:absolute; top:44px; right:0; z-index:40; width:min(360px, 92vw); max-height:72vh; overflow-y:auto; padding:12px 14px 14px; border-radius:12px; border:1px solid var(--line); background:var(--surface-2); box-shadow:0 14px 40px rgba(0,0,0,.45); }
+.reg-gear-pop[hidden]{ display:none; }
+.reg-gear-title{ font-weight:700; font-size:13.5px; margin-bottom:4px; color:var(--text); }
+.reg-gear-sec{ margin:12px 0 2px; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); font-weight:700; }
+.reg-gear-desc{ font-size:10.5px; color:var(--text-dim); font-weight:400; }
+.settings-adv{ margin-top:10px; border-top:1px solid var(--line-soft); padding-top:8px; }
+.settings-adv > summary{ cursor:pointer; font-size:12.5px; font-weight:600; color:var(--text-soft); padding:4px 0; }
+.reg-reset-btn{ background:transparent; border:1px solid var(--line); color:var(--text-soft); border-radius:8px; padding:4px 10px; font-size:12px; cursor:pointer; }
+.reg-reset-btn:hover{ color:var(--text); background:var(--surface-3); }
+.reg-hide-energia [data-regfield="energia"], .reg-hide-fatiga [data-regfield="fatiga"], .reg-hide-sueno [data-regfield="sueno"], .reg-hide-comida [data-regfield="comida"]{ display:none; }
+
+/* U-3: nombre editable de las pestañas Rutina A / B */
+.tab-btn.editing{ cursor:text; }
+.tab-btn .tab-rename{ width:12ch; min-width:90px; max-width:200px; background:transparent; border:0; border-bottom:1.5px solid currentColor; color:inherit; font:inherit; outline:none; text-align:center; padding:0 2px; }
 </style>
 </head>
 
@@ -3242,7 +3314,7 @@ const LK_ANCHOR_SEL = "[data-lk-r],[data-lk-b],[data-lk-v]";
 let _lkClip = null, _lkOpenTimer = null, _lkCloseTimer = null, _lkAnchor = null, _lkSelf = null;
 function lkStore(){ if(!STATE.tecnica) STATE.tecnica = {}; if(!Array.isArray(STATE.tecnica.enlaces)) STATE.tecnica.enlaces = []; return STATE.tecnica.enlaces; }
 function lkExId(ex){ if(!ex.lid) ex.lid = uid("x"); return ex.lid; }
-function lkRoutineLabel(r){ return r === "rutinaA" ? "Rutina A" : (r === "rutinaB" ? "Rutina B" : r); }
+function lkRoutineLabel(r){ return r === "rutinaA" ? rutinaNombre("A") : (r === "rutinaB" ? rutinaNombre("B") : r); }
 function lkTabLabel(v){ if(v === "estandar") v = "biblioteca"; const b = document.querySelector(`.tab-btn[data-view="${v}"]`); return b ? b.textContent.trim() : v; }
 function lkFindEx(r, x){ const arr = (STATE[r] && STATE[r].exercises) || []; const idx = arr.findIndex(e=>e.lid === x); return idx >= 0 ? { ex: arr[idx], idx } : null; }
 function lkSame(a, b){
@@ -3435,8 +3507,10 @@ function dockSet(which, open, pin){
   if(open && which === "leg"){
     const r = dockLegRoutine(); if(!r) return;
     const dl = document.getElementById("dockLegend");
-    if(dl && !g.open) dl.innerHTML = `<div class="dock-leg-t">Categorías · ${r === "rutinaA" ? "Rutina A" : "Rutina B"}</div>${fasesLegend(r)}`;
+    if(dl && !g.open) dl.innerHTML = `<div class="dock-leg-t">Categorías · ${r === "rutinaA" ? rutinaNombre("A") : rutinaNombre("B")}</div>${fasesLegend(r)}`;
   }
+  // Q-5: si se cierra con el cursor quieto sobre la zona, la pastilla reaparece debajo y no debe reabrir sola
+  if(which === "hdr" && !open && g.open) g.lock = !!g.in;
   g.open = open; g.pin = open ? (pin !== undefined ? pin : g.pin) : false;
   dockApply();
 }
@@ -3458,11 +3532,12 @@ function dockInit(){
   window.addEventListener("scroll", dockScroll, { passive:true });
   window.addEventListener("resize", ()=>{ dockScroll(); });
   document.addEventListener("mouseover", ev=>{
+    DOCK.hdr.in = dockInside("hdr", ev.target); if(!DOCK.hdr.in) DOCK.hdr.lock = false;
     ["hdr","leg"].forEach(w=>{
       // Si el panelhead ya estaba abierto, se mantiene abierto mientras el cursor esté en la leyenda (su pastilla o su panel):
       // así la leyenda no sube de posición ni se cierra sola al pasar de uno al otro.
       const inside = dockInside(w, ev.target) || (w === "hdr" && DOCK.hdr.open && dockInside("leg", ev.target));
-      if(inside){ clearTimeout(DOCK[w].t); if(!DOCK[w].open && dockInside(w, ev.target)) dockSet(w, true, false); }
+      if(inside){ clearTimeout(DOCK[w].t); if(!DOCK[w].open && dockInside(w, ev.target) && !(w === "hdr" && DOCK.hdr.lock)) dockSet(w, true, false); }
       else dockCloseSoon(w);
     });
   });
@@ -5340,7 +5415,7 @@ const PANEL_SEARCH_PLACEHOLDERS = {
 };
 
 function panelSearchHtml(panelKey){
-  const ph = PANEL_SEARCH_PLACEHOLDERS[panelKey] || "Buscar…";
+  const ph = (panelKey === "rutinaA" || panelKey === "rutinaB") ? `Buscar ejercicio en ${rutinaNombre(panelKey === "rutinaA" ? "A" : "B")}…` : (PANEL_SEARCH_PLACEHOLDERS[panelKey] || "Buscar…");
   return `
   <div class="panel-search-slot"><div class="panel-search" data-panel-search="${panelKey}">
     <div class="panel-search-box">
@@ -5701,7 +5776,7 @@ function defaultSettings(){
   return {
     idioma: (function(){ try{ return localStorage.getItem("btc_idioma") || "es"; }catch(e){ return "es"; } })(),
     cuenta: { accounts: [], activeIndex: -1 },
-    registro: { autosave: false, onLeaveTab: true, onClose: true, onIdle: true, idleMin: 10 },
+    registro: { autosave: false, onLeaveTab: true, onClose: true, onIdle: true, idleMin: 10, rutinaAuto: true, rutinaPorDia: { 0:"", 1:"A", 2:"B", 3:"A", 4:"B", 5:"A", 6:"B" }, campos: { energia:true, fatiga:true, sueno:true, comida:true }, notasFs: 14, notasAlto: 140 },
     notificaciones: { "export-reminder": { high:false, delay:3600000 }, "reg-draft": { high:false, delay:3600000 }, "file-origin": { high:false, delay:3600000 } },
     sonido: { modo: "simple", finalCount: 3, skipLastRest: true, fullscreenTimerEnabled: true, colores, coloresGlobal, phaseSound, finalCountSound: { family:"beep", variant:"short" } }
   };
@@ -6372,6 +6447,7 @@ function renderRegistroSection(r, T){
         </select>
       </div>
     </div>
+    ${settingsRegistroAdvanced()}
   </div>`;
 }
 function renderNotifSettingsSection(n, T){
@@ -6439,6 +6515,7 @@ function renderSettingsModal(){
     </div>
     ${renderAccountSection(STATE.settings, T)}
     ${renderRegistroSection(STATE.settings.registro, T)}
+    ${renderRutinaNombresSection()}
     ${renderNotifSettingsSection(STATE.settings.notificaciones, T)}
     ${renderAnatSettingsSection()}
     ${renderSoundSection(STATE.settings.sonido, T)}
@@ -7624,7 +7701,7 @@ function renderTrackerPanel(){
       </div>
       <div class="tracker-progress-bar"><div class="tracker-progress-fill" style="width:${pct}%"></div></div>
       <div class="tracker-legend">
-        <span><span class="dot" style="background:var(--coral)"></span>Actividad (Rutina A/B)</span>
+        <span><span class="dot" style="background:var(--coral)"></span>Actividad (${rutinaNombre("A")} / ${rutinaNombre("B")})</span>
         <span><span class="dot" style="background:var(--teal)"></span>Descanso</span>
         <span><span class="dot" style="background:var(--gold-vivid)"></span>Otra actividad</span>
         <span><span class="dot" style="background:var(--surface-3);border:1px solid var(--line)"></span>Sin marcar</span>
@@ -7708,10 +7785,11 @@ function fatigaMiniHtml(cur){
 function renderRegistro(){
   const container = document.getElementById("view-registro");
   let html = `
+  ${regGearHtml()}
   ${renderTrackerPanel()}
   <div class="panel">
     <div class="panel-head"><h2>Nuevo registro diario</h2></div>
-    <div class="panel-body">
+    <div class="panel-body reg-form-body ${regHideClasses()}">
       <div class="form-grid">
         <div class="form-field">
           <label>Fecha</label>
@@ -7720,25 +7798,26 @@ function renderRegistro(){
         <div class="form-field">
           <label>Rutina realizada</label>
           <select id="newLogRoutine">
-            <option value="A">Rutina A — Fuerza y acondicionamiento</option>
-            <option value="B">Rutina B — Cardio + Core</option>
+            <option value="A">${escapeHtml(rutinaNombreLargo("A"))}</option>
+            <option value="B">${escapeHtml(rutinaNombreLargo("B"))}</option>
             <option value="Descanso">Día de descanso</option>
             <option value="Otro">Otra actividad</option>
           </select>
+          <small id="newLogRoutineHint" class="field-hint"></small>
         </div>
-        <div class="form-field">
+        <div class="form-field" data-regfield="energia">
           <label>Energía (1-5)</label>
           <div class="scale-row" id="scaleEnergia">${[1,2,3,4,5].map(n=>`<div class="scale-dot" data-val="${n}">${n}</div>`).join("")}</div>
         </div>
-        <div class="form-field">
+        <div class="form-field" data-regfield="fatiga">
           <label>Fatiga / dolor muscular (1-5)</label>
           ${fatigaScaleHtml("scaleFatiga", null)}
         </div>
-        <div class="form-field">
+        <div class="form-field" data-regfield="sueno">
           <label>Sueño (horas)</label>
           <input type="text" id="newLogSueno" placeholder="ej. 7h">
         </div>
-        <div class="form-field" style="grid-column:1 / -1">
+        <div class="form-field" data-regfield="comida" style="grid-column:1 / -1">
           <label>Alimentación del día</label>
           ${comidaFieldHtml("new", "newLogComida", "", null, [])}
         </div>
@@ -7764,6 +7843,7 @@ function renderRegistro(){
     </div>
   </div>`;
   container.innerHTML = html;
+  regApplyNotasStyle();
 
   document.querySelectorAll('#scaleEnergia .scale-dot').forEach(d=>{
     d.addEventListener('click', ()=>{
@@ -7851,7 +7931,7 @@ function comidaViewHtml(entry){
 
 function entryToHtml(entry){
   if(entry.id === _editingLogId) return editLogHtml(entry);
-  const typeLabel = {A:"Rutina A", B:"Rutina B", Descanso:"Descanso", Otro:"Otra actividad"}[entry.routine] || entry.routine;
+  const typeLabel = {A:rutinaNombre("A"), B:rutinaNombre("B"), Descanso:"Descanso", Otro:"Otra actividad"}[entry.routine] || entry.routine;
   return `
   <div class="log-entry">
     <div class="log-entry-head">
@@ -7966,8 +8046,254 @@ document.addEventListener("keydown", function(e){
   const btn = document.querySelector('button[onclick^="saveEditLog("]');
   if(btn) btn.click();
 }, true);
+// U-1: la rutina del "Nuevo registro diario" se calcula sola según el día de la semana.
+// Mapa por defecto (0 = domingo): A = lun, mié, vie (y domingo, opcional); B = mar, jue, sáb.
+// Se puede reemplazar con STATE.settings.registro.rutinaPorDia (lo expondrá el menú avanzado, U-2).
+const RUTINA_POR_DIA_DEFAULT = { 0:"", 1:"A", 2:"B", 3:"A", 4:"B", 5:"A", 6:"B" };
+function rutinaOpciones(){ return [["", "Sin asignar"], ["A", rutinaNombre("A")], ["B", rutinaNombre("B")], ["Descanso", "Día de descanso"], ["Otro", "Otra actividad"]]; }
+const REG_DIAS = [[1,"Lunes"],[2,"Martes"],[3,"Miércoles"],[4,"Jueves"],[5,"Viernes"],[6,"Sábado"],[0,"Domingo"]];
+function regCfg(){
+  const r = (typeof STATE !== "undefined" && STATE && STATE.settings && STATE.settings.registro) || {};
+  return Object.assign({}, r, {
+    rutinaAuto: r.rutinaAuto !== false,
+    rutinaPorDia: Object.assign({}, RUTINA_POR_DIA_DEFAULT, r.rutinaPorDia || {}),
+    campos: Object.assign({ energia:true, fatiga:true, sueno:true, comida:true }, r.campos || {}),
+    notasFs: Number(r.notasFs) || 14, notasAlto: Number(r.notasAlto) || 140
+  });
+}
+function rutinaDelDia(iso){
+  const r = regCfg();
+  if(!r.rutinaAuto || !iso) return null;
+  const d = new Date(iso + "T12:00:00"); if(isNaN(d)) return null;
+  const v = r.rutinaPorDia[d.getDay()];
+  return v ? { value: v } : null; // vacío = no sugiere nada
+}
+
+// U-2: engranaje del Registro diario + menú avanzado (Ajustes) — comparten la configuración STATE.settings.registro
+const _L = (es, en) => (STATE && STATE.settings && STATE.settings.idioma === "en") ? en : es;
+let _regGearOpen = false;
+let _regAdvOpen = false;
+function regHideClasses(){
+  const c = regCfg().campos;
+  return ["energia","fatiga","sueno","comida"].filter(k=>c[k] === false).map(k=>"reg-hide-" + k).join(" ");
+}
+function regApplyNotasStyle(){
+  const v = document.getElementById("view-registro"); if(!v) return;
+  const r = regCfg();
+  v.style.setProperty("--notas-fs", r.notasFs + "px");
+  v.style.setProperty("--notas-minh", r.notasAlto + "px");
+  try{ autoGrowNotes(); }catch(e){}
+}
+function regApplyFields(){
+  const body = document.querySelector("#view-registro .panel-body.reg-form-body");
+  if(!body) return;
+  ["energia","fatiga","sueno","comida"].forEach(k=>body.classList.remove("reg-hide-" + k));
+  regHideClasses().split(" ").filter(Boolean).forEach(c=>body.classList.add(c));
+}
+function regGearHtml(){
+  return `<div class="reg-toolbar">
+    <button type="button" class="reg-gear ${_regGearOpen ? "on" : ""}" id="regGearBtn" onclick="regGearToggleOpen(event)" title="${_L("Ajustes del registro diario", "Daily log settings")}" aria-label="${_L("Ajustes del registro diario", "Daily log settings")}" aria-expanded="${_regGearOpen}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+    <div class="reg-gear-pop" id="regGearPop" ${_regGearOpen ? "" : "hidden"}>${_regGearOpen ? regGearInner() : ""}</div>
+  </div>`;
+}
+function regGearInner(){
+  const r = regCfg();
+  const row = (label, key, on, desc) => `<div class="settings-row" style="align-items:flex-start"><span class="settings-row-label" style="max-width:230px">${label}${desc ? `<br><span class="reg-gear-desc">${desc}</span>` : ""}</span><button type="button" class="settings-toggle ${on ? "on" : ""}" onclick="regGearSet('${key}')" aria-label="${label}"></button></div>`;
+  const chk = (k, label) => row(label, "campo:" + k, r.campos[k] !== false);
+  const selStyle = "background:var(--surface-3); color:var(--text); border:1px solid var(--line-soft); border-radius:8px; padding:4px 8px; font-size:12px";
+  return `
+    <div class="reg-gear-title">${_L("Ajustes del registro diario", "Daily log settings")}</div>
+    <div class="reg-gear-sec">${_L("Rutina", "Routine")}</div>
+    ${row(_L("Sugerir la rutina según el día", "Suggest the routine for the day"), "rutinaAuto", r.rutinaAuto, _L("Qué rutina va cada día se define en Ajustes → Registro diario → Avanzado", "Which routine goes on each day is set in Settings → Daily log → Advanced"))}
+    <div class="reg-gear-sec">${_L("Autoguardado y avisos", "Autosave and alerts")}</div>
+    ${row(_L("Autoguardado del borrador", "Draft autosave"), "autosave", !!r.autosave)}
+    <div style="padding-left:12px; opacity:${r.autosave ? 1 : 0.45}; pointer-events:${r.autosave ? "auto" : "none"}">
+      ${row(_L("Al cambiar de pestaña", "When leaving the tab"), "onLeaveTab", !!r.onLeaveTab)}
+      ${row(_L("Al cerrar la app", "When closing the app"), "onClose", !!r.onClose)}
+      ${row(_L("Por inactividad", "When idle"), "onIdle", !!r.onIdle)}
+      <div class="settings-row"><span class="settings-row-label">${_L("Minutos de inactividad", "Idle minutes")}</span>
+        <select onchange="regGearSetIdle(this.value)" style="${selStyle}">${[5,10,15,30,60].map(m=>`<option value="${m}" ${Number(r.idleMin) === m ? "selected" : ""}>${m}</option>`).join("")}</select></div>
+    </div>
+    <div class="reg-gear-sec">${_L("Campos visibles", "Visible fields")}</div>
+    ${chk("energia", _L("Energía", "Energy"))}${chk("fatiga", _L("Fatiga / dolor muscular", "Fatigue / soreness"))}${chk("sueno", _L("Sueño", "Sleep"))}${chk("comida", _L("Alimentación del día", "Daily nutrition"))}
+    <div class="reg-gear-sec">${_L("Campo de notas", "Notes field")}</div>
+    <div class="settings-row"><span class="settings-row-label">${_L("Tamaño de letra", "Font size")}</span>
+      <select onchange="regGearSetNotas('notasFs', this.value)" style="${selStyle}">${[[12,_L("Pequeña","Small")],[14,_L("Normal","Normal")],[16,_L("Grande","Large")],[19,_L("Muy grande","Extra large")]].map(([v,l])=>`<option value="${v}" ${r.notasFs === v ? "selected" : ""}>${l}</option>`).join("")}</select></div>
+    <div class="settings-row"><span class="settings-row-label">${_L("Alto mínimo", "Minimum height")}</span>
+      <select onchange="regGearSetNotas('notasAlto', this.value)" style="${selStyle}">${[[90,_L("Compacto","Compact")],[140,_L("Normal","Normal")],[240,_L("Amplio","Tall")],[380,_L("Muy amplio","Extra tall")]].map(([v,l])=>`<option value="${v}" ${r.notasAlto === v ? "selected" : ""}>${l}</option>`).join("")}</select></div>`;
+}
+function regGearRepaint(){
+  const pop = document.getElementById("regGearPop"), btn = document.getElementById("regGearBtn");
+  if(btn){ btn.classList.toggle("on", _regGearOpen); btn.setAttribute("aria-expanded", _regGearOpen); }
+  if(!pop) return;
+  pop.hidden = !_regGearOpen;
+  pop.innerHTML = _regGearOpen ? regGearInner() : "";
+}
+function regGearToggleOpen(ev){ if(ev) ev.stopPropagation(); _regGearOpen = !_regGearOpen; regGearRepaint(); }
+function regGearSet(key){
+  ensureSettings();
+  const r = STATE.settings.registro;
+  if(key.indexOf("campo:") === 0){ const k = key.slice(6); r.campos = Object.assign({ energia:true, fatiga:true, sueno:true, comida:true }, r.campos || {}); r.campos[k] = !(r.campos[k] !== false); regApplyFields(); }
+  else if(key === "rutinaAuto"){ r.rutinaAuto = !(r.rutinaAuto !== false); }
+  else { r[key] = !r[key]; }
+  saveState(true);
+  regGearRepaint(); renderSettingsModal();
+  if(key === "rutinaAuto") syncNewLogRoutine();
+}
+function regGearSetIdle(v){ ensureSettings(); STATE.settings.registro.idleMin = Math.max(1, parseInt(v, 10) || 10); saveState(true); regGearRepaint(); renderSettingsModal(); }
+function regGearSetNotas(key, v){ ensureSettings(); STATE.settings.registro[key] = Number(v); saveState(true); regApplyNotasStyle(); regGearRepaint(); }
+document.addEventListener("click", function(e){
+  if(!_regGearOpen) return;
+  const path = e.composedPath ? e.composedPath() : [];
+  if(path.some(n => n && n.classList && n.classList.contains("reg-toolbar"))) return; // el panel se redibuja: usar el camino original del clic
+  _regGearOpen = false; regGearRepaint();
+});
+document.addEventListener("keydown", function(e){ if(e.key === "Escape" && _regGearOpen){ _regGearOpen = false; regGearRepaint(); } });
+
+// Menú avanzado de Ajustes → Registro diario: qué rutina va cada día
+function settingsSetRutinaDia(dow, v){
+  ensureSettings();
+  const r = STATE.settings.registro;
+  r.rutinaPorDia = Object.assign({}, RUTINA_POR_DIA_DEFAULT, r.rutinaPorDia || {});
+  r.rutinaPorDia[dow] = v;
+  saveState(true); renderSettingsModal(); syncNewLogRoutine();
+}
+function settingsResetRutinaMapa(){
+  ensureSettings();
+  STATE.settings.registro.rutinaPorDia = Object.assign({}, RUTINA_POR_DIA_DEFAULT);
+  saveState(true); renderSettingsModal(); syncNewLogRoutine();
+}
+function settingsRegistroAdvanced(){
+  const r = regCfg();
+  const selStyle = "background:var(--surface-3); color:var(--text); border:1px solid var(--line-soft); border-radius:8px; padding:4px 8px; font-size:12px";
+  return `
+    <details class="settings-adv" ${_regAdvOpen ? "open" : ""} ontoggle="_regAdvOpen = this.open">
+      <summary>${_L("Avanzado: rutina según el día", "Advanced: routine by day")}</summary>
+      <div class="settings-row" style="align-items:flex-start">
+        <span class="settings-row-label" style="max-width:260px">${_L("Sugerir la rutina según el día", "Suggest the routine for the day")}<br><span class="reg-gear-desc">${_L("Al elegir la fecha del registro, la app propone la rutina de ese día de la semana.", "When you pick the log date, the app proposes that weekday's routine.")}</span></span>
+        <button class="settings-toggle ${r.rutinaAuto ? "on" : ""}" onclick="regGearSet('rutinaAuto')" aria-label="${_L("Sugerir la rutina según el día", "Suggest the routine for the day")}"></button>
+      </div>
+      <div style="opacity:${r.rutinaAuto ? 1 : 0.45}; pointer-events:${r.rutinaAuto ? "auto" : "none"}">
+        ${REG_DIAS.map(([dow, name]) => `<div class="settings-row"><span class="settings-row-label">${name}</span>
+          <select onchange="settingsSetRutinaDia(${dow}, this.value)" style="${selStyle}">${rutinaOpciones().map(([v, l]) => `<option value="${v}" ${r.rutinaPorDia[dow] === v ? "selected" : ""}>${escapeHtml(l)}</option>`).join("")}</select></div>`).join("")}
+        <div class="settings-row"><span class="reg-gear-desc">${_L("Un día en \"Sin asignar\" no sugiere nada; podés marcarlo como descanso.", "A day set to \"Unassigned\" suggests nothing; you can mark it as rest.")}</span>
+          <button type="button" class="reg-reset-btn" onclick="settingsResetRutinaMapa()">${_L("Restablecer", "Reset")}</button></div>
+      </div>
+    </details>`;
+}
+
+// U-3: nombres editables de las pestañas "Rutina A" y "Rutina B" (guardados en STATE.meta.rutinaNombres, viajan con la cuenta)
+function rutinaNombre(k){
+  const n = (typeof STATE !== "undefined" && STATE && STATE.meta && STATE.meta.rutinaNombres) || {};
+  const v = String(n[k] || "").trim();
+  return v || (k === "A" ? "Rutina A" : (k === "B" ? "Rutina B" : String(k)));
+}
+function rutinaNombreLargo(k){
+  const n = (typeof STATE !== "undefined" && STATE && STATE.meta && STATE.meta.rutinaNombres) || {};
+  const v = String(n[k] || "").trim();
+  return v || (k === "A" ? "Rutina A — Fuerza y acondicionamiento" : (k === "B" ? "Rutina B — Cardio + Core" : String(k)));
+}
+function rutinaKeyFromView(v){ return v === "rutinaA" ? "A" : (v === "rutinaB" ? "B" : null); }
+function rutinaApplyNames(){
+  ["A","B"].forEach(k=>{
+    const b = document.querySelector(`.tab-btn[data-view="rutina${k}"]`);
+    if(b && !b.querySelector("input")) b.textContent = rutinaNombre(k);
+    ["newLogRoutine","editLogRoutine"].forEach(id=>{
+      const o = document.querySelector(`#${id} option[value="${k}"]`); if(o) o.textContent = rutinaNombreLargo(k);
+    });
+    const si = document.querySelector(`[data-panel-search="rutina${k}"] .panel-search-input`);
+    if(si) si.placeholder = `Buscar ejercicio en ${rutinaNombre(k)}…`;
+  });
+}
+function rutinaSetNombre(k, v){
+  if(k !== "A" && k !== "B") return;
+  if(!STATE.meta) STATE.meta = {};
+  const cur = Object.assign({}, STATE.meta.rutinaNombres || {});
+  v = String(v || "").replace(/\s+/g, " ").trim().slice(0, 30);
+  if(!v || v === (k === "A" ? "Rutina A" : "Rutina B")) delete cur[k]; else cur[k] = v;
+  STATE.meta.rutinaNombres = cur;
+  saveState();
+  rutinaApplyNames();
+  try{ if(document.getElementById("newLogDate")) saveRegistroDraft(); renderRegistro(); }catch(e){}
+  try{ renderSettingsModal(); }catch(e){}
+  try{ anatSync(); }catch(e){}
+  try{ lkRefreshCounts(); }catch(e){}
+}
+function rutinaResetNombres(){
+  if(STATE.meta) delete STATE.meta.rutinaNombres;
+  saveState(); rutinaSetNombre("A", ""); 
+}
+function rutinaEditTab(btn){
+  const k = rutinaKeyFromView(btn && btn.dataset.view);
+  if(!k || btn.querySelector("input")) return;
+  const cur = rutinaNombre(k);
+  btn.classList.add("editing");
+  btn.innerHTML = '<input type="text" class="tab-rename" maxlength="30" aria-label="Nombre de la rutina" spellcheck="false">';
+  const inp = btn.firstChild; inp.value = cur; inp.focus(); inp.select();
+  let done = false;
+  const finish = save => { if(done) return; done = true; const val = inp.value; btn.classList.remove("editing"); btn.textContent = rutinaNombre(k); if(save) rutinaSetNombre(k, val); else rutinaApplyNames(); };
+  inp.addEventListener("keydown", e=>{ e.stopPropagation(); if(e.key === "Enter"){ e.preventDefault(); finish(true); } else if(e.key === "Escape"){ e.preventDefault(); finish(false); } });
+  inp.addEventListener("click", e=>e.stopPropagation());
+  inp.addEventListener("dblclick", e=>e.stopPropagation());
+  inp.addEventListener("blur", ()=>finish(true));
+}
+(function(){
+  document.addEventListener("dblclick", function(e){
+    const b = e.target.closest && e.target.closest('.tab-btn[data-view="rutinaA"], .tab-btn[data-view="rutinaB"]');
+    if(b){ e.preventDefault(); rutinaEditTab(b); }
+  });
+  // celular: mantener presionado ~0,6 s sobre la pestaña
+  let t = 0, sx = 0, sy = 0;
+  document.addEventListener("pointerdown", function(e){
+    if(e.pointerType !== "touch") return;
+    const b = e.target.closest && e.target.closest('.tab-btn[data-view="rutinaA"], .tab-btn[data-view="rutinaB"]');
+    if(!b || b.querySelector("input")) return;
+    sx = e.clientX; sy = e.clientY;
+    clearTimeout(t); t = setTimeout(()=>{ rutinaEditTab(b); }, 650);
+  });
+  ["pointerup","pointercancel"].forEach(ev=>document.addEventListener(ev, ()=>clearTimeout(t)));
+  document.addEventListener("pointermove", function(e){ if(t && (Math.abs(e.clientX - sx) > 8 || Math.abs(e.clientY - sy) > 8)) clearTimeout(t); });
+})();
+function renderRutinaNombresSection(){
+  const inp = "background:var(--surface-3); color:var(--text); border:1px solid var(--line-soft); border-radius:8px; padding:5px 9px; font-size:12.5px; width:190px";
+  const row = (k, def) => `<div class="settings-row"><span class="settings-row-label">${_L("Pestaña", "Tab")} “${def}”</span>
+    <input type="text" maxlength="30" value="${escapeHtml(rutinaNombre(k) === def ? "" : rutinaNombre(k))}" placeholder="${def}" onchange="rutinaSetNombre('${k}', this.value)" style="${inp}"></div>`;
+  return `
+  <div class="settings-section">
+    <div class="settings-section-head"><h2>${_L("Nombres de las rutinas", "Routine names")}</h2></div>
+    ${row("A", "Rutina A")}${row("B", "Rutina B")}
+    <div class="settings-row"><span class="reg-gear-desc" style="max-width:250px">${_L("También podés hacer doble clic en la pestaña (o mantenerla presionada en el celular). El nombre se ve en la pestaña, el selector, el historial, el tracker y los ajustes. Vacío = nombre original.", "You can also double-click the tab (or long-press on mobile). The name shows in the tab, selector, history, tracker and settings. Empty = original name.")}</span>
+      <button type="button" class="reg-reset-btn" onclick="rutinaResetNombres()">${_L("Restablecer", "Reset")}</button></div>
+  </div>`;
+}
+let _newLogRoutineManual = false;
+function syncNewLogRoutine(force){
+  const sel = document.getElementById("newLogRoutine"), dateEl = document.getElementById("newLogDate");
+  if(!sel || !dateEl) return;
+  const hint = document.getElementById("newLogRoutineHint");
+  if(_newLogRoutineManual && !force){ if(hint) hint.innerHTML = 'Elegida a mano · <a href="#" class="field-hint-link" onclick="_newLogRoutineManual=false; syncNewLogRoutine(true); return false;">volver a la sugerida</a>'; return; }
+  const r = rutinaDelDia(dateEl.value);
+  if(!r){ if(hint) hint.textContent = regCfg().rutinaAuto ? "Sin rutina asignada a este día: elegí la que corresponda" : ""; return; }
+  if([...sel.options].some(o=>o.value === r.value)) sel.value = r.value;
+  if(hint){
+    const label = (sel.options[sel.selectedIndex] || {}).text || r.value;
+    hint.textContent = "Sugerida según el día: " + label.split(" — ")[0];
+  }
+}
 function initRegistroForm(){
-  applyRegistroDraft(loadRegistroDraft());
+  const _draft = loadRegistroDraft();
+  applyRegistroDraft(_draft);
+  _newLogRoutineManual = false;
+  { const auto = rutinaDelDia((document.getElementById("newLogDate") || {}).value);
+    if(_draft && registroDraftHasContent(_draft) && _draft.routine && auto && _draft.routine !== auto.value) _newLogRoutineManual = true; }
+  syncNewLogRoutine();
+  { const rs = document.getElementById("newLogRoutine");
+    if(rs) rs.addEventListener("change", function(){ _newLogRoutineManual = true; syncNewLogRoutine(); });
+    const dh = document.getElementById("newLogDate"), dt = document.getElementById("newLogDateTxt");
+    if(dh) dh.addEventListener("change", function(){ syncNewLogRoutine(); saveRegistroDraft(); });
+    if(dt){ dt.addEventListener("input", function(){ syncNewLogRoutine(); }); dt.addEventListener("blur", function(){ syncNewLogRoutine(); }); } }
   const dTxt = document.getElementById("newLogDateTxt");
   if(dTxt){ dTxt.addEventListener("input", saveRegistroDraft); dTxt.addEventListener("blur", saveRegistroDraft); }
   ["newLogDate","newLogRoutine","newLogSueno","newLogComida","newLogNotas"].forEach(id=>{
@@ -8016,7 +8342,7 @@ function promptRegistroDraft(reason, onDone){
   _regPromptOpen = true;
   _regPromptDraft = d;
   _regPromptCb = onDone || null;
-  const routineLabel = {A:"Rutina A", B:"Rutina B", Descanso:"Descanso", Otro:"Otra actividad"}[d.routine] || d.routine;
+  const routineLabel = {A:rutinaNombre("A"), B:rutinaNombre("B"), Descanso:"Descanso", Otro:"Otra actividad"}[d.routine] || d.routine;
   let fecha = d.date;
   try{ fecha = new Date(d.date + "T12:00:00").toLocaleDateString('es-AR', {weekday:'short', day:'numeric', month:'short'}); }catch(e){}
   const msgs = {
@@ -8093,7 +8419,7 @@ function regReloadKey(e){
 
 // ---- Disparador 3: inactividad -> aviso flotante clickeable, no invasivo ----
 function regDraftSummary(d){
-  const routineLabel = {A:"Rutina A", B:"Rutina B", Descanso:"Descanso", Otro:"Otra actividad"}[d.routine] || d.routine;
+  const routineLabel = {A:rutinaNombre("A"), B:rutinaNombre("B"), Descanso:"Descanso", Otro:"Otra actividad"}[d.routine] || d.routine;
   let fecha = d.date || "";
   try{ fecha = new Date(d.date + "T12:00:00").toLocaleDateString('es-AR', {weekday:'short', day:'numeric', month:'short'}); }catch(e){}
   return `${fecha} · ${routineLabel}`;
@@ -8165,8 +8491,8 @@ function editLogHtml(e){
         <div class="form-field"><label>Fecha</label><input type="date" id="editLogDate" value="${escapeHtml(e.date || "")}"></div>
         <div class="form-field"><label>Rutina realizada</label>
           <select id="editLogRoutine">
-            ${opt("A", "Rutina A — Fuerza y acondicionamiento")}
-            ${opt("B", "Rutina B — Cardio + Core")}
+            ${opt("A", rutinaNombreLargo("A"))}
+            ${opt("B", rutinaNombreLargo("B"))}
             ${opt("Descanso", "Día de descanso")}
             ${opt("Otro", "Otra actividad")}
           </select>
@@ -8645,7 +8971,7 @@ const ANAT_SIL = {
   arm:  "M136 78 C150 74 162 84 164 100 C167 120 168 142 168 156 C172 178 178 200 180 222 C181 228 180 232 176 232 L168 232 C165 230 164 226 164 222 C160 202 152 182 148 160 C146 140 142 120 138 104 Z",
   hand: "M174 228 C181 228 184 240 182 252 C180 258 172 258 169 252 C166 244 167 232 174 228 Z"
 };
-const ANAT_GROUPS = { sup:"Tren superior", hom:"Hombro, escápula y cuello", bra:"Brazo, antebrazo y mano", core:"Core", inf:"Tren inferior" };
+const ANAT_GROUPS = { sup:"Tren superior", hom:"Hombro, escápula y cuello", cab:"Cabeza y cara", bra:"Brazo, antebrazo y mano", core:"Core", inf:"Tren inferior" };
 const ANAT_M = {
   pectoral:{ n:"Pectoral", g:"sup",
     v:{}, kids:["pectoral_clav", "pectoral_esterno"],
@@ -8653,22 +8979,22 @@ const ANAT_M = {
         f:"Músculo grande y potente, pensado para empujar y aducir el brazo. Las dos porciones se activan distinto según el ángulo del empuje: cuanto más inclinado hacia arriba, más trabaja la porción clavicular.",
         m:"Aducción horizontal, flexión y rotación interna del hombro. Lo trabajan flexiones, press de banca y aperturas. En flexiones declinadas (pies elevados) aumenta la participación de la porción superior y del deltoides anterior." } },
   deltoides:{ n:"Deltoides", g:"sup",
-    v:{ f:"M136 76 C150 72 163 82 165 102 C165 114 158 120 154 112 C148 100 140 92 134 90 Z", b:"M136 76 C150 72 163 82 165 102 C165 114 158 120 154 112 C148 100 140 92 134 90 Z" },
+    v:{}, kids:["deltoides_ant", "deltoides_lat", "deltoides_post"],
     i:{ a:"Cubre la articulación del hombro. Nace en el tercio externo de la clavícula, el acromion y la espina de la escápula; se inserta en la tuberosidad deltoidea del húmero. Tiene tres haces: anterior, medio y posterior.",
         f:"Cada haz trabaja casi como un músculo distinto. Es muy sensible al volumen de entrenamiento y se recupera relativamente rápido, pero acumula fatiga cuando se suman muchos empujes y elevaciones en la misma semana.",
         m:"Anterior: flexión del hombro (elevaciones frontales). Medio: abducción (elevaciones laterales). Posterior: extensión y abducción horizontal (remos, aperturas posteriores). Interviene en casi todos los empujes y en el press sobre la cabeza." } },
-  biceps:{ n:"Bíceps y braquial", g:"sup",
-    v:{ f:"M147 118 C155 116 163 122 165 136 C165 148 160 156 154 156 C148 148 146 132 147 118 Z" },
+  biceps:{ n:"Bíceps braquial", g:"sup",
+    v:{}, kids:["biceps_larga", "biceps_corta"],
     i:{ a:"Bíceps braquial de dos cabezas (nace en la escápula, apófisis coracoides y tubérculo supraglenoideo; se inserta en la tuberosidad del radio). Debajo está el braquial, que se inserta en el cúbito.",
         f:"El bíceps cruza hombro y codo; el braquial solo el codo, por eso es el flexor 'puro' del codo. Responden bien a tensiones moderadas con tempo controlado.",
         m:"Flexión del codo y supinación del antebrazo (el bíceps). El curl martillo, con agarre neutro, carga más el braquial y el braquiorradial. Las dominadas y los remos también lo reclutan como apoyo." } },
   triceps:{ n:"Tríceps", g:"sup",
-    v:{ b:"M147 112 C155 108 164 116 165 134 C165 148 160 156 154 156 C148 146 146 128 147 112 Z" },
+    v:{}, kids:["triceps_larga", "triceps_lat", "triceps_medial"],
     i:{ a:"Tríceps braquial de tres cabezas: larga (nace en la escápula), lateral y medial (nacen en el húmero). Se inserta en el olécranon del cúbito.",
         f:"Ocupa cerca de dos tercios de la masa del brazo. La cabeza larga cruza el hombro, por lo que trabaja más cuando el brazo está elevado y el músculo queda estirado.",
         m:"Extensión del codo; la cabeza larga ayuda además en la extensión y aducción del hombro. Es clave en flexiones, press y fondos. La extensión tras nuca estira la cabeza larga y la carga con fuerza." } },
   antebrazo:{ n:"Antebrazo y agarre", g:"sup",
-    v:{ f:"M151 162 C159 160 167 166 171 182 C174 198 177 212 177 222 C172 224 168 222 166 218 C162 202 154 184 151 162 Z", b:"M151 162 C159 160 167 166 171 182 C174 198 177 212 177 222 C172 224 168 222 166 218 C162 202 154 184 151 162 Z" },
+    v:{}, kids:["flexores_antebrazo", "extensores_antebrazo", "braquiorradial"],
     i:{ a:"Grupo de flexores y extensores de muñeca y dedos, pronadores, supinadores y el braquiorradial. Nacen cerca del codo y sus tendones largos llegan a la mano.",
         f:"Predominan fibras resistentes a la fatiga, pero un trabajo prolongado de agarre (colgadas, pesos pesados) las fatiga y limita el rendimiento de espalda y piernas.",
         m:"Cierre de mano, flexión y extensión de muñeca, rotación del antebrazo. La colgada muerta y las dominadas son entrenamiento directo de agarre; el peso muerto y los remos lo exigen sin que se vea." } },
@@ -8724,10 +9050,9 @@ const ANAT_M = {
         f:"Su función principal es de estabilización, con fibras que sostienen la pelvis a cada paso; se fatiga rápido en trabajo unilateral.",
         m:"Abducción de cadera y estabilización lateral de la pelvis al apoyar una sola pierna. La elevación lateral con tobillera lo trabaja directo; las búlgaras y sentadillas unilaterales lo exigen para que la rodilla no se cierre." } },
   cuadriceps:{ n:"Cuádriceps", g:"inf",
-    v:{ f:"M106 238 C116 232 128 234 131 248 C132 280 129 312 125 328 L108 328 C106 300 104 272 106 238 Z" },
-    deco:{ f:["M112 250 C114 280 114 304 112 322"] },
+    v:{}, kids:["recto_femoral", "vasto_lateral", "vasto_medial", "vasto_intermedio"],
     i:{ a:"Cuatro porciones: recto femoral, vasto lateral, vasto medial y vasto intermedio. Se unen en el tendón rotuliano que se inserta en la tuberosidad de la tibia.",
-        f:"Mezcla de fibras rápidas y lentas. Es muy exigido en saltos y sprints, y por su volumen genera mucha fatiga general en series largas.",
+        f:"Mezcla de fibras rápidas y lentas. Es muy exigido en saltos y sprints, y por su volumen genera mucha fatiga general en sets largos.",
         m:"Extensión de rodilla; el recto femoral también flexiona la cadera. Sentadillas, búlgaras, saltos y sprints lo trabajan; cuanto más profunda la flexión de rodilla, mayor su demanda." } },
   aductores:{ n:"Aductores", g:"inf",
     v:{ f:"M102 246 L105 242 C108 270 108 298 107 316 C104 300 102 270 102 246 Z" },
@@ -8735,7 +9060,7 @@ const ANAT_M = {
         f:"Estabilizadores de la pelvis y la rodilla; el aductor mayor se comporta casi como un isquiotibial en la extensión de cadera.",
         m:"Aducción de cadera. Además estabilizan en sentadillas y zancadas, y trabajan en jumping jacks al juntar las piernas. Es una zona frecuente de tirones si se fuerza la flexibilidad." } },
   isquiotibiales:{ n:"Isquiotibiales", g:"inf",
-    v:{ b:"M102 258 C114 260 126 256 129 268 C130 296 127 320 124 332 L106 332 C104 304 102 282 102 258 Z" },
+    v:{}, kids:["biceps_femoral", "semitendinoso", "semimembranoso"],
     i:{ a:"Bíceps femoral, semitendinoso y semimembranoso. Nacen en la tuberosidad isquiática (salvo la cabeza corta del bíceps) y se insertan en la tibia y el peroné.",
         f:"Predominan las fibras rápidas y trabajan mucho de forma excéntrica, frenando la extensión de la rodilla. Son una lesión frecuente en sprints y estiramientos forzados.",
         m:"Extensión de cadera y flexión de rodilla. El peso muerto los carga con la cadera hacia atrás mientras se alargan; los sprints y los saltos los exigen al frenar y al despegar." } },
@@ -8837,12 +9162,12 @@ const ANAT_M = {
         f:"Es un flexor del codo atípico: se ve en el antebrazo pero actúa sobre el codo. Trabaja más con la palma neutra.",
         m:"Flexión del codo, sobre todo con agarre neutro o pronado. Lo cargan los curl martillo, los curl inverso y los remos con agarre neutro." } },
   flexores_antebrazo:{ n:"Flexores de muñeca y dedos", g:"bra",
-    v:{ f:"M151 170 C156 174 160 190 164 206 C162 214 158 214 156 208 C152 192 150 180 151 170 Z" },
+    v:{}, kids:["flexor_radial", "palmar_largo", "flexor_cubital", "flexor_sup_dedos"],
     i:{ a:"Grupo de la cara anterior del antebrazo (palmar largo, flexores radial y cubital del carpo, flexores superficial y profundo de los dedos). Nacen sobre todo en el epicóndilo medial del húmero.",
         f:"Sostienen el agarre. Son músculos de resistencia y se fatigan con trabajo de agarre prolongado (colgadas, acarreos).",
         m:"Flexión de la muñeca y de los dedos. Se trabajan con curl de muñeca, colgadas, acarreos y en todo agarre con carga." } },
   extensores_antebrazo:{ n:"Extensores de muñeca y dedos", g:"bra",
-    v:{ b:"M158 168 C164 172 168 188 170 206 C168 212 164 212 162 206 C160 190 158 178 158 168 Z" },
+    v:{}, kids:["ext_radial_largo", "ext_radial_corto", "ext_dedos", "ext_cubital"],
     i:{ a:"Grupo de la cara posterior del antebrazo (extensores radiales y cubital del carpo, extensor de los dedos). Nacen en el epicóndilo lateral del húmero.",
         f:"Contrarrestan a los flexores y estabilizan la muñeca durante el agarre. Se sobrecargan en el 'codo de tenista'.",
         m:"Extensión de la muñeca y de los dedos. Trabajan en curl inverso de muñeca, press y en cualquier agarre donde la muñeca debe mantenerse recta." } },
@@ -8879,6 +9204,194 @@ const ANAT_M = {
     i:{ a:"Parte media e inferior del pectoral mayor. Nace en el esternón, los cartílagos de las costillas 2 a 6 y la vaina del recto abdominal; sus fibras suben y convergen en el mismo tendón del húmero, retorciéndose (las más bajas terminan más arriba).",
         f:"Es la porción más voluminosa y potente. Sus fibras bajas trabajan más cuando el brazo se baja hacia la cadera (fondos, press declinado).",
         m:"Aducción horizontal y extensión del hombro desde posición flexionada. Principal en press plano, declinado, fondos, aperturas y cruces." } },
+  // ── Pasada superficial · antebrazo (Q-6): flexores y extensores por músculo
+  flexor_radial:{ n:"Flexor radial del carpo", g:"bra",
+    v:{ f:"M162.4 162.5 C162.1 163.7 161.9 167.5 162 170 C162 172.4 162.3 174.9 162.7 177.3 C163.1 179.7 163.7 182.1 164.3 184.5 C164.9 186.9 165.5 189.3 166.1 191.6 C166.7 194 167.4 196.4 168 198.8 C168.6 201.1 169.3 203.5 169.9 205.9 C170.4 208.2 171 210.6 171.4 213 C171.9 215.3 172.3 218.9 172.6 220.1 C172.9 221.3 173.4 221.3 173.4 220.1 C173.4 218.9 173 215.3 172.7 212.9 C172.5 210.5 172.3 208.1 172.1 205.7 C171.8 203.2 171.6 200.8 171.3 198.4 C171.1 195.9 170.8 193.5 170.5 191 C170.2 188.6 169.8 186.2 169.4 183.7 C169.1 181.3 168.7 178.8 168.2 176.4 C167.7 174 167.1 171.6 166.2 169.3 C165.4 166.9 164 163.4 163.4 162.3 C162.7 161.2 162.6 161.2 162.4 162.5 Z" },
+    deco:{ f:["M162.6 164.2 L163.2 173.5 L164.9 182.5 L167 191.5 L169.1 200.5 L171 209.4 L172.6 218.4","M163.2 164.1 L164.8 173.2 L166.5 182.3 L168.3 191.3 L170 200.4 L171.6 209.4 L172.8 218.4","M163.8 164 L166.3 172.9 L168.1 182 L169.6 191.2 L170.9 200.3 L172.1 209.4 L173.1 218.4"] },
+    i:{ a:"Nace en el epicóndilo medial del húmero (tendón flexor común) y su tendón se inserta en la base del 2.º y 3.er metacarpiano. Cruza el antebrazo en diagonal hacia el lado del pulgar.",
+        f:"Su tendón se palpa en la cara de la muñeca del lado del pulgar, al lado del pulso. Es un flexor fuerte y estabiliza la muñeca bajo carga.",
+        m:"Flexión de la muñeca y desviación hacia el pulgar. Lo trabajan los curls de muñeca, las colgadas, los remos y el agarre de barra." } },
+  palmar_largo:{ n:"Palmar largo", g:"bra",
+    v:{ f:"M159.1 163.6 C159.1 164.9 159.5 168.6 159.8 171 C160.2 173.4 160.9 175.8 161.4 178.2 C162 180.6 162.6 183 163.3 185.3 C163.9 187.7 164.5 190.1 165.1 192.4 C165.8 194.8 166.4 197.2 167 199.5 C167.6 201.9 168.2 204.2 168.8 206.6 C169.3 208.9 169.9 211.3 170.3 213.7 C170.8 216 171.3 219.6 171.6 220.7 C171.9 221.9 172.2 221.9 172.1 220.7 C172 219.6 171.4 216 171 213.6 C170.6 211.3 170.2 208.9 169.8 206.5 C169.3 204.1 168.9 201.7 168.4 199.4 C167.9 197 167.4 194.6 166.9 192.2 C166.4 189.8 165.9 187.4 165.4 185 C164.8 182.6 164.3 180.2 163.7 177.8 C163.2 175.4 162.7 173 162 170.6 C161.4 168.2 160.2 164.7 159.7 163.5 C159.2 162.4 159.1 162.4 159.1 163.6 Z" },
+    deco:{ f:["M159.8 165.3 L161.7 174.4 L163.9 183.4 L166 192.3 L168.1 201.2 L170 210.1 L171.6 219"] },
+    i:{ a:"Nace en el epicóndilo medial del húmero y termina en un tendón largo que se une a la aponeurosis palmar, en la palma de la mano.",
+        f:"Es débil y falta en una parte de las personas sin que cambie la fuerza de la mano. Su tendón se marca al unir pulgar y meñique y flexionar la muñeca.",
+        m:"Flexión de la muñeca y tensión de la fascia de la palma. Interviene en el agarre y al sostener objetos." } },
+  flexor_cubital:{ n:"Flexor cubital del carpo", g:"bra",
+    v:{ f:"M150.7 163.6 C150.5 164.9 150.6 168.7 150.8 171.2 C151.1 173.7 151.6 176.1 152.2 178.5 C152.8 180.9 153.6 183.3 154.4 185.6 C155.2 188 156 190.3 156.9 192.6 C157.7 194.9 158.6 197.2 159.5 199.5 C160.3 201.8 161.2 204.1 162 206.4 C162.8 208.7 163.6 211 164.3 213.3 C165 215.6 165.7 219 166.1 220.2 C166.6 221.3 167 221.3 166.9 220.2 C166.9 219 166.1 215.5 165.6 213.2 C165.2 210.9 164.7 208.5 164.3 206.2 C163.8 203.8 163.3 201.5 162.8 199.1 C162.3 196.7 161.8 194.4 161.3 192 C160.7 189.6 160.2 187.2 159.5 184.8 C158.9 182.4 158.4 180 157.6 177.7 C156.9 175.3 156 172.9 155 170.5 C154 168.2 152.4 164.6 151.7 163.5 C150.9 162.3 150.8 162.3 150.7 163.6 Z" },
+    deco:{ f:["M151 165.4 L152.4 174.7 L154.8 183.7 L157.7 192.5 L160.7 201.2 L163.6 209.8 L165.9 218.5","M151.6 165.3 L153.9 174.5 L156.4 183.4 L159.1 192.3 L161.7 201.1 L164.1 209.8 L166.2 218.5","M152.2 165.2 L155.4 174.2 L158 183.2 L160.4 192.1 L162.6 201 L164.6 209.8 L166.4 218.5"] },
+    i:{ a:"Tiene dos cabezas: una en el epicóndilo medial del húmero y otra en el olécranon y el borde posterior del cúbito. Se inserta en el pisiforme, el ganchoso y el 5.º metacarpiano.",
+        f:"Es el flexor más interno del antebrazo y trabaja como estabilizador de la muñeca cuando se agarra con fuerza.",
+        m:"Flexión de la muñeca y desviación hacia el meñique. Lo trabajan los curls de muñeca, las colgadas, el agarre de barra y los golpes de raqueta." } },
+  flexor_sup_dedos:{ n:"Flexor superficial de los dedos", g:"bra",
+    v:{ f:"M156.3 165.4 C156.1 166.6 156.1 170.2 156.2 172.6 C156.4 174.9 156.7 177.3 157.2 179.5 C157.7 181.8 158.4 184.1 159.1 186.3 C159.8 188.5 160.6 190.7 161.4 192.9 C162.2 195.1 163.1 197.3 163.9 199.5 C164.7 201.7 165.5 203.9 166.3 206.2 C167.1 208.4 167.8 210.6 168.5 212.8 C169.1 215 169.7 218.4 170.2 219.5 C170.6 220.6 171.1 220.6 171.1 219.5 C171.1 218.4 170.4 215 170.1 212.7 C169.8 210.5 169.5 208.2 169.2 205.9 C168.8 203.6 168.5 201.4 168.1 199.1 C167.8 196.8 167.4 194.5 166.9 192.2 C166.5 189.9 166 187.6 165.5 185.3 C164.9 183 164.4 180.7 163.6 178.5 C162.9 176.2 162 174 160.9 171.8 C159.9 169.6 158.3 166.3 157.5 165.2 C156.7 164.2 156.5 164.2 156.3 165.4 Z" },
+    deco:{ f:["M156.6 167.1 L157.7 175.8 L159.9 184.4 L162.5 192.8 L165.3 201.1 L167.9 209.5 L170 217.9","M157.3 167 L159.5 175.6 L161.8 184.1 L164.2 192.6 L166.5 201 L168.5 209.4 L170.3 217.9","M158 166.9 L161.2 175.3 L163.8 183.8 L165.8 192.3 L167.6 200.9 L169.2 209.4 L170.7 217.9"] },
+    i:{ a:"Nace en el epicóndilo medial, la apófisis coronoides del cúbito y el radio. Cuatro tendones se insertan en las falanges medias de los dedos 2 a 5. Queda en capa intermedia, bajo el palmar largo y el flexor radial.",
+        f:"Es el principal flexor de los dedos para el agarre sostenido. Se fatiga rápido en colgadas largas.",
+        m:"Flexión de los dedos y ayuda en la flexión de la muñeca. Trabaja en colgadas, dominadas, peso muerto, remos y cualquier agarre con carga." } },
+  ext_radial_largo:{ n:"Extensor radial largo del carpo", g:"bra",
+    v:{ b:"M165.2 160.7 C164.9 162 164.5 165.7 164.5 168.1 C164.5 170.6 165 173 165.4 175.4 C165.8 177.8 166.3 180.2 166.8 182.6 C167.3 184.9 167.8 187.3 168.3 189.7 C168.8 192.1 169.4 194.4 169.9 196.8 C170.4 199.2 171 201.6 171.4 203.9 C171.9 206.3 172.3 208.7 172.7 211.1 C173.1 213.4 173.4 217 173.7 218.2 C174 219.4 174.4 219.4 174.4 218.2 C174.4 217 174 213.4 173.8 211 C173.6 208.6 173.4 206.2 173.2 203.8 C173 201.4 172.8 198.9 172.6 196.5 C172.3 194.1 172.1 191.6 171.8 189.2 C171.6 186.8 171.3 184.3 171 181.9 C170.7 179.5 170.4 177 170.1 174.6 C169.7 172.2 169.4 169.8 168.7 167.4 C168.1 165.1 166.7 161.7 166.1 160.6 C165.5 159.4 165.4 159.4 165.2 160.7 Z" },
+    deco:{ b:["M165.3 162.4 L165.7 171.6 L167.3 180.6 L169 189.6 L170.8 198.6 L172.4 207.5 L173.6 216.5","M165.8 162.3 L167.2 171.4 L168.6 180.4 L170.1 189.4 L171.5 198.5 L172.8 207.5 L173.9 216.5","M166.4 162.2 L168.6 171.1 L169.9 180.2 L171.1 189.3 L172.3 198.4 L173.2 207.5 L174.1 216.4"] },
+    i:{ a:"Nace en la cresta supracondílea lateral del húmero y se inserta en la base del 2.º metacarpiano. Va pegado al braquiorradial por el lado del pulgar.",
+        f:"Es el extensor más potente de la muñeca y la mantiene firme cuando se agarra con fuerza.",
+        m:"Extensión de la muñeca y desviación hacia el pulgar. Trabaja en colgadas, dominadas, remos y peso muerto, como estabilizador del agarre." } },
+  ext_radial_corto:{ n:"Extensor radial corto del carpo", g:"bra",
+    v:{ b:"M161.2 162.6 C161.1 163.9 160.9 167.6 161.1 170 C161.2 172.5 161.7 174.9 162.1 177.3 C162.6 179.6 163.2 182 163.8 184.3 C164.4 186.7 165 189 165.6 191.4 C166.3 193.7 166.9 196.1 167.6 198.4 C168.2 200.7 168.8 203.1 169.4 205.4 C170 207.8 170.5 210.1 171 212.4 C171.5 214.8 171.9 218.3 172.2 219.5 C172.6 220.6 173 220.6 173 219.5 C172.9 218.3 172.4 214.7 172.1 212.4 C171.8 210 171.6 207.6 171.3 205.3 C171 202.9 170.7 200.5 170.4 198.1 C170 195.7 169.7 193.3 169.3 190.9 C168.9 188.5 168.6 186.1 168.1 183.7 C167.7 181.3 167.3 178.9 166.8 176.5 C166.3 174.1 165.7 171.7 164.9 169.4 C164.1 167.1 162.7 163.6 162.1 162.5 C161.5 161.4 161.4 161.4 161.2 162.6 Z" },
+    deco:{ b:["M161.4 164.4 L162.3 173.5 L164.2 182.4 L166.4 191.3 L168.6 200.1 L170.5 208.9 L172.1 217.8","M162 164.3 L163.7 173.2 L165.6 182.2 L167.5 191.1 L169.3 200 L171 208.9 L172.4 217.8","M162.5 164.2 L165.1 173 L166.9 182 L168.6 191 L170.1 200 L171.4 208.9 L172.6 217.8"] },
+    i:{ a:"Nace en el epicóndilo lateral del húmero (tendón extensor común) y se inserta en la base del 3.er metacarpiano, bajo el radial largo.",
+        f:"Es el extensor de la muñeca más activo en el agarre. Su tendón suele sobrecargarse en el llamado codo de tenista.",
+        m:"Extensión de la muñeca. Se activa en agarres con carga, curls con barra y golpes de raqueta." } },
+  ext_dedos:{ n:"Extensor de los dedos", g:"bra",
+    v:{ b:"M156.3 163.4 C156.1 164.7 156 168.4 156.1 170.9 C156.3 173.3 156.6 175.7 157.2 178.1 C157.7 180.4 158.5 182.7 159.2 185 C159.9 187.4 160.8 189.6 161.6 191.9 C162.4 194.2 163.3 196.5 164.1 198.8 C164.9 201.1 165.8 203.4 166.6 205.7 C167.4 208 168.1 210.2 168.8 212.6 C169.4 214.9 170 218.3 170.5 219.5 C170.9 220.7 171.5 220.7 171.5 219.5 C171.4 218.3 170.7 214.8 170.4 212.5 C170 210.1 169.7 207.8 169.4 205.4 C169 203.1 168.7 200.7 168.3 198.3 C167.9 195.9 167.5 193.6 167 191.2 C166.6 188.8 166.1 186.4 165.5 184.1 C165 181.7 164.5 179.3 163.7 177 C163 174.6 162.1 172.3 161.1 170 C160 167.7 158.3 164.3 157.5 163.2 C156.7 162.1 156.5 162.1 156.3 163.4 Z" },
+    deco:{ b:["M156.6 165.2 L157.7 174.2 L159.9 183.1 L162.7 191.8 L165.5 200.5 L168.2 209.1 L170.4 217.8","M157.3 165 L159.5 173.9 L161.9 182.8 L164.3 191.6 L166.7 200.3 L168.8 209.1 L170.7 217.8","M158 164.9 L161.3 173.6 L163.8 182.5 L165.9 191.3 L167.8 200.2 L169.5 209 L171 217.8"] },
+    i:{ a:"Nace en el epicóndilo lateral del húmero y se divide en cuatro tendones que llegan a la expansión extensora de los dedos 2 a 5.",
+        f:"Equilibra el trabajo de los flexores y abre la mano. Conviene entrenarlo para evitar descompensaciones y molestias en el codo.",
+        m:"Extensión de los dedos y ayuda en la extensión de la muñeca. Se trabaja abriendo la mano contra resistencia (bandas) y se activa al soltar el agarre." } },
+  ext_cubital:{ n:"Extensor cubital del carpo", g:"bra",
+    v:{ b:"M151.7 165.5 C151.5 166.7 151.5 170.4 151.7 172.8 C152 175.2 152.6 177.5 153.2 179.9 C153.8 182.2 154.6 184.4 155.4 186.7 C156.2 188.9 157 191.2 157.8 193.4 C158.7 195.7 159.5 197.9 160.4 200.1 C161.2 202.3 162.1 204.5 162.8 206.8 C163.6 209 164.4 211.2 165 213.5 C165.7 215.7 166.4 219 166.8 220.2 C167.2 221.3 167.7 221.3 167.6 220.2 C167.5 219 166.7 215.6 166.3 213.4 C165.9 211.1 165.4 208.9 165 206.6 C164.6 204.3 164.1 202 163.6 199.7 C163.1 197.4 162.6 195.1 162.1 192.8 C161.6 190.5 161 188.2 160.5 185.9 C159.9 183.6 159.3 181.3 158.6 179 C157.9 176.7 157.2 174.4 156.2 172.1 C155.2 169.8 153.4 166.4 152.7 165.3 C151.9 164.2 151.8 164.2 151.7 165.5 Z" },
+    deco:{ b:["M152 167.2 L153.3 176.2 L155.8 184.8 L158.7 193.3 L161.6 201.7 L164.3 210.1 L166.6 218.5","M152.6 167.1 L154.9 175.9 L157.4 184.6 L160 193.1 L162.5 201.6 L164.8 210.1 L166.8 218.5","M153.2 167 L156.5 175.6 L159 184.3 L161.3 193 L163.4 201.5 L165.3 210.1 L167.1 218.5"] },
+    i:{ a:"Nace en el epicóndilo lateral del húmero y el borde posterior del cúbito. Se inserta en la base del 5.º metacarpiano, del lado del meñique.",
+        f:"Estabiliza la muñeca del lado del meñique, sobre todo al sostener cargas y en golpes con raqueta o martillo.",
+        m:"Extensión de la muñeca y desviación hacia el meñique. Trabaja con carga en agarres, remos y movimientos de martillo." } },
+  // ── Pasada superficial · brazo (Q-6): cabezas del bíceps y del tríceps
+  biceps_larga:{ n:"Bíceps · cabeza larga", g:"sup",
+    v:{ f:"M155.4 119 C160 121.4 163.7 127 165 136 C165 148 160 156 154 156 C155.5 144 156.5 128 155.4 119 Z" },
+    deco:{ f:["M158 120.8 Q157.2 138.4 153.8 155.4","M161.9 125.9 Q159.2 140.9 154 155.4","M164.5 133.4 Q160.5 144.7 154.2 155.4"] },
+    i:{ a:"Cabeza larga (externa) del bíceps braquial. Nace en el tubérculo supraglenoideo de la escápula y su tendón pasa por dentro de la articulación del hombro y por el surco intertubercular. Se une a la cabeza corta en un tendón común que se inserta en la tuberosidad del radio.",
+        f:"Es la cabeza que da el \"pico\" al bíceps. Se estira más cuando el brazo queda por detrás del cuerpo, por eso el curl inclinado la expone bastante.",
+        m:"Flexión del codo, supinación del antebrazo y ayuda en la flexión del hombro. La trabajan los curls, las dominadas con agarre supino y los remos." } },
+  biceps_corta:{ n:"Bíceps · cabeza corta", g:"sup",
+    v:{ f:"M147 118 C149.9 117.3 152.8 117.6 155.4 119 C156.5 128 155.5 144 154 156 C148 148 146 132 147 118 Z" },
+    deco:{ f:["M149.1 118.2 L149 124.8 L149.2 131.7 L149.8 138.5 L150.8 145 L152.2 151 L154 156","M151.6 118.5 L151.7 124.5 L151.9 131 L152.2 137.7 L152.6 144.3 L153.2 150.5 L154 156","M153.7 118.8 L154 124.2 L154.1 130.4 L154.1 136.9 L154.1 143.6 L154 150 L154 156"] },
+    i:{ a:"Cabeza corta (interna) del bíceps braquial. Nace en la apófisis coracoides de la escápula, junto al coracobraquial, y comparte el tendón común con la cabeza larga hasta el radio.",
+        f:"Con el brazo por delante del cuerpo (curl predicador) queda más expuesta y la larga trabaja con menos estiramiento. Aporta grosor a la cara interna del brazo.",
+        m:"Flexión del codo, supinación del antebrazo y aducción del hombro. La trabajan los curls con apoyo, las dominadas supinas y los remos con agarre supino." } },
+  triceps_larga:{ n:"Tríceps · cabeza larga", g:"sup",
+    v:{ b:"M147 112 C151 110 155.2 111 158.6 114.8 C156 126 155 143 154 156 C148 146 146 128 147 112 Z" },
+    deco:{ b:["M149.9 112.7 L149.4 120.3 L149.4 128.1 L149.8 135.9 L150.7 143.3 L152.1 150.1 L154 156","M153.4 113.5 L152.6 120.5 L152.2 127.9 L152.2 135.4 L152.5 142.8 L153.1 149.7 L154 156","M156.3 114.2 L155.3 120.7 L154.6 127.7 L154.1 135 L153.9 142.4 L153.9 149.4 L154 156"] },
+    i:{ a:"Cabeza larga del tríceps braquial, interna y la única que cruza el hombro. Nace en el tubérculo infraglenoideo de la escápula, pasa entre el redondo menor y el mayor y se inserta en el olécranon del cúbito por el tendón común.",
+        f:"Como cruza dos articulaciones, trabaja más estirada cuando el brazo está sobre la cabeza. Es la porción más voluminosa y la que más crece con extensiones por encima de la cabeza.",
+        m:"Extensión del codo y, además, extensión y aducción del hombro. La trabajan el press francés, las extensiones sobre la cabeza y los fondos." } },
+  triceps_lat:{ n:"Tríceps · cabeza lateral", g:"sup",
+    v:{ b:"M158.6 114.8 C162 118.5 164.5 125 165 134 C165 148 160 156 154 156 C155 143 156 126 158.6 114.8 Z" },
+    deco:{ b:["M160.5 117.3 Q158.5 136.7 153.8 155.4","M163.2 123.4 Q159.8 139.7 154 155.4","M164.8 131.4 Q160.6 143.7 154.2 155.4"] },
+    i:{ a:"Cabeza lateral del tríceps braquial, externa. Nace en la cara posterior del húmero, por encima del surco del nervio radial, y se une al tendón común del olécranon. Es la que dibuja la herradura externa del brazo.",
+        f:"Es la cabeza más potente. Responde bien a empujes con codos cerca del cuerpo y a cargas pesadas.",
+        m:"Extensión del codo. La trabajan los jalones de tríceps en polea, el press de agarre cerrado, los fondos y las flexiones." } },
+  triceps_medial:{ n:"Tríceps · cabeza medial", g:"sup", l:"d",
+    v:{ b:"M150.5 137 C154 134 159 137 160 145 C159 152 156 156 153 156.5 C150.5 150 150 143 150.5 137 Z" },
+    deco:{ b:["M152 139 C152.5 146 153 151 153.5 155","M155 138 C155.5 145 155 151 154 155.5","M158 141 C157.5 147 156 152 154.5 155.5"] },
+    i:{ a:"Cabeza medial (profunda) del tríceps braquial. Nace en la cara posterior del húmero, por debajo del surco radial, y queda tapada casi toda por las otras dos cabezas; solo asoma cerca del codo.",
+        f:"Participa en casi toda extensión del codo, sobre todo con cargas livianas y movimientos controlados, y no depende de la posición del hombro.",
+        m:"Extensión del codo. Interviene en todos los ejercicios de tríceps, desde extensiones hasta flexiones y fondos." } },
+  // ── Pasada superficial · deltoides (Q-6): tres haces
+  deltoides_ant:{ n:"Deltoides · haz anterior", g:"sup",
+    v:{ f:"M136 76 C141 74.6 146 74.9 150.3 76.9 C152.5 92 152 103 154 112 C148 100 140 92 134 90 Z" },
+    deco:{ f:["M138 78 C142 90 147 102 153.5 111","M141.5 76.5 C145 88 150 100 153.5 111","M146 75.5 C148.5 87 151.5 99 153.5 111","M137.5 85 C142.5 93 148 103 153.5 111"] },
+    i:{ a:"Haz anterior (clavicular) del deltoides. Nace en el tercio externo de la clavícula y se inserta en la tuberosidad deltoidea del húmero. Sus fibras son largas y casi paralelas, y quedan junto a la porción clavicular del pectoral.",
+        f:"Trabaja en casi todos los empujes, así que suele recibir más estímulo que los otros dos haces. Muchas veces no necesita aislamiento extra si ya se hace press de pecho y press sobre la cabeza.",
+        m:"Flexión del hombro, rotación interna y aducción horizontal. Lo trabajan las elevaciones frontales, el press sobre la cabeza, el press inclinado y las flexiones." } },
+  deltoides_lat:{ n:"Deltoides · haz lateral", g:"sup",
+    v:{ f:"M150.3 76.9 C157.9 80.5 163.7 89.2 165 102 C165 114 158 120 154 112 C152 103 152.5 92 150.3 76.9 Z", b:"M150.3 76.9 C157.9 80.5 163.7 89.2 165 102 C165 114 158 120 154 112 C152 103 152.5 92 150.3 76.9 Z" },
+    deco:{ f:["M160.5 80.5 L152.8 86","M163 87 L152.4 94","M164.5 94.5 L152.4 101","M164.8 101 L153 107","M163 107 L153.8 110.5"], b:["M160.5 80.5 L152.8 86","M163 87 L152.4 94","M164.5 94.5 L152.4 101","M164.8 101 L153 107","M163 107 L153.8 110.5"] },
+    i:{ a:"Haz lateral (medio) del deltoides. Nace en el acromion y se inserta en la tuberosidad deltoidea del húmero. Es multipenado: sus fibras cortas y oblicuas convergen en tendones internos, y es el que da el ancho al hombro visto de frente.",
+        f:"La disposición multipenada le da mucha fuerza para su tamaño pero un recorrido corto. Responde bien a trabajo con volumen moderado y tensión constante.",
+        m:"Abducción del hombro (separar el brazo del cuerpo). Lo trabajan las elevaciones laterales y, junto al haz anterior, el press sobre la cabeza." } },
+  deltoides_post:{ n:"Deltoides · haz posterior", g:"sup",
+    v:{ b:"M136 76 C141 74.6 146 74.9 150.3 76.9 C152.5 92 152 103 154 112 C148 100 140 92 134 90 Z" },
+    deco:{ b:["M138 78 C142 90 147 102 153.5 111","M141.5 76.5 C145 88 150 100 153.5 111","M146 75.5 C148.5 87 151.5 99 153.5 111","M137.5 85 C142.5 93 148 103 153.5 111"] },
+    i:{ a:"Haz posterior del deltoides. Nace en el labio inferior de la espina de la escápula y se inserta en la tuberosidad deltoidea del húmero. Se ve desde atrás, junto al infraespinoso y el redondo menor.",
+        f:"Suele ser el haz más rezagado, porque casi no participa en los empujes. Conviene trabajarlo con jalones y remos o con aislamiento, con cargas livianas y buena técnica.",
+        m:"Extensión del hombro, abducción horizontal y ayuda en la rotación externa. Lo trabajan las aperturas posteriores, los remos con codos abiertos y el face pull." } },
+  recto_femoral:{ n:"Cuádriceps · recto femoral", g:"inf",
+    v:{ f:"M113 241 C119 238 123.4 243 123.4 256 C123.4 284 121.4 308 118.6 326 L113.6 326 C111 300 111 270 113 241 Z" },
+    deco:{ f:["M117.2 243 L117.2 322", "M121.8 250 L117.2 256", "M112.6 250 L117.2 256", "M121.8 259 L117.2 265", "M112.6 259 L117.2 265", "M121.8 268 L117.2 274", "M112.6 268 L117.2 274", "M121.8 277 L117.2 283", "M112.6 277 L117.2 283", "M121.8 286 L117.2 292", "M112.6 286 L117.2 292", "M121.8 295 L117.2 301", "M112.6 295 L117.2 301", "M121.8 304 L117.2 310", "M112.6 304 L117.2 310"] },
+    i:{ a:"Porción central y superficial del cuádriceps, de fibras bipenadas (en forma de pluma). Nace en la espina ilíaca anteroinferior y el borde del acetábulo, y se inserta en la rótula y, por el tendón rotuliano, en la tuberosidad de la tibia.",
+        f:"Es el único de los cuatro que cruza la cadera además de la rodilla, por eso se estira más con la cadera extendida y se acorta con las posturas sentadas. Predominan las fibras rápidas.",
+        m:"Extiende la rodilla y flexiona la cadera. Trabaja fuerte en sprints, patadas y elevaciones de rodilla al pecho; en las sentadillas y búlgaras colabora, pero con la cadera flexionada pierde parte de su eficacia." } },
+  vasto_lateral:{ n:"Cuádriceps · vasto lateral", g:"inf",
+    v:{ f:"M122.6 247 C127 240.6 131.2 246 131.6 257 C132.4 285 129.6 311 125.6 328 L118.6 326.4 C121.6 306 123.6 282 122.6 247 Z" },
+    deco:{ f:["M130.6 254 L123.4 263", "M130.6 264 L123.4 273", "M130.6 274 L123.4 283", "M130.6 284 L123.4 293", "M130.6 294 L123.4 303", "M130.6 304 L123.4 313"] },
+    i:{ a:"Es el más voluminoso de los cuatro y da el ancho a la cara externa del muslo. Nace en el trocánter mayor y la línea áspera del fémur, y se inserta en la rótula y el tendón rotuliano.",
+        f:"Gran capacidad de producir fuerza; soporta buena parte de la carga en las sentadillas. Suele dominar sobre el vasto medial si la rodilla se cierra hacia adentro.",
+        m:"Extensión de rodilla y tracción lateral de la rótula. Lo exigen las sentadillas, búlgaras, zancadas y sprints; en los desplantes con el pie ligeramente rotado hacia afuera suele participar más." } },
+  vasto_medial:{ n:"Cuádriceps · vasto medial", g:"inf",
+    v:{ f:"M106.4 268 C107.4 256 111.6 249.6 113.4 255 C112.2 280 114.6 306 118.6 326.4 L109.4 327.6 C105.8 310 105 288 106.4 268 Z" },
+    deco:{ f:["M107 268 L113.6 278", "M107 277 L113.6 287", "M107 286 L113.6 296", "M107 295 L113.6 305", "M107 304 L113.6 314"] },
+    i:{ a:"Forma la 'gota' interna del muslo, cerca de la rodilla. Nace en la línea áspera y la línea intertrocantérea del fémur y se inserta en la rótula (sus fibras bajas se llaman oblicuo del vasto medial).",
+        f:"Sus fibras bajas son las que más se activan en los últimos grados de extensión de la rodilla y ayudan a mantener la rótula centrada. Se debilita rápido si se evita el rango completo.",
+        m:"Extensión de rodilla y estabilización medial de la rótula. Se carga mucho en las sentadillas profundas, las búlgaras y los step-ups, sobre todo al estirar del todo la rodilla al subir." } },
+  vasto_intermedio:{ n:"Cuádriceps · vasto intermedio", g:"inf", l:"d",
+    v:{ f:"M112.6 250 C117.4 248 121.6 250.4 122 258 C122.2 282 120 306 118 322 L113.2 322 C111 300 111 272 112.6 250 Z" },
+    i:{ a:"Porción profunda del cuádriceps, tapada por el recto femoral. Nace en la cara anterior y lateral del fémur y se inserta en la rótula y el tendón rotuliano.",
+        f:"Trabaja casi siempre que se extiende la rodilla, incluso con poca carga; es un motor de resistencia y fuerza que no se ve desde afuera.",
+        m:"Extensión de rodilla pura, sin intervenir en la cadera. Lo cargan las sentadillas, las prensas y las extensiones aisladas, sobre todo con la cadera flexionada, cuando el recto femoral queda en desventaja." } },
+  biceps_femoral:{ n:"Isquiotibiales · bíceps femoral", g:"inf",
+    v:{ b:"M116 262 C122 258 128 260 129.4 270 C130.4 296 127.4 320 124.4 332 L117 332 C118 308 117.6 284 116 262 Z" },
+    deco:{ b:["M128.6 266 L118 275", "M128.6 276 L118 285", "M128.6 286 L118 295", "M128.6 296 L118 305", "M128.6 306 L118 315", "M128.6 316 L118 325"] },
+    i:{ a:"Músculo lateral de la cara posterior del muslo, con dos cabezas: la larga nace en la tuberosidad isquiática y la corta en la línea áspera del fémur. Se inserta en la cabeza del peroné.",
+        f:"La cabeza larga cruza cadera y rodilla; la corta solo la rodilla. Es el isquiotibial más lesionado en sprints, sobre todo al frenar la pierna en el balanceo final.",
+        m:"Flexiona la rodilla, extiende la cadera y rota la pierna hacia afuera. Lo trabajan el peso muerto, los puentes, el curl de pierna y los sprints." } },
+  semitendinoso:{ n:"Isquiotibiales · semitendinoso", g:"inf",
+    v:{ b:"M108.6 260 C112 260 115.6 261 116.4 264 C118 288 117.6 312 116.6 332 L110 332 C108 306 107.6 282 108.6 260 Z" },
+    deco:{ b:["M112.4 263 L112.8 300", "M110.4 266 L110.8 296", "M114.4 266 L114.6 296"] },
+    i:{ a:"Músculo superficial interno de la parte posterior del muslo, con un tendón largo en su mitad inferior. Nace en la tuberosidad isquiática y se inserta en la cara interna de la tibia (pata de ganso).",
+        f:"Predominan las fibras rápidas. Aguanta bien el trabajo excéntrico, pero se tensa con facilidad si hay poca elongación.",
+        m:"Flexiona la rodilla, extiende la cadera y rota la pierna hacia adentro. Lo trabajan el peso muerto rumano, los puentes y las flexiones de rodilla con tobillera." } },
+  semimembranoso:{ n:"Isquiotibiales · semimembranoso", g:"inf", l:"d",
+    v:{ b:"M103 258 C106 258 108.6 259 108.6 262 C108.2 290 110 312 110.4 332 L106 332 C104 304 102.4 282 103 258 Z" },
+    deco:{ b:["M104.8 262 L106.6 300", "M106.8 262 L108 296"] },
+    i:{ a:"Porción más profunda e interna de los isquiotibiales, tapada en parte por el semitendinoso. Nace en la tuberosidad isquiática y se inserta en la cara posterior del cóndilo medial de la tibia.",
+        f:"Es el isquiotibial más voluminoso y fuerte para extender la cadera; con el semitendinoso forma la pared medial de la corva.",
+        m:"Extiende la cadera, flexiona la rodilla y rota la pierna hacia adentro. Se carga en el peso muerto, las sentadillas profundas y los puentes." } },
+  frontal:{ n:"Frontal (frente)", g:"cab",
+    v:{ "f": "M100 10.6 C104.4 10.6 108.8 11.6 111 14.6 C112.2 17 111.6 20 110 22.4 C106.4 20.6 103 20.4 100 20.6 Z" },
+    deco:{ "f": ["M104 11.6 L104 20", "M107.6 12.6 L107.8 20.6", "M110 15.4 L109.8 21.6"] },
+    i:{ a:"Vientre frontal del músculo occipitofrontal: una lámina fina sobre la frente. Nace en la galea aponeurótica (el casquete del cráneo) y se inserta en la piel de las cejas y la raíz de la nariz.",
+        f:"Músculo cutáneo de contracción fina y rápida, sin gran capacidad de fuerza. Se fatiga con la tensión sostenida (ceño levantado), algo común con el estrés o con la concentración visual.",
+        m:"Eleva las cejas y arruga la frente. No interviene en el movimiento de la cabeza; en el entrenamiento solo se activa por gestos o tensión facial al esforzarse." } },
+  temporal:{ n:"Temporal", g:"cab",
+    v:{ "f": "M112.4 16.6 C116.6 17.6 119 24 118.6 31 C117 32.2 115.2 32.6 113.8 32.2 C114.4 27 113.4 21.4 112.4 16.6 Z" },
+    deco:{ "f": ["M113 18 L117.4 28", "M113.4 22 L117.8 30", "M113.8 26.4 L117 31"] },
+    i:{ a:"Músculo en abanico sobre la sien. Nace en la fosa temporal y se inserta en la apófisis coronoides de la mandíbula, pasando por debajo del arco cigomático.",
+        f:"Fibras de contracción lenta y resistente, pensadas para sostener el cierre de la boca durante la masticación. Es el músculo que se carga al apretar los dientes con fuerza.",
+        m:"Cierra la mandíbula (elevación) y retrae la mandíbula hacia atrás. En esfuerzos máximos suele activarse de forma involuntaria al apretar la mandíbula." } },
+  orbicular_ojos:{ n:"Orbicular de los ojos", g:"cab",
+    v:{ "f": "M102.4 26.6 C104.6 23.6 110.2 23.6 112.8 26.4 C114 28.6 112.6 32 109.6 32.6 C105.6 33 102 31 102.4 26.6 Z" },
+    deco:{ "f": ["M103.6 27.8 C105 25.6 110.4 25.4 111.8 27.8", "M104.4 30.6 C106.4 32 109.6 31.8 111.2 30"] },
+    i:{ a:"Músculo circular que rodea el ojo. Nace en el hueso frontal y la apófisis del maxilar, y se inserta en la piel del párpado y de la ceja.",
+        f:"Músculo de contracción rápida y fina, de gran resistencia a la fatiga; parpadea miles de veces por día sin cansarse.",
+        m:"Cierra el párpado (parpadeo) y protege el ojo. Al hacer esfuerzo máximo se cierra con fuerza de forma refleja, junto con el ceño." } },
+  masetero:{ n:"Masetero", g:"cab",
+    v:{ "f": "M110.4 34 C113.6 33.2 116.8 34.8 117 38.4 C117 42.6 114.8 45.6 112 47 C110.2 44.4 109.4 39 110.4 34 Z" },
+    deco:{ "f": ["M111.8 35.4 L116.4 44.6", "M113.8 34.6 L117 41.6", "M110.6 40 L113.4 48.6"] },
+    i:{ a:"El músculo masticador más potente por su tamaño. Nace en el arco cigomático y se inserta en el ángulo y la rama de la mandíbula.",
+        f:"Capaz de generar mucha fuerza en el cierre de la boca; con fibras rápidas y lentas. Se hipertrofia con la masticación dura y se tensa mucho con el bruxismo y el estrés.",
+        m:"Eleva la mandíbula (cierra la boca) y participa en el movimiento lateral. Al apretar la mandíbula durante un esfuerzo fuerte, se activa junto con el temporal." } },
+  orbicular_boca:{ n:"Orbicular de la boca", g:"cab",
+    v:{ "f": "M100 42.4 C103.8 41.4 107.8 42.2 109.6 44.4 C107.8 47 103.8 47.4 100 47 Z" },
+    deco:{ "f": ["M101 44.6 L108.6 44.4", "M101.4 46.2 L107.4 46"] },
+    i:{ a:"Músculo circular de los labios. Se forma por fibras de varios músculos faciales que se entrecruzan, e inserta en la piel y la mucosa de los labios.",
+        f:"Fibras lentas y resistentes, con gran control fino. Se fatiga poco.",
+        m:"Cierra y protruye los labios, y participa en el habla, el soplo y la succión. Al hacer fuerza con respiración controlada, ayuda a regular la salida del aire." } },
+  occipital:{ n:"Occipital (nuca)", g:"cab",
+    v:{ "b": "M100 13.6 C108 12.4 116.4 18 117.6 28 C112.4 31.2 106 32.2 100 32 Z" },
+    deco:{ "b": ["M102 15 C108 14 113 18 114.8 26", "M102 20 C107 19 111.4 22 112.6 29.4", "M102 25.4 C106 25 109.8 26.4 111 30.4"] },
+    i:{ a:"Vientre occipital del músculo occipitofrontal. Nace en la línea nucal superior del hueso occipital y se une a la galea aponeurótica del cráneo.",
+        f:"Músculo cutáneo fino, sin función de fuerza, que tira de la galea hacia atrás; suele tensarse junto con el cuello al mantener la cabeza hacia adelante.",
+        m:"Tira del cuero cabelludo hacia atrás. Se relaciona con la tensión de la nuca y con dolores de cabeza por postura mantenida." } },
+  extensores_pie:{ n:"Extensores del pie (dorso)", g:"inf",
+    v:{ "f": "M109 431 C114 430 119 433 122 439 C125 443 126.4 448 125 452 L110 452.4 C107.8 446 107.6 436 109 431 Z" },
+    deco:{ "f": ["M113.6 433 L111 451", "M116.6 434 L116.4 451.6", "M119.6 436 L121.6 451", "M122 440 L124 450"] },
+    i:{ a:"Extensor largo de los dedos, extensor largo del dedo gordo y extensor corto de los dedos. Los largos nacen en la pierna y el corto en el calcáneo; todos se insertan en las falanges de los dedos.",
+        f:"Fibras lentas y resistentes a la fatiga, que trabajan casi sin parar al caminar y correr para evitar que los dedos arrastren.",
+        m:"Extienden los dedos y ayudan a levantar la punta del pie junto al tibial anterior. Participan al despegar y al apoyar el pie en carreras, saltos y equilibrios." } },
+  plantares_pie:{ n:"Plantares del pie (arco)", g:"inf",
+    v:{ "b": "M108 436 C113 434 119 436 122 441 C125 445 126 449 124.6 452.6 L109 452.8 C106.6 448 106.6 440 108 436 Z" },
+    deco:{ "b": ["M111 438 L110.6 452", "M115 437 L115 452.4", "M119 439 L121 452"] },
+    i:{ a:"Músculos intrínsecos de la planta: abductor del dedo gordo, flexor corto de los dedos y abductor del dedo meñique, entre otros. Nacen en el calcáneo y se insertan en los dedos. Están por debajo del pie, por eso se ven como capa profunda.",
+        f:"Fibras lentas y resistentes a la fatiga. Sostienen el arco y absorben carga al apoyar; se atrofian con el calzado muy amortiguado y se fortalecen caminando descalzo o con ejercicios de pie corto.",
+        m:"Sostienen el arco longitudinal, estabilizan el pie y flexionan los dedos. Los trabajan el pie corto, las caminatas de puntillas y los saltos, y refuerzan el apoyo en sentadillas y desplantes." } },
   trapecio_sup:{ n:"Trapecio superior", g:"sup",
     v:{ b:"M100 52 L108 62 C122 66 134 72 138 78 C128 80 114 84 100 84 Z" },
     deco:{ b:["M101 58 C112 66 124 74 136 78","M101 66 C112 72 122 78 130 80"] },
@@ -8925,30 +9438,32 @@ const ANAT_DECO = {
 };
 // Reglas automáticas (sobre el nombre normalizado). Se suman todas las que coincidan.
 const ANAT_RULES = [
-  [/flexion(es)?\b|push.?up/, ["pectoral","triceps","deltoides"], ["serrato","abdominales"]],
+  [/flexion(es)?\b|push.?up/, ["pectoral","triceps","deltoides_ant"], ["serrato","abdominales"]],
   [/press de (banca|pecho)|banca plana|apertura/, ["pectoral"], ["triceps","deltoides","serrato"]],
-  [/\bpress\b(?! de (banca|pecho))/, ["deltoides","triceps"], ["trapecio","serrato"]],
-  [/elevaci(on|ones) frontal/, ["deltoides"], ["trapecio","serrato","pectoral"]],
-  [/elevaci(on|ones) lateral/, ["deltoides"], ["trapecio"]],
+  [/\bpress\b(?! de (banca|pecho)| frances)/, ["deltoides_ant","deltoides_lat","triceps"], ["trapecio","serrato"]],
+  [/elevaci(on|ones) frontal/, ["deltoides_ant"], ["trapecio","serrato","pectoral"]],
+  [/elevaci(on|ones) lateral/, ["deltoides_lat"], ["trapecio"]],
   [/gluteo medio|abduccion/, ["gluteo_medio"], ["gluteo_mayor","oblicuos"]],
   [/bulgara|zancada|desplante|lunge|step.?up/, ["cuadriceps","gluteo_mayor"], ["isquiotibiales","aductores","gluteo_medio","pantorrilla"]],
   [/peso muerto/, ["gluteo_mayor","isquiotibiales","erectores"], ["dorsal","trapecio","antebrazo","cuadriceps","abdominales"]],
   [/sentadilla|squat|goblet/, ["cuadriceps","gluteo_mayor"], ["isquiotibiales","aductores","erectores","abdominales","pantorrilla"]],
-  [/salto|jump|pliom/, ["cuadriceps","gluteo_mayor","pantorrilla"], ["isquiotibiales","tibial","abdominales"]],
-  [/jack/, ["pantorrilla","gluteo_medio","deltoides"], ["aductores","cuadriceps","trapecio"]],
+  [/salto|jump|pliom/, ["cuadriceps","gluteo_mayor","pantorrilla"], ["isquiotibiales","tibial","abdominales","plantares_pie"]],
+  [/jack/, ["pantorrilla","gluteo_medio","deltoides_lat"], ["aductores","cuadriceps","trapecio"]],
   [/mountain/, ["abdominales","flexores_cadera"], ["deltoides","pectoral","triceps","cuadriceps","serrato"]],
   [/sprint|carrera|correr/, ["cuadriceps","isquiotibiales","gluteo_mayor","pantorrilla"], ["flexores_cadera","abdominales","tibial"]],
-  [/dominada|pull.?up|chin.?up|jalon/, ["dorsal","biceps"], ["espalda_media","trapecio","antebrazo","abdominales","deltoides"]],
-  [/colgada|descompresion/, ["antebrazo","dorsal"], ["deltoides","trapecio","abdominales","serrato"]],
-  [/remo/, ["dorsal","espalda_media"], ["biceps","deltoides","trapecio","erectores","antebrazo"]],
+  [/dominada|pull.?up|chin.?up|jalon/, ["dorsal","biceps"], ["espalda_media","trapecio","antebrazo","abdominales","deltoides_post"]],
+  [/colgada|descompresion/, ["flexores_antebrazo","dorsal"], ["extensores_antebrazo","braquiorradial","deltoides","trapecio","abdominales","serrato"]],
+  [/remo/, ["dorsal","espalda_media"], ["biceps","deltoides_post","trapecio","erectores","antebrazo"]],
   [/triceps|fondos/, ["triceps"], ["deltoides"]],
+  [/press frances|rompecraneos|skull/, ["triceps"], []],
   [/curl|biceps|martillo/, ["biceps"], ["antebrazo"]],
   [/elevacion(es)? de piernas|leg raise/, ["flexores_cadera","abdominales"], ["antebrazo","oblicuos"]],
   [/crunch inverso/, ["abdominales"], ["flexores_cadera","oblicuos"]],
   [/hollow|dead.?bug/, ["abdominales"], ["oblicuos","flexores_cadera"]],
   [/crunch oblicuo|oblicuo/, ["oblicuos"], ["abdominales"]],
   [/crunch|abdominal/, ["abdominales"], ["oblicuos"]],
-  [/plantar|gemelo|pantorrilla|calf/, ["pantorrilla"], ["tibial"]],
+  [/pie corto|short foot|arco del pie|dedos del pie|toe/, ["plantares_pie"], ["tibial","extensores_pie"]],
+  [/plantar|gemelo|pantorrilla|calf/, ["pantorrilla"], ["tibial","plantares_pie"]],
   [/plancha|plank/, ["abdominales"], ["oblicuos","deltoides","serrato","gluteo_mayor"]],
   [/puente|hip.?thrust|elevacion de cadera/, ["gluteo_mayor"], ["isquiotibiales"]]
 ];
@@ -9100,7 +9615,7 @@ function anatPaint(root, auto){
   } else body.innerHTML = `<p class="anat-none">Tocá un músculo del dibujo o de la lista para ver su información.</p>`;
   if(root.dataset.mode === "tab"){
     const lst = root.querySelector(".anat-exlist"); let h = "";
-    ["rutinaA","rutinaB"].forEach(r=>{ const arr = (STATE[r] && STATE[r].exercises) || []; h += `<div class="anat-exgrp">${r === "rutinaA" ? "Rutina A" : "Rutina B"}</div>`;
+    ["rutinaA","rutinaB"].forEach(r=>{ const arr = (STATE[r] && STATE[r].exercises) || []; h += `<div class="anat-exgrp">${r === "rutinaA" ? rutinaNombre("A") : rutinaNombre("B")}</div>`;
       arr.forEach((ex, i)=>{ h += `<button type="button" class="anat-exbtn ${act && act.r === r && act.idx === i ? "on" : ""}" data-ex="${r}:${i}">${escapeHtml(ex.nombre || "Sin nombre")}</button>`; }); });
     lst.innerHTML = h;
   }
@@ -9250,7 +9765,7 @@ function anatInit(){
   anatRenderTab(); anatInitUI(); anatSync();
 }
 function renderAnatSettingsSection(){
-  const a = anatState(), names = { muro:"Muro", rutinaA:"Rutina A", rutinaB:"Rutina B", calentamiento:"Calentamiento / Enfriamiento", tecnica:"Técnica y prioridades", biblioteca:"Biblioteca", registro:"Registro diario", semanal:"Conclusiones semanales" };
+  const a = anatState(), names = { muro:"Muro", rutinaA:rutinaNombre("A"), rutinaB:rutinaNombre("B"), calentamiento:"Calentamiento / Enfriamiento", tecnica:"Técnica y prioridades", biblioteca:"Biblioteca", registro:"Registro diario", semanal:"Conclusiones semanales" };
   return `<div class="settings-section">
     <div class="settings-section-head"><h2>Panel de anatomía</h2></div>
     <div class="settings-row"><span class="settings-row-label" style="max-width:100%; font-size:11px; color:var(--text-dim); font-weight:400">Elegí en qué pestañas aparece el botón flotante del panel con el modelo anatómico (se abre y se cierra desde ese botón).</span></div>
@@ -9261,6 +9776,7 @@ function settingsToggleAnat(v){ const a = anatState(); a.tabs[v] = !a.tabs[v]; s
 // <<ANAT-END>>
 function renderAll(){
   applyCustomFases();
+  rutinaApplyNames();
   document.getElementById("startDate").textContent = STATE.meta.startDate;
   document.getElementById("cycleName").textContent = STATE.meta.cycleName;
   document.getElementById("lastUpdate").textContent = STATE.meta.lastUpdate || "—";
@@ -10934,6 +11450,204 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   if(!("serviceWorker" in navigator) || !/^https?:$/.test(location.protocol)) return;
   window.addEventListener("load", function(){
     navigator.serviceWorker.register("sw.js").catch(function(e){ console.warn("Service worker no registrado", e); });
+  });
+})();
+</script>
+<script>
+// ============================================================
+// Calculadora (Q-2, Q-3, Q-4): teclado + entrenamiento (reps / Time Work / reps por segundo) + tabla de unidades
+// ============================================================
+const CALC_UNITS = {
+  peso:   { label:"Peso",    base:"kg", units:[["kg",1],["g",0.001],["lb",0.45359237],["oz",0.028349523125]] },
+  tiempo: { label:"Tiempo",  base:"s",  units:[["ms",0.001],["s",1],["min",60],["h",3600]] },
+  long:   { label:"Longitud",base:"m",  units:[["mm",0.001],["cm",0.01],["m",1],["km",1000],["in",0.0254],["ft",0.3048],["yd",0.9144]] },
+  ritmo:  { label:"Ritmo (BPM)", base:"BPM", units:[["BPM",null],["Hz (beats/s)",null],["s por beat",null]] }
+};
+const _CALC = { expr:"", done:false, cat:"peso", from:"kg", val:"1" };
+function calcFmt(n){
+  if(!isFinite(n)) return "Error";
+  const a = Math.abs(n);
+  if(a !== 0 && (a >= 1e12 || a < 1e-6)) return n.toExponential(4).replace(/\.?0+e/, "e");
+  return String(parseFloat(n.toPrecision(10)));
+}
+function calcEval(src){
+  const s = String(src).replace(/×/g,"*").replace(/÷/g,"/").replace(/−/g,"-").replace(/,/g,".").replace(/\s+/g,"");
+  let i = 0;
+  function num(){
+    const m = s.slice(i).match(/^\d*\.?\d+(?:e[+-]?\d+)?|^\d+\.?/i);
+    if(!m) throw new Error("num");
+    i += m[0].length; return parseFloat(m[0]);
+  }
+  function prim(){
+    let v;
+    if(s[i] === "("){ i++; v = expr(); if(s[i] !== ")") throw new Error("par"); i++; }
+    else v = num();
+    while(s[i] === "%"){ v /= 100; i++; }
+    return v;
+  }
+  function unary(){
+    if(s[i] === "-"){ i++; return -unary(); }
+    if(s[i] === "+"){ i++; return unary(); }
+    return prim();
+  }
+  function term(){
+    let v = unary();
+    while(s[i] === "*" || s[i] === "/"){ const o = s[i++]; const r = unary(); v = o === "*" ? v*r : v/r; }
+    return v;
+  }
+  function expr(){
+    let v = term();
+    while(s[i] === "+" || s[i] === "-"){ const o = s[i++]; const r = term(); v = o === "+" ? v+r : v-r; }
+    return v;
+  }
+  if(!s) return null;
+  const out = expr();
+  if(i < s.length) throw new Error("fin");
+  return out;
+}
+function calcPreview(){
+  try{ const v = calcEval(_CALC.expr); return v == null ? "0" : calcFmt(v); }catch(e){ return null; }
+}
+function calcRender(){
+  const ex = document.getElementById("calcExpr"), rs = document.getElementById("calcRes");
+  if(!ex || !rs) return;
+  ex.textContent = _CALC.expr || " ";
+  const p = calcPreview();
+  rs.textContent = p == null ? (_CALC.expr ? "…" : "0") : p;
+}
+function calcPress(k){
+  if(k === "C"){ _CALC.expr = ""; _CALC.done = false; }
+  else if(k === "⌫"){ _CALC.expr = _CALC.expr.slice(0,-1); _CALC.done = false; }
+  else if(k === "="){
+    const p = calcPreview();
+    if(p != null && _CALC.expr){ _CALC.expr = p === "Error" ? "" : p; _CALC.done = true; }
+  } else {
+    const isOp = /^[+\-×÷%)]$/.test(k);
+    if(_CALC.done && !isOp) _CALC.expr = "";
+    _CALC.done = false;
+    if(/^[+×÷]$/.test(k) && !_CALC.expr) return;
+    if(/^[+\-×÷]$/.test(k) && /[+\-×÷]$/.test(_CALC.expr)) _CALC.expr = _CALC.expr.slice(0,-1);
+    _CALC.expr += k;
+  }
+  calcRender();
+}
+function calcInsertNumber(txt){
+  const n = String(txt).replace(/,/g, ".");
+  if(_CALC.done || !_CALC.expr) _CALC.expr = n;
+  else if(/[\d.]$/.test(_CALC.expr)) _CALC.expr = _CALC.expr.replace(/[\d.]+$/, n);
+  else _CALC.expr += n;
+  _CALC.done = false; calcRender();
+}
+function calcToBase(cat, unit, v){
+  if(cat !== "ritmo"){ const u = CALC_UNITS[cat].units.find(x => x[0] === unit); return v * u[1]; }
+  if(unit === "BPM") return v;
+  if(unit === "Hz (beats/s)") return v * 60;
+  return v ? 60 / v : NaN; // s por beat
+}
+function calcFromBase(cat, unit, b){
+  if(cat !== "ritmo"){ const u = CALC_UNITS[cat].units.find(x => x[0] === unit); return b / u[1]; }
+  if(unit === "BPM") return b;
+  if(unit === "Hz (beats/s)") return b / 60;
+  return b ? 60 / b : NaN;
+}
+function calcRenderUnits(){
+  const c = CALC_UNITS[_CALC.cat];
+  const cats = document.getElementById("calcCats"), sel = document.getElementById("calcFrom"), tb = document.getElementById("calcUnitsTbl");
+  if(!cats || !sel || !tb) return;
+  cats.innerHTML = Object.keys(CALC_UNITS).map(k => `<button type="button" class="calc-cat${k === _CALC.cat ? " on" : ""}" onclick="calcSetCat('${k}')">${CALC_UNITS[k].label}</button>`).join("");
+  sel.innerHTML = c.units.map(u => `<option value="${u[0]}"${u[0] === _CALC.from ? " selected" : ""}>${u[0]}</option>`).join("");
+  const v = parseFloat(String(_CALC.val).replace(",", "."));
+  if(!isFinite(v)){ tb.innerHTML = `<tr><td colspan="2">Escribí un número</td></tr>`; return; }
+  const b = calcToBase(_CALC.cat, _CALC.from, v);
+  tb.innerHTML = c.units.map(u => { const r = calcFmt(calcFromBase(_CALC.cat, u[0], b)); return `<tr class="${u[0] === _CALC.from ? "src" : ""}" onclick="calcInsertNumber('${r}')" title="Clic: pasar a la calculadora"><td>${u[0]}</td><td>${r}</td></tr>`; }).join("");
+}
+function calcSetCat(k){ _CALC.cat = k; _CALC.from = CALC_UNITS[k].units[0][0]; calcRenderUnits(); }
+function calcUnitInput(){
+  _CALC.val = document.getElementById("calcVal").value;
+  _CALC.from = document.getElementById("calcFrom").value;
+  calcRenderUnits();
+}
+function calcTrainParse(){
+  const g = id => String(document.getElementById(id).value || "").trim().replace(",", ".");
+  const bpm = parseFloat(g("calcBpm")), win = parseFloat(g("calcWin")) || 1;
+  const parts = g("calcTempo").split("/")[0].split(/[-–—]/).map(x => x.trim());
+  let sum = 0, okT = parts.length >= 2;
+  for(const p of parts){ if(/^\d+(\.\d+)?$/.test(p)) sum += parseFloat(p); else okT = false; }
+  const reps = parseFloat(g("calcReps")), tw = parseFloat(g("calcTw"));
+  return { bpm, win, sum, okT, reps, tw };
+}
+function calcTrain(){
+  const el = document.getElementById("calcOuts"); if(!el) return;
+  const t = calcTrainParse(), rows = [];
+  if(t.bpm > 0 && t.okT && t.sum > 0){
+    const spr = t.sum * 60 / t.bpm;
+    rows.push(["Segundos por rep", calcFmt(spr) + " s"]);
+    rows.push(["Reps por segundo", calcFmt(1 / spr)]);
+    rows.push(["Reps por minuto", calcFmt(60 / spr)]);
+    rows.push([`Reps que caben en ${calcFmt(t.win)} s`, calcFmt(t.win / spr)]);
+    if(t.reps > 0) rows.push([`Time Work de ${calcFmt(t.reps)} reps`, calcFmt(t.reps * spr) + " s"]);
+    if(t.tw > 0) rows.push([`Reps en ${calcFmt(t.tw)} s`, calcFmt(t.tw / spr)]);
+    el.innerHTML = rows.map(r => `<div class="calc-out" onclick="calcInsertNumber('${r[1].replace(/ s$/, "")}')" title="Clic: pasar a la calculadora"><span>${r[0]}</span><b>${r[1]}</b></div>`).join("")
+      + `<div class="calc-hint">Segundos por rep = suma del tempo × 60 ÷ BPM. Clic en un resultado para pasarlo a la calculadora.</div>`;
+  } else {
+    el.innerHTML = `<div class="calc-hint">Completá BPM y tempo con números (ej. 2-1-3) para calcular reps, Time Work y reps por segundo.</div>`;
+  }
+}
+function openCalc(){
+  const o = document.getElementById("calcOverlay"); if(!o) return;
+  o.classList.add("open"); calcRender(); calcRenderUnits(); calcTrain();
+}
+function closeCalc(){ const o = document.getElementById("calcOverlay"); if(o) o.classList.remove("open"); }
+(function calcInit(){
+  const keys = [["C","clr"],["⌫","op"],["%","op"],["÷","op"],["7",""],["8",""],["9",""],["×","op"],["4",""],["5",""],["6",""],["−","op"],["1",""],["2",""],["3",""],["+","op"],["(","op"],[")","op"],["0",""],[".",""],["=","eq"]];
+  const wrap = document.createElement("div");
+  wrap.innerHTML = `
+<button type="button" class="calc-fab" id="calcFab" onclick="openCalc()" title="Calculadora" aria-label="Abrir calculadora">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><rect x="8" y="6" width="8" height="3.5" rx="0.8"/><path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>
+</button>
+<div class="calc-overlay" id="calcOverlay" onclick="if(event.target===this)closeCalc()">
+  <div class="calc-modal" role="dialog" aria-label="Calculadora">
+    <div class="calc-head"><h3>Calculadora</h3><button type="button" class="calc-x" onclick="closeCalc()" aria-label="Cerrar">✕</button></div>
+    <div class="calc-body">
+      <section class="calc-left">
+        <div class="calc-disp"><div class="calc-expr" id="calcExpr"> </div><div class="calc-res" id="calcRes">0</div></div>
+        <div class="calc-keys">${keys.map(k => `<button type="button" class="calc-key ${k[1]}" onclick="calcPress('${k[0]}')">${k[0]}</button>`).join("")}</div>
+        <div class="calc-sec">
+          <h4>Entrenamiento</h4>
+          <div class="calc-grid2">
+            <div class="calc-field"><label>BPM</label><input id="calcBpm" inputmode="decimal" placeholder="60" oninput="calcTrain()"></div>
+            <div class="calc-field"><label>Tempo</label><input id="calcTempo" placeholder="2-1-3" oninput="calcTrain()"></div>
+            <div class="calc-field"><label>Reps</label><input id="calcReps" inputmode="decimal" placeholder="12" oninput="calcTrain()"></div>
+            <div class="calc-field"><label>Time Work (s)</label><input id="calcTw" inputmode="decimal" placeholder="48" oninput="calcTrain()"></div>
+            <div class="calc-field" style="grid-column:1/-1"><label>Ventana de tiempo (s) para "cuántas reps caben"</label><input id="calcWin" inputmode="decimal" value="1" oninput="calcTrain()"></div>
+          </div>
+          <div class="calc-outs" id="calcOuts"></div>
+        </div>
+      </section>
+      <section class="calc-right">
+        <h4>Tabla de unidades</h4>
+        <div class="calc-cats" id="calcCats"></div>
+        <div class="calc-grid2">
+          <div class="calc-field"><label>Valor</label><input id="calcVal" inputmode="decimal" value="1" oninput="calcUnitInput()"></div>
+          <div class="calc-field"><label>Unidad de origen</label><select id="calcFrom" onchange="calcUnitInput()"></select></div>
+        </div>
+        <table class="calc-units"><tbody id="calcUnitsTbl"></tbody></table>
+        <div class="calc-hint">Clic en una fila para pasar ese valor a la calculadora.</div>
+      </section>
+    </div>
+  </div>
+</div>`;
+  while(wrap.firstChild) document.body.appendChild(wrap.firstChild);
+  document.addEventListener("keydown", e => {
+    const o = document.getElementById("calcOverlay");
+    if(!o || !o.classList.contains("open")) return;
+    if(e.key === "Escape"){ closeCalc(); return; }
+    const tg = e.target && e.target.tagName;
+    if(tg === "INPUT" || tg === "SELECT" || tg === "TEXTAREA") return;
+    const m = { "*":"×", "/":"÷", "-":"−", "Enter":"=", "Backspace":"⌫", "Delete":"C" };
+    const k = m[e.key] || e.key;
+    if(/^[0-9.+−×÷%()=⌫C]$/.test(k)){ e.preventDefault(); calcPress(k); }
+    else if(e.key === ","){ e.preventDefault(); calcPress("."); }
   });
 })();
 </script>
