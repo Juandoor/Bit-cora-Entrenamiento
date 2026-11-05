@@ -845,6 +845,15 @@
   .form-field textarea{ resize:vertical; min-height:60px; }
   /* L-C: las notas del registro diario son más altas y crecen hacia abajo al escribir */
   #newLogNotas, #editLogNotas{ min-height:var(--notas-minh, 140px); max-height:80vh; overflow-y:auto; line-height:1.5; font-size:var(--notas-fs, 13.5px); }
+  /* U-6: notas del registro con negrita (editor rico; se guarda como **texto**) */
+  div.notas-rich{ width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:4px; font-family:var(--font-body); background:var(--surface-2); color:var(--text); white-space:pre-wrap; word-break:break-word; outline:none; box-sizing:border-box; cursor:text; }
+  div.notas-rich:focus{ border-color:var(--gold, var(--line)); }
+  div.notas-rich:empty:before{ content:attr(data-placeholder); color:var(--text-dim); pointer-events:none; }
+  div.notas-rich b, div.notas-rich strong{ font-weight:800; }
+  .notas-bar{ display:flex; gap:6px; margin:0 0 6px; }
+  .notas-bar button{ min-width:30px; height:28px; padding:0 8px; border:1px solid var(--line); border-radius:4px; background:var(--surface-3); color:var(--text); font-weight:800; font-size:14px; line-height:1; cursor:pointer; }
+  .notas-bar button.on, .notas-bar button:hover{ background:var(--gold, var(--surface-2)); color:#111; }
+  .log-notes .v b{ font-weight:800; }
   .form-field input::placeholder, .form-field textarea::placeholder{ color: var(--text-dim); }
   /* Campo de fecha editable dígito a dígito */
   .date-text-wrap{ position:relative; display:flex; align-items:stretch; gap:6px; }
@@ -2528,6 +2537,42 @@
 /* U-3: nombre editable de las pestañas Rutina A / B */
 .tab-btn.editing{ cursor:text; }
 .tab-btn .tab-rename{ width:12ch; min-width:90px; max-width:200px; background:transparent; border:0; border-bottom:1.5px solid currentColor; color:inherit; font:inherit; outline:none; text-align:center; padding:0 2px; }
+
+/* ===== U-4 · Pestaña Rutinas ===== */
+.rut-intro{ color:var(--text-soft); font-size:13.5px; margin:-4px 0 12px; }
+.rut-toolbar{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+.rut-toolbar button, .rut-card-act button, .rut-modal button{ background:var(--surface-3); color:var(--text); border:1px solid var(--line-soft); border-radius:8px; padding:7px 12px; font-size:13px; cursor:pointer; font-family:inherit; }
+.rut-toolbar button:hover, .rut-card-act button:hover, .rut-modal button:hover{ filter:brightness(1.15); }
+.rut-primary{ background:var(--gold) !important; color:#1a1405 !important; border-color:transparent !important; font-weight:600; }
+button.danger{ color:#F0A296 !important; }
+.rut-list{ display:flex; flex-direction:column; gap:8px; }
+.rut-card{ display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; background:var(--surface-3); border:1px solid var(--line-soft); border-radius:10px; padding:10px 12px; }
+.rut-card-cons{ opacity:.8; border-style:dashed; }
+.rut-card-name{ font-weight:600; }
+.rut-card-sub{ color:var(--text-soft); font-size:12.5px; margin-top:2px; }
+.rut-card-act{ display:flex; gap:6px; flex-wrap:wrap; }
+.rut-chip{ font-size:10.5px; font-weight:500; border:1px solid var(--line-soft); border-radius:20px; padding:1px 7px; color:var(--text-soft); margin-left:4px; }
+.rut-sub{ margin:18px 0 8px; font-size:14px; color:var(--text-soft); }
+.rut-modal-bg{ position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:10000; display:flex; align-items:center; justify-content:center; padding:16px; }
+.rut-modal{ background:var(--surface-2, var(--surface-3)); color:var(--text); border:1px solid var(--line-soft); border-radius:14px; padding:18px; width:min(440px,100%); max-height:90vh; overflow:auto; }
+.rut-modal h3{ margin:0 0 10px; font-size:16px; }
+.rut-modal label{ display:block; font-size:12.5px; color:var(--text-soft); margin:10px 0 4px; }
+.rut-modal input[type=text], .rut-modal select{ width:100%; background:var(--surface-3); color:var(--text); border:1px solid var(--line-soft); border-radius:8px; padding:8px 10px; font-size:14px; }
+.rut-modal label.rut-check{ display:flex; gap:8px; align-items:flex-start; color:var(--text); font-size:13.5px; margin:6px 0; }
+.rut-hint{ color:var(--text-soft); font-size:13px; }
+.rut-modal-act{ display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
+.rut-modal-col{ display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+.rut-pers-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+.rut-pers-f label{ display:block; font-size:12px; color:var(--text-soft); margin-bottom:4px; }
+.rut-pers-f span, .rut-pers-f input{ display:block; min-height:34px; background:var(--surface-3); border:1px solid var(--line-soft); border-radius:8px; padding:7px 10px; font-size:13.5px; color:var(--text); }
+.rut-pers-f span:empty::before{ content:attr(data-ph); color:var(--text-soft); opacity:.6; }
+  /* U-7: fuentes, tamaño, color y neón en las notas del registro */
+  .notas-bar{ flex-wrap:wrap; align-items:center; }
+  .notas-bar button{ font-size:13px; }
+  .notas-bar select{ height:28px; border:1px solid var(--line); border-radius:4px; background:var(--surface-3); color:var(--text); font-size:12.5px; padding:0 4px; max-width:120px; }
+  .notas-bar input[type=color]{ width:30px; height:28px; padding:1px; border:1px solid var(--line); border-radius:4px; background:var(--surface-3); cursor:pointer; }
+  div.notas-rich .nn{ text-shadow:0 0 4px currentColor, 0 0 10px currentColor, 0 0 18px currentColor; }
+  div.notas-rich span[style*="font-size: medium"]{ font-size:1em !important; }
 </style>
 </head>
 
@@ -2561,8 +2606,9 @@
   </div>
   <nav class="tabs" id="tabs">
     <button class="tab-btn" data-view="muro">Muro</button>
-    <button class="tab-btn active" data-view="rutinaA">Rutina A</button>
-    <button class="tab-btn" data-view="rutinaB">Rutina B</button>
+    <button class="tab-btn active" data-view="rutinaA" data-rutina="A">Rutina A</button>
+    <button class="tab-btn" data-view="rutinaB" data-rutina="B">Rutina B</button>
+    <button class="tab-btn" data-view="rutinas" id="tabRutinas">Rutinas</button>
     <button class="tab-btn" data-view="calentamiento">Calentamiento / Enfriamiento</button>
     <button class="tab-btn" data-view="tecnica">Técnica y prioridades</button>
     <button class="tab-btn" data-view="biblioteca">Biblioteca</button>
@@ -2581,6 +2627,7 @@
   <div class="view" id="view-muro"></div>
   <div class="view active" id="view-rutinaA"></div>
   <div class="view" id="view-rutinaB"></div>
+  <div class="view" id="view-rutinas"></div>
   <div class="view" id="view-calentamiento"></div>
   <div class="view" id="view-tecnica"></div>
   <div class="view" id="view-biblioteca"></div>
@@ -3118,7 +3165,7 @@ function renderFaseModal(keepName){
     </div>`;
   if(keepName){ const inp = document.getElementById("faseName"); if(inp){ inp.focus(); const n = inp.value.length; inp.setSelectionRange(n, n); } }
 }
-function rerenderRoutines(){ ["rutinaA","rutinaB"].forEach(k=>{ if(document.getElementById(`view-${k}`)) renderRoutine(k); }); }
+function rerenderRoutines(){ rutinaViewKeys().forEach(k=>{ if(document.getElementById(`view-${k}`)) renderRoutine(k); }); }
 function saveFaseModal(){
   const d = _faseDraft; if(!d) return;
   if(d.base){
@@ -3155,13 +3202,13 @@ function resetFaseBase(id){
 }
 function deleteFaseCustom(id){
   const c = (STATE.fasesCustom || []).find(x=>x.id === id); if(!c) return;
-  let n = 0; ["rutinaA","rutinaB"].forEach(k=>{ n += STATE[k].exercises.filter(e=>e.fase === id).length; });
+  let n = 0; rutinaViewKeys().forEach(k=>{ n += rutinaGet(k).exercises.filter(e=>e.fase === id).length; });
   const msg = n ? nl(`¿Eliminar la categoría "${c.label}"? Los ${n} ejercicio(s) que la usan pasan a "Accesorio liviano".`, `Delete the category "${c.label}"? The ${n} exercise(s) using it move to "Light accessory".`)
                 : nl(`¿Eliminar la categoría "${c.label}"?`, `Delete the category "${c.label}"?`);
   if(!confirm(msg)) return;
-  ["rutinaA","rutinaB"].forEach(k=>{
-    let i; while((i = STATE[k].exercises.findIndex(e=>e.fase === id)) !== -1){
-      const ex = STATE[k].exercises.splice(i, 1)[0]; ex.fase = "accesorio";
+  rutinaViewKeys().forEach(k=>{
+    let i; while((i = rutinaGet(k).exercises.findIndex(e=>e.fase === id)) !== -1){
+      const ex = rutinaGet(k).exercises.splice(i, 1)[0]; ex.fase = "accesorio";
       insertExerciseInFase(k, ex, "accesorio");
     }
   });
@@ -3271,7 +3318,7 @@ function openEstiPop(btn, routineKey, idx){
   const same = was && was.dataset.r === routineKey && was.dataset.i === String(idx);
   closeEstiPop();
   if(same) return;
-  const ex = STATE[routineKey].exercises[idx];
+  const ex = rutinaGet(routineKey).exercises[idx];
   const cur = ex.estiramientoTipo || "";
   const subOpen = ESTIRA_ESTATICO_SUB.includes(cur);
   const optBtn = o => `<button type="button" class="esti-opt ${o===cur?"on":""}" data-v="${o}">${ESTIRA_TIPO_LABELS[o]}</button>`;
@@ -3314,9 +3361,9 @@ const LK_ANCHOR_SEL = "[data-lk-r],[data-lk-b],[data-lk-v]";
 let _lkClip = null, _lkOpenTimer = null, _lkCloseTimer = null, _lkAnchor = null, _lkSelf = null;
 function lkStore(){ if(!STATE.tecnica) STATE.tecnica = {}; if(!Array.isArray(STATE.tecnica.enlaces)) STATE.tecnica.enlaces = []; return STATE.tecnica.enlaces; }
 function lkExId(ex){ if(!ex.lid) ex.lid = uid("x"); return ex.lid; }
-function lkRoutineLabel(r){ return r === "rutinaA" ? rutinaNombre("A") : (r === "rutinaB" ? rutinaNombre("B") : r); }
+function lkRoutineLabel(r){ const k = rutinaKeyFromView(r); return k !== null ? rutinaNombre(k) : r; }
 function lkTabLabel(v){ if(v === "estandar") v = "biblioteca"; const b = document.querySelector(`.tab-btn[data-view="${v}"]`); return b ? b.textContent.trim() : v; }
-function lkFindEx(r, x){ const arr = (STATE[r] && STATE[r].exercises) || []; const idx = arr.findIndex(e=>e.lid === x); return idx >= 0 ? { ex: arr[idx], idx } : null; }
+function lkFindEx(r, x){ const arr = (rutinaGet(r) && rutinaGet(r).exercises) || []; const idx = arr.findIndex(e=>e.lid === x); return idx >= 0 ? { ex: arr[idx], idx } : null; }
 function lkSame(a, b){
   if(!a || !b || a.t !== b.t) return false;
   if(a.t === "ex") return a.r === b.r && a.x === b.x;
@@ -3419,7 +3466,7 @@ function lkConnTarget(el){
   let n;
   if((n = el.closest(".bib-item[data-bib-id]"))) return { node:n, ep:{ t:"bib", b:n.dataset.bibId } };
   if((n = el.closest(".ex-card[data-routine][data-idx]"))){
-    const ex = (STATE[n.dataset.routine] && STATE[n.dataset.routine].exercises || [])[+n.dataset.idx];
+    const ex = (rutinaGet(n.dataset.routine) && rutinaGet(n.dataset.routine).exercises || [])[+n.dataset.idx];
     if(ex) return { node:n, ep:{ t:"ex", r:n.dataset.routine, x: lkExId(ex) } };
   }
   return null;
@@ -3470,7 +3517,7 @@ function lkInjectTabBtns(){
 // ============================================================
 const DOCK = { collapsed:false, hdr:{ open:false, pin:false, t:null }, leg:{ open:false, pin:false, t:null } };
 function dockMast(){ return document.querySelector(".masthead"); }
-function dockLegRoutine(){ return (_currentView === "rutinaA" || _currentView === "rutinaB") ? _currentView : null; }
+function dockLegRoutine(){ return rutinaKeyFromView(_currentView) !== null ? _currentView : null; }
 function dockApply(){
   const m = dockMast(); if(!m) return;
   document.documentElement.style.setProperty("--dock-h", m.offsetHeight + "px");
@@ -3507,7 +3554,7 @@ function dockSet(which, open, pin){
   if(open && which === "leg"){
     const r = dockLegRoutine(); if(!r) return;
     const dl = document.getElementById("dockLegend");
-    if(dl && !g.open) dl.innerHTML = `<div class="dock-leg-t">Categorías · ${r === "rutinaA" ? rutinaNombre("A") : rutinaNombre("B")}</div>${fasesLegend(r)}`;
+    if(dl && !g.open) dl.innerHTML = `<div class="dock-leg-t">Categorías · ${rutinaNombre(rutinaKeyFromView(r))}</div>${fasesLegend(r)}`;
   }
   // Q-5: si se cierra con el cursor quieto sobre la zona, la pastilla reaparece debajo y no debe reabrir sola
   if(which === "hdr" && !open && g.open) g.lock = !!g.in;
@@ -3655,7 +3702,7 @@ document.addEventListener("keydown", ev=>{ if(ev.key === "Escape") closeLkPop();
 window.addEventListener("resize", ()=>lkPlacePop());
 
 function setIsoTipo(routineKey, idx, value){
-  const ex = STATE[routineKey].exercises[idx];
+  const ex = rutinaGet(routineKey).exercises[idx];
   ex.isoTipo = value;
   if(value && (!ex.notasAclaracion || !ex.notasAclaracion.trim())){
     ex.notasAclaracion = isoTipoDef(value);
@@ -3664,7 +3711,7 @@ function setIsoTipo(routineKey, idx, value){
   renderRoutine(routineKey);
 }
 function setEstiramientoTipo(routineKey, idx, value){
-  const ex = STATE[routineKey].exercises[idx];
+  const ex = rutinaGet(routineKey).exercises[idx];
   ex.estiramientoTipo = value;
   if(value && (!ex.notasAclaracion || !ex.notasAclaracion.trim())){
     ex.notasAclaracion = estiraTipoDef(value);
@@ -3717,6 +3764,7 @@ async function loadState(){
     muro: JSON.parse(JSON.stringify(DEFAULT_DATA.muro || {cover:null, avatar:null, coverAspect:null})),
     rutinaA: JSON.parse(JSON.stringify(DEFAULT_DATA.rutinaA)),
     rutinaB: JSON.parse(JSON.stringify(DEFAULT_DATA.rutinaB)),
+    rutinasX: { order:[], items:{}, conservado:[] },
     tecnica: JSON.parse(JSON.stringify(DEFAULT_DATA.tecnica)),
     logs: JSON.parse(JSON.stringify(DEFAULT_DATA.logs || EMPTY_LOGS)),
     bloques: JSON.parse(JSON.stringify(DEFAULT_DATA.bloques || [])),
@@ -3793,11 +3841,11 @@ async function saveState(silent){
 // se guarda y se carga el de la entrante (o una plantilla en blanco si
 // es nueva). Así cerrar sesión sí oculta la información de esa cuenta.
 // ============================================================
-const ACCOUNT_DATA_KEYS = ["meta","muro","rutinaA","rutinaB","tecnica","logs","bloques","tracker","timerPresets"];
+const ACCOUNT_DATA_KEYS = ["meta","muro","rutinaA","rutinaB","rutinasX","tecnica","logs","bloques","tracker","timerPresets"];
 const LOCAL_BUCKET_ID = "__local__"; // datos del dispositivo cuando no hay sesión activa
 function accountBucketKey(id){ return "acctdata::" + String(id).toLowerCase(); }
 function extractAccountData(state){
-  const out = {};
+  const out = {}; if(state && !state.rutinasX) state.rutinasX = { order:[], items:{}, conservado:[] };
   ACCOUNT_DATA_KEYS.forEach(k=> out[k] = JSON.parse(JSON.stringify(state[k])));
   return out;
 }
@@ -3807,6 +3855,7 @@ function blankAccountData(){
     muro: JSON.parse(JSON.stringify(DEFAULT_DATA.muro || {cover:null, avatar:null, coverAspect:null})),
     rutinaA: JSON.parse(JSON.stringify(DEFAULT_DATA.rutinaA)),
     rutinaB: JSON.parse(JSON.stringify(DEFAULT_DATA.rutinaB)),
+    rutinasX: { order:[], items:{}, conservado:[] },
     tecnica: JSON.parse(JSON.stringify(DEFAULT_DATA.tecnica)),
     logs: JSON.parse(JSON.stringify(DEFAULT_DATA.logs || EMPTY_LOGS)),
     bloques: JSON.parse(JSON.stringify(DEFAULT_DATA.bloques || [])),
@@ -4533,17 +4582,17 @@ function qcalcRender(rk, idx){
   const card = document.querySelector(`.ex-card[data-routine="${rk}"][data-idx="${idx}"]`);
   if(!card) return;
   const slot = card.querySelector("[data-qcalc]");
-  if(slot) slot.innerHTML = qcalcChipHtml(STATE[rk].exercises[idx], rk, idx);
+  if(slot) slot.innerHTML = qcalcChipHtml(rutinaGet(rk).exercises[idx], rk, idx);
 }
 function qcalcSetField(rk, idx, field, value){
-  const ex = STATE[rk].exercises[idx];
+  const ex = rutinaGet(rk).exercises[idx];
   ex.stats[field] = value;
   const card = document.querySelector(`.ex-card[data-routine="${rk}"][data-idx="${idx}"]`);
   const el = card && card.querySelector(`[data-field="${field}"]`);
   if(el) el.innerText = value;
 }
 function qcalcAfterEdit(rk, idx, field){
-  const ex = STATE[rk] && STATE[rk].exercises[idx];
+  const ex = rutinaGet(rk) && rutinaGet(rk).exercises[idx];
   if(!ex || !ex.stats) return;
   const key = rk + ":" + idx;
   const q = _QC[key] || (_QC[key] = {});
@@ -4570,7 +4619,7 @@ function qcalcAfterEdit(rk, idx, field){
   qcalcRender(rk, idx);
 }
 function qcalcApply(rk, idx, what){
-  const ex = STATE[rk] && STATE[rk].exercises[idx];
+  const ex = rutinaGet(rk) && rutinaGet(rk).exercises[idx];
   if(!ex || !ex.stats) return;
   const spr = qcalcSecPerRep(ex.stats);
   if(!spr) return;
@@ -4679,36 +4728,36 @@ function extraStatsBlock(ex, routineKey, idx){
   return html;
 }
 function addPreparacion(routineKey, idx){
-  STATE[routineKey].exercises[idx].stats.preparacion = "";
+  rutinaGet(routineKey).exercises[idx].stats.preparacion = "";
   saveState();
   renderRoutine(routineKey);
 }
 function removePreparacion(routineKey, idx){
-  delete STATE[routineKey].exercises[idx].stats.preparacion;
+  delete rutinaGet(routineKey).exercises[idx].stats.preparacion;
   saveState();
   renderRoutine(routineKey);
 }
 function addTiempoWork(routineKey, idx){
-  STATE[routineKey].exercises[idx].stats.tiempoWork = "";
+  rutinaGet(routineKey).exercises[idx].stats.tiempoWork = "";
   saveState();
   renderRoutine(routineKey);
 }
 function removeTiempoWork(routineKey, idx){
-  delete STATE[routineKey].exercises[idx].stats.tiempoWork;
-  delete STATE[routineKey].exercises[idx].stats.tiempoWorkSets;
+  delete rutinaGet(routineKey).exercises[idx].stats.tiempoWork;
+  delete rutinaGet(routineKey).exercises[idx].stats.tiempoWorkSets;
   saveState();
   renderRoutine(routineKey);
 }
 // M-3: Time Work distinto por set. tiempoWork queda como valor base (y para sets en blanco).
 function twSetsOn(routineKey, idx){
-  const stats = STATE[routineKey].exercises[idx].stats;
+  const stats = rutinaGet(routineKey).exercises[idx].stats;
   const n = Math.max(1, parseInt(stats.series, 10) || 1);
   stats.tiempoWorkSets = Array.from({length:n}, ()=> stats.tiempoWork || "");
   saveState();
   renderRoutine(routineKey);
 }
 function twSetsOff(routineKey, idx){
-  const stats = STATE[routineKey].exercises[idx].stats;
+  const stats = rutinaGet(routineKey).exercises[idx].stats;
   const first = (stats.tiempoWorkSets || []).find(v => String(v||"").trim() !== "");
   if(first !== undefined) stats.tiempoWork = first;
   delete stats.tiempoWorkSets;
@@ -4716,12 +4765,12 @@ function twSetsOff(routineKey, idx){
   renderRoutine(routineKey);
 }
 function addMetronomo(routineKey, idx){
-  STATE[routineKey].exercises[idx].metronomo = { pulsosCompas:"", clicksPulso:"" };
+  rutinaGet(routineKey).exercises[idx].metronomo = { pulsosCompas:"", clicksPulso:"" };
   saveState();
   renderRoutine(routineKey);
 }
 function removeMetronomo(routineKey, idx){
-  delete STATE[routineKey].exercises[idx].metronomo;
+  delete rutinaGet(routineKey).exercises[idx].metronomo;
   saveState();
   renderRoutine(routineKey);
 }
@@ -4912,14 +4961,14 @@ function addVideoLink(routineKey, idx){
   const url = prompt("Pegá el enlace del video (Drive, YouTube, etc.):");
   if(!url || !url.trim()) return;
   const label = prompt("Etiqueta corta para este video (opcional):", "") || "";
-  const ex = STATE[routineKey].exercises[idx];
+  const ex = rutinaGet(routineKey).exercises[idx];
   if(!ex.videos) ex.videos = [];
   ex.videos.push({ url: url.trim(), label: label.trim() });
   saveState();
   renderRoutine(routineKey);
 }
 function deleteVideoLink(routineKey, idx, videoIdx){
-  const ex = STATE[routineKey].exercises[idx];
+  const ex = rutinaGet(routineKey).exercises[idx];
   ex.videos.splice(videoIdx, 1);
   saveState();
   renderRoutine(routineKey);
@@ -4961,8 +5010,9 @@ function scrollToFase(routineKey, fase){
 
 function renderRoutine(routineKey){
   applyCustomFases();
-  const r = STATE[routineKey];
+  const r = rutinaGet(routineKey);
   const container = document.getElementById(`view-${routineKey}`);
+  if(!r || !container) return;
 
   // agrupar por fase en el orden FASE_ORDER, pero respetando el orden interno del array
   let exHtml = "";
@@ -5003,6 +5053,12 @@ function renderRoutine(routineKey){
       </div>
     </div>`;
   }
+  if(routineKey !== "rutinaA" && rutinaKeyFromView(routineKey) !== null && !(routineKey === "rutinaB")){
+    html += `
+    <div class="panel"><div class="panel-head"><h2>Notas generales de la rutina</h2></div><div class="panel-body"><div class="callout gold"><b>Regresión / palés:</b>
+      <span contenteditable="true" data-routine-field="regresion" data-routine="${routineKey}">${escapeHtml(r.regresion || "")}</span></div></div></div>`;
+  }
+  html += rutinaPersonalPanel(routineKey, r);
   container.innerHTML = html;
   attachEditableHandlers(container);
   reprocessEmbeds();
@@ -5021,7 +5077,7 @@ function onEditableBlur(e){
   if(card){
     const routineKey = card.dataset.routine;
     const idx = parseInt(card.dataset.idx);
-    const ex = STATE[routineKey].exercises[idx];
+    const ex = rutinaGet(routineKey).exercises[idx];
     if(el.dataset.metro){
       if(!ex.metronomo) ex.metronomo = { pulsosCompas:"", clicksPulso:"" };
       ex.metronomo[el.dataset.metro] = el.innerText.trim();
@@ -5061,7 +5117,7 @@ function onEditableBlur(e){
   }
   if(el.dataset.routineField){
     const rk = el.dataset.routine;
-    STATE[rk][el.dataset.routineField] = el.innerText.trim();
+    rutinaGet(rk)[el.dataset.routineField] = el.innerText.trim();
     saveState();
     return;
   }
@@ -5086,9 +5142,9 @@ function setByPath(obj, path, value){
 
 // Mueve el ejercicio al bloque de su nueva fase y vuelve a dibujar la rutina. Devuelve el ejercicio movido.
 function applyFaseChange(routineKey, idx, newFase){
-  STATE[routineKey].exercises[idx].fase = newFase;
+  rutinaGet(routineKey).exercises[idx].fase = newFase;
   // reordenar: mover el ejercicio al final del bloque de su nueva fase
-  const arr = STATE[routineKey].exercises;
+  const arr = rutinaGet(routineKey).exercises;
   const moved = arr.splice(idx,1)[0];
   let insertAt = arr.length;
   for(let i=arr.length-1;i>=0;i--){
@@ -5109,7 +5165,7 @@ function applyFaseChange(routineKey, idx, newFase){
 }
 function cardOf(routineKey, ex){
   const container = document.getElementById(`view-${routineKey}`);
-  const idx = STATE[routineKey].exercises.indexOf(ex);
+  const idx = rutinaGet(routineKey).exercises.indexOf(ex);
   return (container && idx !== -1) ? container.querySelector(`.ex-card[data-idx="${idx}"]`) : null;
 }
 // Animación de reubicación al cambiar la fase de una tarjeta:
@@ -5168,7 +5224,7 @@ function deleteExercise(routineKey, idx){
     clearInterval(cardSeqTickHandle);
     cardSeqRun = null;
   }
-  STATE[routineKey].exercises.splice(idx,1);
+  rutinaGet(routineKey).exercises.splice(idx,1);
   saveState();
   renderRoutine(routineKey);
 }
@@ -5375,7 +5431,7 @@ function confirmAddExercise(){
 // ejercicios), igual criterio que changeFase(), para que la tarjeta nueva
 // aparezca en su sitio y no siempre al final de la lista.
 function insertExerciseInFase(routineKey, ex, fase){
-  const arr = STATE[routineKey].exercises;
+  const arr = rutinaGet(routineKey).exercises;
   let insertAt = arr.length;
   for(let i=arr.length-1;i>=0;i--){
     if((arr[i].fase||"fuerza") === fase){ insertAt = i+1; break; }
@@ -5390,7 +5446,7 @@ function insertExerciseInFase(routineKey, ex, fase){
 function flashExerciseCard(routineKey, ex){
   const container = document.getElementById(`view-${routineKey}`);
   if(!container) return;
-  const idx = STATE[routineKey].exercises.indexOf(ex);
+  const idx = rutinaGet(routineKey).exercises.indexOf(ex);
   if(idx === -1) return;
   const card = container.querySelector(`.ex-card[data-idx="${idx}"]`);
   if(!card) return;
@@ -5415,7 +5471,7 @@ const PANEL_SEARCH_PLACEHOLDERS = {
 };
 
 function panelSearchHtml(panelKey){
-  const ph = (panelKey === "rutinaA" || panelKey === "rutinaB") ? `Buscar ejercicio en ${rutinaNombre(panelKey === "rutinaA" ? "A" : "B")}…` : (PANEL_SEARCH_PLACEHOLDERS[panelKey] || "Buscar…");
+  const ph = (rutinaKeyFromView(panelKey) !== null) ? `Buscar ejercicio en ${rutinaNombre(rutinaKeyFromView(panelKey))}…` : (PANEL_SEARCH_PLACEHOLDERS[panelKey] || "Buscar…");
   return `
   <div class="panel-search-slot"><div class="panel-search" data-panel-search="${panelKey}">
     <div class="panel-search-box">
@@ -5454,7 +5510,7 @@ function getPanelSearchItems(panelKey){
   const container = document.getElementById(`view-${panelKey}`);
   if(!container) return [];
   const items = [];
-  if(panelKey === "rutinaA" || panelKey === "rutinaB"){
+  if(rutinaKeyFromView(panelKey) !== null){
     container.querySelectorAll(".ex-card").forEach(card=>{
       const idx = parseInt(card.dataset.idx);
       const titleEl = card.querySelector(".ex-title");
@@ -7735,30 +7791,37 @@ function renderTrackerPanel(){
 
 // ---- Escala de fatiga: barras de intensidad con gradiente ----
 const FATIGA_LEVELS = [
+  {n:0, label:"Sin dolor", c:"#5b9dff"},
   {n:1, label:"Muy leve",  c:"#3fb9a6"},
   {n:2, label:"Leve",      c:"#8fcf5a"},
   {n:3, label:"Moderada",  c:"#f2c94c"},
   {n:4, label:"Alta",      c:"#f2994a"},
   {n:5, label:"Muy alta",  c:"#e5533d"}
 ];
+// U-5: "0" = cero dolor muscular/físico. Se guarda como texto "0" (distinto de "sin marcar" = null)
+function fatigaHas(cur){ return cur !== null && cur !== undefined && cur !== "" && !isNaN(parseInt(cur, 10)); }
+function fatigaLevel(v){ return FATIGA_LEVELS.find(L=>L.n === v) || null; }
 function fatigaScaleHtml(id, cur){
-  const v = cur ? parseInt(cur, 10) : 0;
-  const bars = FATIGA_LEVELS.map(L=>`<div class="scale-dot fatiga-bar ${v === L.n ? "active" : ""} ${L.n <= v ? "filled" : ""}" data-val="${L.n}" style="--c:${L.c}; --h:${18 + L.n * 9}px" title="${L.n} · ${L.label}">${L.n}</div>`).join("");
+  const has = fatigaHas(cur);
+  const v = has ? parseInt(cur, 10) : -1;
+  const bars = FATIGA_LEVELS.map(L=>`<div class="scale-dot fatiga-bar ${v === L.n ? "active" : ""} ${(has && L.n >= 1 && L.n <= v) ? "filled" : ""}" data-val="${L.n}" style="--c:${L.c}; --h:${18 + L.n * 9}px" title="${L.n} · ${L.label}">${L.n}</div>`).join("");
   return `<div class="fatiga-wrap"><div class="scale-row fatiga-scale" id="${id}">${bars}</div><div class="fatiga-caption" id="${id}-cap"></div></div>`;
 }
 function paintFatiga(id){
   const root = document.getElementById(id);
   if(!root) return;
   const act = root.querySelector(".scale-dot.active");
-  const v = act ? parseInt(act.dataset.val, 10) : 0;
+  const has = !!act;
+  const v = has ? parseInt(act.dataset.val, 10) : -1;
   root.querySelectorAll(".scale-dot").forEach(d=>{
-    d.classList.toggle("filled", parseInt(d.dataset.val, 10) <= v);
+    const n = parseInt(d.dataset.val, 10);
+    d.classList.toggle("filled", has && n >= 1 && n <= v);
   });
   const cap = document.getElementById(id + "-cap");
   if(cap){
-    const L = FATIGA_LEVELS[v - 1];
-    cap.textContent = v ? `${v}/5 · ${L.label}` : "Sin marcar";
-    cap.style.color = v ? L.c : "";
+    const L = has ? fatigaLevel(v) : null;
+    cap.textContent = L ? `${v}/5 · ${L.label}` : "Sin marcar";
+    cap.style.color = L ? L.c : "";
   }
 }
 function attachFatigaHandlers(id){
@@ -7775,10 +7838,11 @@ function attachFatigaHandlers(id){
   paintFatiga(id);
 }
 function fatigaMiniHtml(cur){
-  const v = cur ? parseInt(cur, 10) : 0;
-  if(!v) return "—";
-  const L = FATIGA_LEVELS[v - 1];
-  const bars = FATIGA_LEVELS.map(x=>`<i class="${x.n <= v ? "on" : ""}" style="--c:${x.c}; --h:${5 + x.n * 3}px"></i>`).join("");
+  if(!fatigaHas(cur)) return "—";
+  const v = parseInt(cur, 10);
+  const L = fatigaLevel(v);
+  if(!L) return "—";
+  const bars = FATIGA_LEVELS.filter(x=>x.n >= 1).map(x=>`<i class="${x.n <= v ? "on" : ""}" style="--c:${x.c}; --h:${5 + x.n * 3}px"></i>`).join("");
   return `<span class="fatiga-mini">${bars}</span><span style="color:${L.c}; font-weight:700">${v}/5</span>`;
 }
 
@@ -7800,6 +7864,7 @@ function renderRegistro(){
           <select id="newLogRoutine">
             <option value="A">${escapeHtml(rutinaNombreLargo("A"))}</option>
             <option value="B">${escapeHtml(rutinaNombreLargo("B"))}</option>
+            ${rutinasExtraIds().map(i=>`<option value="${i}">${escapeHtml(rutinaNombre(i))}</option>`).join("")}
             <option value="Descanso">Día de descanso</option>
             <option value="Otro">Otra actividad</option>
           </select>
@@ -7810,7 +7875,7 @@ function renderRegistro(){
           <div class="scale-row" id="scaleEnergia">${[1,2,3,4,5].map(n=>`<div class="scale-dot" data-val="${n}">${n}</div>`).join("")}</div>
         </div>
         <div class="form-field" data-regfield="fatiga">
-          <label>Fatiga / dolor muscular (1-5)</label>
+          <label>Fatiga / dolor muscular (0-5)</label>
           ${fatigaScaleHtml("scaleFatiga", null)}
         </div>
         <div class="form-field" data-regfield="sueno">
@@ -7824,7 +7889,7 @@ function renderRegistro(){
       </div>
       <div class="form-field" style="margin-bottom:14px">
         <label>Notas (qué se hizo, qué se modificó, qué se sintió)</label>
-        <textarea id="newLogNotas" placeholder="Ej: aumenté peso en sentadillas a 16kg, bajé tobilleras en hollow porque temblaba antes de 20s..."></textarea>
+        ${notasEditorHtml("newLogNotas","","Ej: aumenté peso en sentadillas a 16kg, bajé tobilleras en hollow porque temblaba antes de 20s...")}
       </div>
       <button class="primary-btn" onclick="saveNewLog()">Guardar registro</button>
     </div>
@@ -7944,7 +8009,7 @@ function entryToHtml(entry){
       <div class="log-field"><label>Sueño</label><div class="v">${escapeHtml(entry.sueno||"—")}</div></div>
       <div class="log-field"><label>Alimentación</label><div class="v">${comidaViewHtml(entry)}</div></div>
     </div>
-    ${entry.notas ? `<div class="log-notes"><label style="font-size:10px;text-transform:uppercase;color:var(--text-dim);font-weight:700">Notas</label><div class="v">${nl2br(entry.notas)}</div></div>` : ""}
+    ${entry.notas ? `<div class="log-notes"><label style="font-size:10px;text-transform:uppercase;color:var(--text-dim);font-weight:700">Notas</label><div class="v">${notasHtml(entry.notas)}</div></div>` : ""}
     <div style="padding:0 16px 14px; text-align:right">
       <button class="secondary-btn" onclick="startEditLog('${entry.id}')" style="margin-right:8px">Editar</button>
       <button class="secondary-btn" onclick="deleteLog('${entry.id}')">Eliminar registro</button>
@@ -7989,7 +8054,7 @@ function readRegistroForm(noTrim){
   };
 }
 function registroDraftHasContent(d){
-  return !!(d && (d.energia || d.fatiga || d.sueno || d.comida || d.comidaCal || (d.comidaTipos && d.comidaTipos.length) || d.notas));
+  return !!(d && (d.energia || fatigaHas(d.fatiga) || d.sueno || d.comida || d.comidaCal || (d.comidaTipos && d.comidaTipos.length) || d.notas));
 }
 function loadRegistroDraft(){
   try{ const raw = localStorage.getItem(REG_DRAFT_KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
@@ -8013,12 +8078,188 @@ function applyRegistroDraft(d){
   set("newLogSueno", d.sueno); set("newLogComida", d.comida); set("newLogNotas", d.notas);
   comidaApply("new", d.comidaCal, d.comidaTipos);
   [["scaleEnergia", d.energia], ["scaleFatiga", d.fatiga]].forEach(([id, v])=>{
-    if(!v) return;
+    if(v === null || v === undefined || v === "") return;
     const dot = document.querySelector(`#${id} .scale-dot[data-val="${v}"]`);
     if(dot) dot.classList.add("active");
   });
   paintFatiga("scaleFatiga");
 }
+// U-6: negrita en las notas del registro diario. El campo es un editor rico (contenteditable);
+// por dentro se guarda como texto con **negrita**, así borradores, búsqueda y datos viejos siguen funcionando.
+// U-7: fuentes y estilos. Formato dentro del texto: {{i,u,f:serif,s:5,c:ff5500,n|texto}} (i cursiva, u subrayado,
+// f fuente, s tamaño 2-6, c color, n neón); la negrita sigue siendo **texto**. Texto viejo sin marcas sigue igual.
+const NOTAS_FUENTES = {
+  sans:{n:"Normal", css:""},
+  serif:{n:"Serif", css:"Georgia, 'Times New Roman', serif"},
+  mono:{n:"Mono", css:"'Courier New', ui-monospace, monospace"},
+  manus:{n:"Manuscrita", css:"'Segoe Print', 'Comic Sans MS', 'Bradley Hand', cursive"},
+  impacto:{n:"Impacto", css:"Impact, 'Arial Narrow', sans-serif"},
+  redonda:{n:"Redondeada", css:"'Trebuchet MS', Verdana, sans-serif"}
+};
+const NOTAS_TAM = {2:"small", 4:"large", 5:"x-large", 6:"xx-large"};
+function notasFontKey(fam){
+  const f = String(fam||"").split(",")[0].replace(/["']/g,"").trim().toLowerCase();
+  if(!f) return "";
+  for(const k in NOTAS_FUENTES){ const c = NOTAS_FUENTES[k].css; if(c && c.split(",")[0].replace(/["']/g,"").trim().toLowerCase() === f) return k; }
+  return "";
+}
+function notasSpan(a){
+  let st = "", cls = "";
+  a.split(",").forEach(function(p){
+    if(p === "i") st += "font-style:italic;";
+    else if(p === "u") st += "text-decoration:underline;";
+    else if(p === "n") cls = ' class="nn"';
+    else if(p.indexOf("f:") === 0 && NOTAS_FUENTES[p.slice(2)] && NOTAS_FUENTES[p.slice(2)].css) st += "font-family:" + NOTAS_FUENTES[p.slice(2)].css.replace(/'/g,"&#39;") + ";";
+    else if(p.indexOf("s:") === 0 && NOTAS_TAM[p.slice(2)]) st += "font-size:" + NOTAS_TAM[p.slice(2)] + ";";
+    else if(p.indexOf("c:") === 0 && /^[0-9a-f]{6}$/i.test(p.slice(2))) st += "color:#" + p.slice(2) + ";";
+  });
+  return "<span" + cls + (st ? ' style="' + st + '"' : "") + ">";
+}
+function notasHtml(s){
+  let html = escapeHtml(s||"").replace(/\*\*([^*\s](?:[^*]|\*(?!\*))*?)\*\*/g, "<b>$1</b>");
+  let depth = 0;
+  html = html.replace(/\{\{([a-z0-9:,]+)\||\}\}/g, function(m, a){
+    if(a){ depth++; return notasSpan(a); }
+    if(depth > 0){ depth--; return "</span>"; }
+    return m;
+  });
+  while(depth-- > 0) html += "</span>";
+  return html.replace(/\n/g, "<br>");
+}
+function notasHex(c){
+  const m = String(c||"").match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if(m) return [m[1],m[2],m[3]].map(function(x){ return ("0"+(+x).toString(16)).slice(-2); }).join("");
+  const h = String(c||"").match(/^#([0-9a-f]{6})$/i); return h ? h[1].toLowerCase() : "";
+}
+function notasSerialize(root){
+  let out = "";
+  (function walk(n){
+    n.childNodes.forEach(function(ch){
+      if(ch.nodeType === 3){ out += ch.nodeValue.replace(/\u200b/g,""); return; }
+      if(ch.nodeType !== 1) return;
+      const tag = ch.tagName;
+      if(tag === "BR"){ out += "\n"; return; }
+      const st = ch.style || {};
+      const bold = tag === "B" || tag === "STRONG" || /^(bold|[6-9]00)$/.test(st.fontWeight||"");
+      const at = [];
+      if(tag === "I" || tag === "EM" || st.fontStyle === "italic") at.push("i");
+      if(tag === "U" || /underline/.test((st.textDecorationLine||"") + (st.textDecoration||""))) at.push("u");
+      const fk = notasFontKey(st.fontFamily || (tag === "FONT" ? ch.getAttribute("face") : "")); if(fk && fk !== "sans") at.push("f:" + fk);
+      const lv = {"x-small":1,small:2,medium:3,large:4,"x-large":5,"xx-large":6,"xxx-large":7}[st.fontSize||""]; if(NOTAS_TAM[lv]) at.push("s:" + lv);
+      const col = notasHex(st.color || (tag === "FONT" ? ch.getAttribute("color") : "")); if(col) at.push("c:" + col);
+      if(ch.classList && ch.classList.contains("nn")) at.push("n");
+      const block = (tag === "DIV" || tag === "P");
+      if(block && out && !out.endsWith("\n")) out += "\n";
+      const keep = out; out = ""; walk(ch); let inner = out; out = keep;
+      if(inner.trim()){
+        const m = inner.match(/^(\s*)([\s\S]*?)(\s*)$/);
+        let core = m[2];
+        if(bold) core = "**" + core + "**";
+        if(at.length) core = "{{" + at.join(",") + "|" + core + "}}";
+        inner = m[1] + core + m[3];
+      }
+      out += inner;
+    });
+  })(root);
+  return out.replace(/\u00a0/g, " ");
+}
+(function(){
+  const proto = HTMLDivElement.prototype;
+  Object.defineProperty(proto, "value", {
+    configurable: true,
+    get: function(){ return this.hasAttribute("data-rich") ? notasSerialize(this) : this.__v; },
+    set: function(v){
+      if(this.hasAttribute("data-rich")){ this.innerHTML = notasHtml(v == null ? "" : String(v)); }
+      else Object.defineProperty(this, "value", { value: v, writable: true, configurable: true });
+    }
+  });
+})();
+let NOTAS_TODA = false, NOTAS_SEL = null;
+function notasEditorHtml(id, text, ph){
+  const md = 'onmousedown="event.preventDefault()"';
+  const fav = ["sans","serif","mono","manus"].map(function(k){ const f = NOTAS_FUENTES[k]; return `<button type="button" title="Fuente: ${f.n}" ${md} onclick="notasFont('${id}','${k}')" style="font-family:${(f.css||'inherit').replace(/'/g,'&quot;')};font-weight:600">${k === "sans" ? "Aa" : f.n}</button>`; }).join("");
+  const all = Object.keys(NOTAS_FUENTES).map(function(k){ return `<option value="${k}">${NOTAS_FUENTES[k].n}</option>`; }).join("");
+  return `<div class="notas-bar">` +
+    `<button type="button" id="${id}Bold" title="Negrita (Ctrl+B)" ${md} onclick="notasBold('${id}')"><b>B</b></button>` +
+    `<button type="button" id="${id}Ital" title="Cursiva (Ctrl+I)" ${md} onclick="notasCmd('${id}','italic')"><i>I</i></button>` +
+    `<button type="button" id="${id}Und" title="Subrayado (Ctrl+U)" ${md} onclick="notasCmd('${id}','underline')"><u>U</u></button>` +
+    fav +
+    `<select title="Todas las fuentes" onchange="notasFont('${id}',this.value);this.selectedIndex=0"><option value="">Más fuentes…</option>${all}</select>` +
+    `<select title="Tamaño de letra" onchange="notasSize('${id}',this.value);this.selectedIndex=0"><option value="">Tamaño</option><option value="2">Pequeño</option><option value="3">Normal</option><option value="4">Grande</option><option value="5">Muy grande</option><option value="6">Enorme</option></select>` +
+    `<input type="color" value="#ff8a3d" title="Color del texto" oninput="notasColor('${id}',this.value)">` +
+    `<button type="button" id="${id}Neon" title="Efecto neón" ${md} onclick="notasNeon('${id}')">✦ Neón</button>` +
+    `<button type="button" title="Quitar estilos" ${md} onclick="notasCmd('${id}','removeFormat')">Tx</button>` +
+    `<button type="button" id="${id}Toda" title="Aplicar a toda la nota (en vez de la selección)" ${md} onclick="notasToda()">Toda la nota</button>` +
+    `</div>` +
+    `<div id="${id}" class="notas-rich" contenteditable="true" data-rich="1" role="textbox" aria-multiline="true" data-placeholder="${escapeHtml(ph||"")}">${notasHtml(text)}</div>`;
+}
+function notasToda(){ NOTAS_TODA = !NOTAS_TODA; notasBarSync(); }
+function notasPrep(id){
+  const el = document.getElementById(id); if(!el) return null;
+  el.focus();
+  const sel = window.getSelection();
+  if(NOTAS_TODA){ const r = document.createRange(); r.selectNodeContents(el); sel.removeAllRanges(); sel.addRange(r); }
+  else if(NOTAS_SEL && NOTAS_SEL.el === el && (!sel.rangeCount || !el.contains(sel.anchorNode))){ sel.removeAllRanges(); sel.addRange(NOTAS_SEL.r); }
+  try{ document.execCommand("styleWithCSS", false, true); }catch(e){}
+  return el;
+}
+function notasDone(el){
+  if(NOTAS_TODA){ const sel = window.getSelection(); sel.selectAllChildren(el); sel.collapseToEnd(); }
+  el.dispatchEvent(new Event("input", { bubbles:true }));
+  notasBarSync();
+}
+function notasCmd(id, cmd, val){ const el = notasPrep(id); if(!el) return; document.execCommand(cmd, false, val); notasDone(el); }
+function notasBold(id){ notasCmd(id, "bold"); }
+function notasFont(id, k){ if(!k || !NOTAS_FUENTES[k]) return; notasCmd(id, "fontName", NOTAS_FUENTES[k].css || "system-ui, sans-serif"); }
+function notasSize(id, lv){ if(lv) notasCmd(id, "fontSize", lv); }
+function notasColor(id, hex){ notasCmd(id, "foreColor", hex); }
+function notasNeon(id){
+  const el = notasPrep(id); if(!el) return;
+  const sel = window.getSelection(); if(!sel.rangeCount) return;
+  const r = sel.getRangeAt(0);
+  const host = (r.startContainer.nodeType === 1 ? r.startContainer : r.startContainer.parentElement).closest(".nn");
+  if(host && el.contains(host)){ const p = host.parentNode; while(host.firstChild) p.insertBefore(host.firstChild, host); p.removeChild(host); }
+  else {
+    const sp = document.createElement("span"); sp.className = "nn";
+    if(r.collapsed){ sp.textContent = "\u200b"; r.insertNode(sp); const nr = document.createRange(); nr.setStart(sp.firstChild, 1); nr.collapse(true); sel.removeAllRanges(); sel.addRange(nr); }
+    else { sp.appendChild(r.extractContents()); r.insertNode(sp); sel.selectAllChildren(sp); }
+  }
+  notasDone(el);
+}
+function notasBarSync(){
+  ["newLogNotas","editLogNotas"].forEach(function(id){
+    const el = document.getElementById(id); if(!el) return;
+    [["Bold","bold"],["Ital","italic"],["Und","underline"]].forEach(function(p){
+      const b = document.getElementById(id + p[0]); if(!b) return;
+      let on = false; try{ on = document.activeElement === el && document.queryCommandState(p[1]); }catch(e){}
+      b.classList.toggle("on", !!on);
+    });
+    const n = document.getElementById(id + "Neon"); if(n){ let on = false; const s = window.getSelection(); if(document.activeElement === el && s.rangeCount){ const c = s.anchorNode; on = !!(c && (c.nodeType === 1 ? c : c.parentElement).closest(".nn")); } n.classList.toggle("on", on); }
+    const t = document.getElementById(id + "Toda"); if(t) t.classList.toggle("on", NOTAS_TODA);
+  });
+}
+document.addEventListener("selectionchange", function(){
+  const s = window.getSelection();
+  if(s.rangeCount && s.anchorNode){ const e = (s.anchorNode.nodeType === 1 ? s.anchorNode : s.anchorNode.parentElement); const r = e && e.closest && e.closest("div.notas-rich"); if(r) NOTAS_SEL = { el:r, r:s.getRangeAt(0).cloneRange() }; }
+  notasBarSync();
+});
+// Pegar (W-2): entra el texto sin estilos ajenos y HEREDA el estilo activo en el cursor (fuente, negrita, color, etc.)
+document.addEventListener("paste", function(e){
+  const t = e.target && e.target.closest && e.target.closest("div.notas-rich");
+  if(!t) return;
+  e.preventDefault();
+  const txt = (e.clipboardData || window.clipboardData).getData("text/plain").replace(/\r\n?/g, "\n");
+  txt.split("\n").forEach(function(line, i){
+    if(i) document.execCommand("insertLineBreak");
+    if(line) document.execCommand("insertText", false, line);
+  });
+  t.dispatchEvent(new Event("input", { bubbles:true }));
+}, true);
+// Campo vacío de verdad (sin <br> residual) para que se vea el texto guía
+document.addEventListener("input", function(e){
+  const t = e.target;
+  if(t && t.classList && t.classList.contains("notas-rich") && !t.textContent && !t.querySelector("img")) t.innerHTML = "";
+}, true);
 // L-C: el campo de notas del registro (nuevo y edición) se agranda hacia abajo según lo escrito
 function autoGrowNotes(){
   document.querySelectorAll("#newLogNotas, #editLogNotas").forEach(function(el){
@@ -8035,10 +8276,19 @@ function autoGrowNotes(){
   new MutationObserver(soon).observe(document.documentElement, { childList:true, subtree:true });
   document.addEventListener("click", function(){ setTimeout(soon, 60); }, true);
 })();
+document.addEventListener("keydown", function(e){
+  const t = e.target;
+  if(t && t.classList && t.classList.contains("notas-rich") && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && (e.key === "b" || e.key === "B")){
+    e.preventDefault(); notasBold(t.id);
+  } else if(t && t.classList && t.classList.contains("notas-rich") && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && /^[iIuU]$/.test(e.key)){
+    e.preventDefault(); notasCmd(t.id, /i/i.test(e.key) ? "italic" : "underline");
+  }
+}, true);
 // M-2: en las notas del registro diario, Enter guarda y Shift+Enter baja un renglón
 document.addEventListener("keydown", function(e){
   const t = e.target;
   if(!t || (t.id !== "newLogNotas" && t.id !== "editLogNotas")) return;
+  if(e.key === "Enter" && e.shiftKey && !e.isComposing && t.classList.contains("notas-rich")){ e.preventDefault(); document.execCommand("insertLineBreak"); t.dispatchEvent(new Event("input",{bubbles:true})); return; }
   if(e.key !== "Enter" || e.shiftKey || e.isComposing || e.altKey) return; // Shift+Enter: comportamiento normal (salto de línea)
   e.preventDefault();
   try{ t.blur(); }catch(err){} // confirma el campo (change) ANTES de guardar, igual que al tocar el botón
@@ -8050,7 +8300,7 @@ document.addEventListener("keydown", function(e){
 // Mapa por defecto (0 = domingo): A = lun, mié, vie (y domingo, opcional); B = mar, jue, sáb.
 // Se puede reemplazar con STATE.settings.registro.rutinaPorDia (lo expondrá el menú avanzado, U-2).
 const RUTINA_POR_DIA_DEFAULT = { 0:"", 1:"A", 2:"B", 3:"A", 4:"B", 5:"A", 6:"B" };
-function rutinaOpciones(){ return [["", "Sin asignar"], ["A", rutinaNombre("A")], ["B", rutinaNombre("B")], ["Descanso", "Día de descanso"], ["Otro", "Otra actividad"]]; }
+function rutinaOpciones(){ return [["", "Sin asignar"], ["A", rutinaNombre("A")], ["B", rutinaNombre("B")], ...rutinasExtraIds().map(i=>[i, rutinaNombre(i)]), ["Descanso", "Día de descanso"], ["Otro", "Otra actividad"]]; }
 const REG_DIAS = [[1,"Lunes"],[2,"Martes"],[3,"Miércoles"],[4,"Jueves"],[5,"Viernes"],[6,"Sábado"],[0,"Domingo"]];
 function regCfg(){
   const r = (typeof STATE !== "undefined" && STATE && STATE.settings && STATE.settings.registro) || {};
@@ -8185,30 +8435,257 @@ function settingsRegistroAdvanced(){
 }
 
 // U-3: nombres editables de las pestañas "Rutina A" y "Rutina B" (guardados en STATE.meta.rutinaNombres, viajan con la cuenta)
+// ============================================================
+// U-4 · Pestaña "Rutinas": cada rutina guardada tiene su propia pestaña
+// (Rutina A y B son dos más). Datos en STATE.rutinasX = { order, items, conservado }
+// ============================================================
+function rutinasX(){
+  if(typeof STATE === "undefined" || !STATE) return { order:[], items:{}, conservado:[] };
+  if(!STATE.rutinasX || typeof STATE.rutinasX !== "object") STATE.rutinasX = { order:[], items:{}, conservado:[] };
+  const x = STATE.rutinasX;
+  if(!Array.isArray(x.order)) x.order = []; if(!x.items) x.items = {}; if(!Array.isArray(x.conservado)) x.conservado = [];
+  return x;
+}
+function rutinaItem(id){ const x = rutinasX(); return (id && x.items[id]) || null; }
+function rutinaConservada(id){ return rutinasX().conservado.find(c=>c.id === id) || null; }
+function rutinasExtraIds(){ const x = rutinasX(); return x.order.filter(i=>x.items[i]); }
+function rutinaGet(key){
+  if(key === "rutinaA" || key === "rutinaB") return STATE[key];
+  const id = rutinaKeyFromView(key); return id ? rutinaItem(id) : undefined;
+}
+function rutinaViewKeys(){ return ["rutinaA","rutinaB"].concat(rutinasExtraIds().map(i=>"rutinaX_" + i)); }
+function rutinasSyncTabs(){
+  const nav = document.getElementById("tabs"), wrap = document.querySelector(".wrap"), anchor = document.getElementById("tabRutinas");
+  if(!nav || !wrap || !anchor) return;
+  const ids = rutinasExtraIds();
+  nav.querySelectorAll('.tab-btn[data-rutina]').forEach(b=>{ const k = b.dataset.rutina; if(k !== "A" && k !== "B" && !ids.includes(k)) b.remove(); });
+  wrap.querySelectorAll('.view[id^="view-rutinaX_"]').forEach(v=>{ if(!ids.includes(v.id.slice(15))) v.remove(); });
+  ids.forEach(id=>{
+    if(!nav.querySelector(`.tab-btn[data-view="rutinaX_${id}"]`)){
+      const b = document.createElement("button"); b.className = "tab-btn"; b.dataset.view = "rutinaX_" + id; b.dataset.rutina = id;
+      b.textContent = rutinaNombre(id); nav.insertBefore(b, anchor);
+    }
+    if(!document.getElementById("view-rutinaX_" + id)){
+      const v = document.createElement("div"); v.className = "view"; v.id = "view-rutinaX_" + id; wrap.appendChild(v);
+      try{ renderRoutine("rutinaX_" + id); }catch(e){}
+    }
+  });
+}
+function rutinaPersonalPanel(key, r){
+  const f = (name, label, ph) => `<div class="rut-pers-f"><label>${label}</label><span contenteditable="true" data-routine-field="${name}" data-routine="${key}" data-ph="${ph}">${escapeHtml(r[name] || "")}</span></div>`;
+  return `<div class="panel rut-personal"><div class="panel-head"><h2>Información personal de esta rutina</h2></div><div class="panel-body">
+    <div class="rut-pers-grid">
+      <div class="rut-pers-f"><label>Fecha de inicio</label><input type="date" value="${escapeHtml(r.fechaInicio || "")}" onchange="rutinaSetPersonal('${key}','fechaInicio',this.value)"></div>
+      ${f("ciclo","Ciclo","Ej.: ciclo 2, semana 3")}
+      ${f("notaPersonal","Notas personales","Peso usado, sensaciones, ajustes…")}
+    </div></div></div>`;
+}
+function rutinaSetPersonal(key, field, val){ const r = rutinaGet(key); if(!r) return; r[field] = String(val || ""); saveState(); }
+
+// ---------- modal simple ----------
+function rutModal(html, onReady){
+  rutModalClose();
+  const bg = document.createElement("div"); bg.className = "rut-modal-bg"; bg.id = "rutModalBg";
+  bg.innerHTML = `<div class="rut-modal" role="dialog" aria-modal="true">${html}</div>`;
+  bg.addEventListener("mousedown", e=>{ if(e.target === bg) rutModalClose(); });
+  document.body.appendChild(bg);
+  if(onReady) onReady(bg);
+}
+function rutModalClose(){ const b = document.getElementById("rutModalBg"); if(b) b.remove(); }
+function rutSlug(t){ return String(t || "rutina").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "rutina"; }
+function rutLogsDe(id){ return ((STATE.logs && STATE.logs.daily) || []).filter(l=>l.routine === id); }
+function rutIdDe(key){ return key === "A" || key === "B" ? key : key; }
+
+// ---------- lista ----------
+function rutinasRender(){
+  const el = document.getElementById("view-rutinas"); if(!el) return;
+  const x = rutinasX();
+  const all = ["A","B"].concat(rutinasExtraIds());
+  const card = id=>{
+    const r = rutinaGet(id === "A" ? "rutinaA" : (id === "B" ? "rutinaB" : "rutinaX_" + id)); if(!r) return "";
+    const logs = rutLogsDe(id); const last = logs.map(l=>l.date).sort().pop();
+    const base = id === "A" || id === "B";
+    return `<div class="rut-card"><div class="rut-card-main">
+      <div class="rut-card-name">${escapeHtml(rutinaNombre(id))}${base ? ' <span class="rut-chip">base</span>' : ""}</div>
+      <div class="rut-card-sub">${(r.exercises || []).length} ejercicios · ${logs.length} registro(s)${last ? " · último: " + escapeHtml(last) : ""}${r.ciclo ? " · " + escapeHtml(r.ciclo) : ""}</div></div>
+      <div class="rut-card-act">
+        <button onclick="showView('${id === "A" ? "rutinaA" : (id === "B" ? "rutinaB" : "rutinaX_" + id)}')">Abrir</button>
+        <button onclick="rutinaNuevaModal('${id}')">Duplicar</button>
+        <button onclick="rutinaExportarModal('${id}')">Guardar copia</button>
+        ${base ? "" : `<button class="danger" onclick="rutinaEliminarModal('${id}')">Eliminar</button>`}
+      </div></div>`;
+  };
+  const cons = x.conservado.map(c=>`<div class="rut-card rut-card-cons"><div class="rut-card-main"><div class="rut-card-name">${escapeHtml(c.nombre)} <span class="rut-chip">info conservada</span></div>
+      <div class="rut-card-sub">Eliminada el ${escapeHtml(c.fecha || "")}${c.fechaInicio ? " · inicio " + escapeHtml(c.fechaInicio) : ""}${c.ciclo ? " · " + escapeHtml(c.ciclo) : ""} · ${c.logs || 0} registro(s) conservados</div></div>
+      <div class="rut-card-act"><button class="danger" onclick="rutinaDescartarConservada('${c.id}')">Descartar</button></div></div>`).join("");
+  el.innerHTML = `<div class="panel"><div class="panel-head"><h2>Rutinas</h2><span class="count">${all.length}</span></div><div class="panel-body">
+    <p class="rut-intro">Cada rutina tiene su propia pestaña. Podés crear una nueva, duplicar una existente, guardar una copia en un archivo (eligiendo qué incluir) o importar una.</p>
+    <div class="rut-toolbar"><button class="rut-primary" onclick="rutinaNuevaModal()">+ Nueva rutina</button><button onclick="rutinaImportarArchivo()">Importar archivo</button></div>
+    <div class="rut-list">${all.map(card).join("")}</div>
+    ${cons ? `<h3 class="rut-sub">Información conservada de rutinas eliminadas</h3><div class="rut-list">${cons}</div>` : ""}
+  </div></div>`;
+}
+
+// ---------- crear / duplicar ----------
+function rutinaNuevaModal(baseId){
+  const opts = ["A","B"].concat(rutinasExtraIds()).map(i=>`<option value="${i}" ${i === baseId ? "selected" : ""}>Copia de ${escapeHtml(rutinaNombre(i))}</option>`).join("");
+  rutModal(`<h3>${baseId ? "Duplicar rutina" : "Nueva rutina"}</h3>
+    <label>Nombre</label><input type="text" id="rutNewNombre" maxlength="30" value="${baseId ? escapeHtml(rutinaNombre(baseId)) + " (copia)" : ""}" placeholder="Ej.: Pierna y glúteos">
+    <label>Punto de partida</label><select id="rutNewBase"><option value="">Rutina vacía</option>${opts}</select>
+    <label>Qué copiar (si partís de una existente)</label>${rutPartesHtml("rutNew")}
+    <div class="rut-modal-act"><button onclick="rutModalClose()">Cancelar</button><button class="rut-primary" onclick="rutinaCrear()">Crear</button></div>`,
+    ()=>{ const i = document.getElementById("rutNewNombre"); if(i){ i.focus(); i.select(); } });
+}
+function rutPartesHtml(pfx, disabledLogs){
+  const c = (k, t, on)=>`<label class="rut-check"><input type="checkbox" id="${pfx}_${k}" ${on ? "checked" : ""}> ${t}</label>`;
+  return c("ej","Ejercicios (sets, reps, descansos, notas)",true) + c("tx","Título, descripción y regresión",true) + c("pe","Información personal (peso usado, notas, fecha de inicio y ciclo)",true) + c("lg","Registros diarios hechos con esa rutina",false);
+}
+function rutPartes(pfx){ const g = k=>{ const e = document.getElementById(pfx + "_" + k); return !!(e && e.checked); }; return { ej:g("ej"), tx:g("tx"), pe:g("pe"), lg:g("lg") }; }
+const RUT_EX_PERSONALES = ["notas","nota","notasPersonales","peso","pesoUsado"];
+function rutEmpaquetar(id, p){
+  const r = rutinaGet(id === "A" ? "rutinaA" : (id === "B" ? "rutinaB" : "rutinaX_" + id)); const out = { nombre: rutinaNombre(id), partes: [] };
+  if(p.ej){
+    out.exercises = JSON.parse(JSON.stringify(r.exercises || [])).map(ex=>{
+      delete ex.lid;
+      if(!p.pe){ RUT_EX_PERSONALES.forEach(k=>delete ex[k]); if(ex.stats) ["peso","pesoUsado"].forEach(k=>delete ex.stats[k]); }
+      return ex;
+    });
+    out.partes.push("ejercicios");
+  }
+  if(p.tx){ out.title = r.title; out.desc = r.desc; out.regresion = r.regresion || ""; out.partes.push("textos"); }
+  if(p.pe){ out.fechaInicio = r.fechaInicio || ""; out.ciclo = r.ciclo || ""; out.notaPersonal = r.notaPersonal || ""; out.partes.push("personal"); }
+  if(p.lg){ out.logs = JSON.parse(JSON.stringify(rutLogsDe(id))); out.partes.push("registros"); }
+  return out;
+}
+function rutAplicar(item, pack, p, nuevoId){
+  if(p.ej && pack.exercises) item.exercises = JSON.parse(JSON.stringify(pack.exercises)).map(ex=>{ ex.lid = uid("x"); return ex; });
+  if(p.tx){ if(pack.title !== undefined) item.title = pack.title; if(pack.desc !== undefined) item.desc = pack.desc; if(pack.regresion !== undefined) item.regresion = pack.regresion; }
+  if(p.pe){ item.fechaInicio = pack.fechaInicio || ""; item.ciclo = pack.ciclo || ""; item.notaPersonal = pack.notaPersonal || ""; }
+  if(p.lg && pack.logs && pack.logs.length){
+    pack.logs.forEach(l=>{ const c = JSON.parse(JSON.stringify(l)); c.id = uid("log"); c.routine = nuevoId; STATE.logs.daily.push(c); });
+    STATE.logs.daily.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  }
+}
+function rutNuevoItem(nombre){
+  const x = rutinasX(); const id = uid("r").replace("r_", "r");
+  x.items[id] = { id, nombre, title: nombre, desc: "", regresion: "", exercises: [], fechaInicio: "", ciclo: "", notaPersonal: "", creada: new Date().toISOString().slice(0,10) };
+  x.order.push(id); return id;
+}
+function rutinaCrear(){
+  const nombre = (document.getElementById("rutNewNombre").value || "").replace(/\s+/g," ").trim().slice(0,30);
+  if(!nombre){ alert("Escribí un nombre para la rutina."); return; }
+  const base = document.getElementById("rutNewBase").value, p = rutPartes("rutNew");
+  const id = rutNuevoItem(nombre);
+  if(base){ const pack = rutEmpaquetar(base, p); rutAplicar(rutinaItem(id), pack, p, id); if(!p.tx) rutinaItem(id).title = nombre; }
+  saveState(); rutModalClose(); rutinaApplyNames(); renderRoutine("rutinaX_" + id);
+  try{ if(document.getElementById("newLogDate")) saveRegistroDraft(); renderRegistro(); }catch(e){}
+  rutinasRender(); showView("rutinaX_" + id);
+}
+
+// ---------- guardar copia / importar ----------
+function rutinaExportarModal(id){
+  rutModal(`<h3>Guardar copia de «${escapeHtml(rutinaNombre(id))}»</h3><p class="rut-hint">Elegí qué querés guardar en el archivo.</p>${rutPartesHtml("rutExp")}
+    <div class="rut-modal-act"><button onclick="rutModalClose()">Cancelar</button><button class="rut-primary" onclick="rutinaExportar('${id}')">Descargar</button></div>`);
+}
+function rutinaExportar(id){
+  const p = rutPartes("rutExp");
+  if(!p.ej && !p.tx && !p.pe && !p.lg){ alert("Elegí al menos una parte."); return; }
+  const pack = rutEmpaquetar(id, p); pack.formato = "bitacora-rutina"; pack.version = 1;
+  const blob = new Blob([JSON.stringify(pack, null, 2)], { type:"application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "rutina-" + rutSlug(pack.nombre) + ".json";
+  document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500); rutModalClose();
+}
+function rutinaImportarArchivo(){
+  const inp = document.createElement("input"); inp.type = "file"; inp.accept = "application/json,.json";
+  inp.onchange = ()=>{
+    const f = inp.files && inp.files[0]; if(!f) return;
+    const rd = new FileReader();
+    rd.onload = ()=>{
+      let pack; try{ pack = JSON.parse(rd.result); }catch(e){ alert("El archivo no es un JSON válido."); return; }
+      if(!pack || pack.formato !== "bitacora-rutina"){ alert("Este archivo no es una copia de rutina de la Bitácora."); return; }
+      const id = rutNuevoItem(String(pack.nombre || "Rutina importada").slice(0,30));
+      const p = { ej:!!pack.exercises, tx:pack.title !== undefined, pe:pack.fechaInicio !== undefined || pack.ciclo !== undefined, lg:!!(pack.logs && pack.logs.length) };
+      rutAplicar(rutinaItem(id), pack, p, id); if(!p.tx) rutinaItem(id).title = rutinaItem(id).nombre;
+      saveState(); rutinaApplyNames(); renderRoutine("rutinaX_" + id); rutinasRender();
+      alert("Rutina importada: " + rutinaItem(id).nombre + " (" + (pack.partes || []).join(", ") + ").");
+    };
+    rd.readAsText(f);
+  };
+  inp.click();
+}
+
+// ---------- eliminar ----------
+function rutinaEliminarModal(id){
+  const it = rutinaItem(id); if(!it) return; const n = rutLogsDe(id).length;
+  rutModal(`<h3>Eliminar «${escapeHtml(it.nombre)}»</h3>
+    <p class="rut-hint">La rutina (ejercicios, título, descripción y regresión) se elimina. ¿Qué hacemos con su información personal (fecha de inicio, ciclo, notas) y sus ${n} registro(s) diario(s)?</p>
+    <div class="rut-modal-col">
+      <button class="rut-primary" onclick="rutinaEliminar('${id}', true)">Conservar la información personal</button>
+      <button class="danger" onclick="rutinaEliminar('${id}', false)">Desechar todo (incluye los ${n} registro(s))</button>
+      <button onclick="rutModalClose()">Cancelar</button>
+    </div>`);
+}
+function rutinaEliminar(id, conservar){
+  const x = rutinasX(), it = rutinaItem(id); if(!it) return;
+  if(!conservar && !confirm("Se borrarán la rutina, su información personal y sus registros diarios. No se puede deshacer. ¿Continuar?")) return;
+  const logs = rutLogsDe(id);
+  if(conservar){
+    x.conservado.push({ id, nombre: it.nombre, fecha: new Date().toISOString().slice(0,10), fechaInicio: it.fechaInicio || "", ciclo: it.ciclo || "", notaPersonal: it.notaPersonal || "", logs: logs.length });
+  }else{
+    STATE.logs.daily = STATE.logs.daily.filter(l=>l.routine !== id);
+  }
+  delete x.items[id]; x.order = x.order.filter(i=>i !== id);
+  try{ const rpd = STATE.settings && STATE.settings.registro && STATE.settings.registro.rutinaPorDia; if(rpd) Object.keys(rpd).forEach(k=>{ if(rpd[k] === id) rpd[k] = ""; }); }catch(e){}
+  if(_currentView === "rutinaX_" + id) showView("rutinas");
+  saveState(); rutModalClose(); rutinasSyncTabs();
+  try{ if(document.getElementById("newLogDate")) saveRegistroDraft(); renderRegistro(); }catch(e){}
+  rutinasRender();
+}
+function rutinaDescartarConservada(id){
+  if(!confirm("Se descartará la información conservada de esta rutina (sus registros diarios no se tocan). ¿Continuar?")) return;
+  const x = rutinasX(); x.conservado = x.conservado.filter(c=>c.id !== id); saveState(); rutinasRender();
+}
+
 function rutinaNombre(k){
   const n = (typeof STATE !== "undefined" && STATE && STATE.meta && STATE.meta.rutinaNombres) || {};
+  if(k !== "A" && k !== "B"){
+    const it = rutinaItem(k); if(it) return String(it.nombre || "").trim() || "Rutina";
+    const c = rutinaConservada(k); return c ? c.nombre : String(k);
+  }
   const v = String(n[k] || "").trim();
-  return v || (k === "A" ? "Rutina A" : (k === "B" ? "Rutina B" : String(k)));
+  return v || (k === "A" ? "Rutina A" : "Rutina B");
 }
 function rutinaNombreLargo(k){
+  if(k !== "A" && k !== "B") return rutinaNombre(k);
   const n = (typeof STATE !== "undefined" && STATE && STATE.meta && STATE.meta.rutinaNombres) || {};
   const v = String(n[k] || "").trim();
-  return v || (k === "A" ? "Rutina A — Fuerza y acondicionamiento" : (k === "B" ? "Rutina B — Cardio + Core" : String(k)));
+  return v || (k === "A" ? "Rutina A — Fuerza y acondicionamiento" : "Rutina B — Cardio + Core");
 }
-function rutinaKeyFromView(v){ return v === "rutinaA" ? "A" : (v === "rutinaB" ? "B" : null); }
+function rutinaKeyFromView(v){
+  if(v === "rutinaA") return "A"; if(v === "rutinaB") return "B";
+  const m = /^rutinaX_(.+)$/.exec(String(v || "")); return m ? m[1] : null;
+}
 function rutinaApplyNames(){
-  ["A","B"].forEach(k=>{
-    const b = document.querySelector(`.tab-btn[data-view="rutina${k}"]`);
+  rutinasSyncTabs();
+  ["A","B"].concat(rutinasExtraIds()).forEach(k=>{
+    const b = document.querySelector(`.tab-btn[data-view="${k === "A" || k === "B" ? "rutina" + k : "rutinaX_" + k}"]`);
     if(b && !b.querySelector("input")) b.textContent = rutinaNombre(k);
     ["newLogRoutine","editLogRoutine"].forEach(id=>{
       const o = document.querySelector(`#${id} option[value="${k}"]`); if(o) o.textContent = rutinaNombreLargo(k);
     });
-    const si = document.querySelector(`[data-panel-search="rutina${k}"] .panel-search-input`);
+    const si = document.querySelector(`[data-panel-search="${k === "A" || k === "B" ? "rutina" + k : "rutinaX_" + k}"] .panel-search-input`);
     if(si) si.placeholder = `Buscar ejercicio en ${rutinaNombre(k)}…`;
   });
 }
 function rutinaSetNombre(k, v){
-  if(k !== "A" && k !== "B") return;
+  if(k !== "A" && k !== "B"){
+    const it = rutinaItem(k); if(!it) return;
+    it.nombre = String(v || "").replace(/\s+/g, " ").trim().slice(0, 30) || "Rutina";
+    saveState(); rutinaApplyNames();
+    try{ if(document.getElementById("newLogDate")) saveRegistroDraft(); renderRegistro(); }catch(e){}
+    try{ if(_currentView === "rutinas") rutinasRender(); }catch(e){}
+    return;
+  }
   if(!STATE.meta) STATE.meta = {};
   const cur = Object.assign({}, STATE.meta.rutinaNombres || {});
   v = String(v || "").replace(/\s+/g, " ").trim().slice(0, 30);
@@ -8241,14 +8718,14 @@ function rutinaEditTab(btn){
 }
 (function(){
   document.addEventListener("dblclick", function(e){
-    const b = e.target.closest && e.target.closest('.tab-btn[data-view="rutinaA"], .tab-btn[data-view="rutinaB"]');
+    const b = e.target.closest && e.target.closest('.tab-btn[data-rutina]');
     if(b){ e.preventDefault(); rutinaEditTab(b); }
   });
   // celular: mantener presionado ~0,6 s sobre la pestaña
   let t = 0, sx = 0, sy = 0;
   document.addEventListener("pointerdown", function(e){
     if(e.pointerType !== "touch") return;
-    const b = e.target.closest && e.target.closest('.tab-btn[data-view="rutinaA"], .tab-btn[data-view="rutinaB"]');
+    const b = e.target.closest && e.target.closest('.tab-btn[data-rutina]');
     if(!b || b.querySelector("input")) return;
     sx = e.clientX; sy = e.clientY;
     clearTimeout(t); t = setTimeout(()=>{ rutinaEditTab(b); }, 650);
@@ -8316,7 +8793,7 @@ function commitLog(f){
     dateFormatted,
     routine: f.routine,
     energia: f.energia || null,
-    fatiga: f.fatiga || null,
+    fatiga: fatigaHas(f.fatiga) ? String(f.fatiga) : null,
     sueno: f.sueno || "", comida: f.comida || "",
     comidaCal: f.comidaCal || null, comidaTipos: Array.isArray(f.comidaTipos) ? f.comidaTipos : [],
     notas: f.notas || ""
@@ -8493,16 +8970,18 @@ function editLogHtml(e){
           <select id="editLogRoutine">
             ${opt("A", rutinaNombreLargo("A"))}
             ${opt("B", rutinaNombreLargo("B"))}
+            ${rutinasExtraIds().map(i=>opt(i, escapeHtml(rutinaNombre(i)))).join("")}
+            ${(e.routine && !["A","B","Descanso","Otro"].includes(e.routine) && !rutinaItem(e.routine)) ? opt(e.routine, escapeHtml(rutinaNombre(e.routine)) + " (eliminada)") : ""}
             ${opt("Descanso", "Día de descanso")}
             ${opt("Otro", "Otra actividad")}
           </select>
         </div>
         <div class="form-field"><label>Energía (1-5)</label><div class="scale-row" id="scaleEditEnergia">${dots(e.energia)}</div></div>
-        <div class="form-field"><label>Fatiga / dolor muscular (1-5)</label>${fatigaScaleHtml("scaleEditFatiga", e.fatiga)}</div>
+        <div class="form-field"><label>Fatiga / dolor muscular (0-5)</label>${fatigaScaleHtml("scaleEditFatiga", e.fatiga)}</div>
         <div class="form-field"><label>Sueño (horas)</label><input type="text" id="editLogSueno" value="${escapeHtml(e.sueno || "")}"></div>
         <div class="form-field" style="grid-column:1 / -1"><label>Alimentación del día</label>${comidaFieldHtml("edit", "editLogComida", e.comida, e.comidaCal, e.comidaTipos)}</div>
       </div>
-      <div class="form-field" style="margin-bottom:14px"><label>Notas</label><textarea id="editLogNotas">${escapeHtml(e.notas || "")}</textarea></div>
+      <div class="form-field" style="margin-bottom:14px"><label>Notas</label>${notasEditorHtml("editLogNotas", e.notas || "", "")}</div>
       <div class="log-edit-actions">
         <button class="secondary-btn" onclick="cancelEditLog()">Cancelar</button>
         <button class="primary-btn" onclick="saveEditLog('${e.id}')">Guardar cambios</button>
@@ -8569,7 +9048,8 @@ function renderSemanal(){
   const container = document.getElementById("view-semanal");
   const totalLogs = STATE.logs.daily.length;
   const avgEnergia = totalLogs ? (STATE.logs.daily.reduce((s,l)=>s+(parseInt(l.energia)||0),0)/(STATE.logs.daily.filter(l=>l.energia).length || 1)).toFixed(1) : "—";
-  const avgFatiga = totalLogs ? (STATE.logs.daily.reduce((s,l)=>s+(parseInt(l.fatiga)||0),0)/(STATE.logs.daily.filter(l=>l.fatiga).length || 1)).toFixed(1) : "—";
+  const _fatList = STATE.logs.daily.filter(l=>fatigaHas(l.fatiga));
+  const avgFatiga = _fatList.length ? (_fatList.reduce((t,l)=>t+parseInt(l.fatiga,10),0)/_fatList.length).toFixed(1) : "—";
 
   let html = `
   <div class="panel">
@@ -8845,7 +9325,8 @@ function renderMuro(){
 // app: al abrirla vuelve a la misma pestaña y al mismo punto donde la dejaste.
 const _scrollPositions = {};          // copia en memoria de la sesión (más fresca que STATE)
 let _currentView = "rutinaA";         // se corrige al arrancar con STATE.ui.vista
-const VISTAS_VALIDAS = ["muro","rutinaA","rutinaB","calentamiento","tecnica","biblioteca","anatomia","registro","semanal"];
+const VISTAS_VALIDAS = ["muro","rutinaA","rutinaB","rutinas","calentamiento","tecnica","biblioteca","anatomia","registro","semanal"];
+function vistaValida(v){ return VISTAS_VALIDAS.includes(v) || (rutinaKeyFromView(v) !== null && !!rutinaGet(v)); }
 
 function ensureUiState(){
   if(!STATE.ui || typeof STATE.ui !== "object") STATE.ui = {};
@@ -8863,7 +9344,7 @@ let _addExFabRoutine = null;
 function updateAddExFab(viewKey){
   const fab = document.getElementById("addExFabBtn");
   if(!fab) return;
-  if(viewKey === "rutinaA" || viewKey === "rutinaB"){
+  if(rutinaKeyFromView(viewKey) !== null){
     _addExFabRoutine = viewKey;
     fab.classList.add("visible");
   }else{
@@ -8911,7 +9392,8 @@ function restoreScrollFor(viewKey){
 function showView(viewKey){
   if(viewKey === "estandar") viewKey = "biblioteca"; // N-1: la pestaña "Estándar de repeticiones" pasó a la Biblioteca
   setTimeout(psUpdateFloating, 80); setTimeout(psUpdateFloating, 450); // P-1
-  if(!VISTAS_VALIDAS.includes(viewKey)) viewKey = "rutinaA";
+  rutinasSyncTabs();
+  if(!vistaValida(viewKey)) viewKey = "rutinaA";
   if(regLeaveGuard(viewKey)) return;
   if(_currentView){
     _scrollPositions[_currentView] = window.scrollY;
@@ -8936,6 +9418,7 @@ function showView(viewKey){
       toggle.classList.add("muro-toggle-enter");
     }
   }
+  if(viewKey === "rutinas"){ try{ rutinasRender(); }catch(e){ console.error(e); } }
   updateAddExFab(viewKey);
 }
 
@@ -9783,6 +10266,7 @@ function renderAll(){
   renderMuro();
   renderRoutine("rutinaA");
   renderRoutine("rutinaB");
+  rutinasSyncTabs(); rutinaViewKeys().forEach(k=>{ if(k !== "rutinaA" && k !== "rutinaB") renderRoutine(k); });
   renderCalentamiento();
   renderTecnica();
   try{ _bibSel = (STATE.ui && STATE.ui.bibSel) || _bibSel; }catch(e){}
@@ -10750,7 +11234,7 @@ function startCardSeq(routineKey, idx){
   if(cardSeqRun && cardSeqRun.phase !== "done" && (cardSeqRun.routineKey !== routineKey || cardSeqRun.idx !== idx)){
     if(!confirm("Ya hay una secuencia corriendo en otro ejercicio. ¿Detenerla e iniciar esta?")) return;
   }
-  const ex = STATE[routineKey].exercises[idx];
+  const ex = rutinaGet(routineKey).exercises[idx];
   const stats = ex.stats || {};
   const prepSec = stats.preparacion !== undefined ? parseSecs(stats.preparacion) : 0;
   const workSec = stats.tiempoWork !== undefined ? parseSecs(stats.tiempoWork) : 0;
@@ -11373,7 +11857,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   // Volver a la pestaña y al punto de scroll donde se cerró la app por última vez
   {
     const ui = ensureUiState();
-    const vista = ui.vista === "estandar" ? "biblioteca" : (VISTAS_VALIDAS.includes(ui.vista) ? ui.vista : "rutinaA");
+    const vista = ui.vista === "estandar" ? "biblioteca" : (vistaValida(ui.vista) ? ui.vista : "rutinaA");
     _currentView = vista;
     showView(vista);
   }
