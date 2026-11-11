@@ -11,8 +11,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0E14'/%3E%3Crect x='10' y='29' width='44' height='6' rx='3' fill='%23FF6B5B'/%3E%3Crect x='6' y='20' width='9' height='24' rx='3' fill='%232DD4BF'/%3E%3Crect x='49' y='20' width='9' height='24' rx='3' fill='%232DD4BF'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0E14'/%3E%3Crect x='10' y='29' width='44' height='6' rx='3' fill='%23FF6B5B'/%3E%3Crect x='6' y='20' width='9' height='24' rx='3' fill='%232DD4BF'/%3E%3Crect x='49' y='20' width='9' height='24' rx='3' fill='%232DD4BF'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%232DD4BF'/%3E%3Cpath%20d=%22M38%2027V64M38%2027H53A9%209%200%200%201%2053%2045H38M38%2045H56A9.5%209.5%200%200%201%2056%2064H38%22%20fill=%22none%22%20stroke=%22%230B0E14%22%20stroke-width=%229%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22/%3E%3Crect%20x=%2236%22%20y=%2273%22%20width=%2228%22%20height=%225%22%20rx=%222.5%22%20fill=%22%23FF6B5B%22/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon-maskable-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
@@ -424,6 +424,18 @@
     overflow-x:auto; scrollbar-width:none;
   }
   .tabs::-webkit-scrollbar{ display:none; }
+
+  /* Q-9: flechas "<" ">" para desplazar las pestañas del encabezado cuando no entran (p. ej. pantalla dividida).
+     Son hijos "sticky" del propio .tabs con margen negativo: no ocupan lugar y se ven solo si hay más pestañas a ese lado. */
+  .tabs-arrow{
+    display:none; position:sticky; z-index:4; flex:0 0 28px; width:28px; align-self:stretch;
+    align-items:center; justify-content:center; padding:0; border:none; cursor:pointer;
+    color: var(--text); font-size:20px; line-height:1; font-weight:700;
+  }
+  .tabs-arrow.show{ display:flex; }
+  .tabs-arrow-l{ left:0; margin-right:-28px; background: linear-gradient(90deg, #1a2d26 62%, rgba(26,45,38,0)); justify-content:flex-start; padding-left:3px; }
+  .tabs-arrow-r{ right:0; margin-left:-28px; background: linear-gradient(270deg, #1a2d26 62%, rgba(26,45,38,0)); justify-content:flex-end; padding-right:3px; }
+  .tabs-arrow:hover{ color: var(--teal); }
   .tab-btn{
     font-family: var(--font-body);
     font-weight: 600;
@@ -848,6 +860,8 @@
   /* U-6: notas del registro con negrita (editor rico; se guarda como **texto**) */
   div.notas-rich{ width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:4px; font-family:var(--font-body); background:var(--surface-2); color:var(--text); white-space:pre-wrap; word-break:break-word; outline:none; box-sizing:border-box; cursor:text; }
   div.notas-rich:focus{ border-color:var(--gold, var(--line)); }
+  /* Q-10: sobre la barra de desplazamiento de un campo editable el cursor vuelve a ser flecha (antes quedaba el cursor de texto) */
+  [contenteditable="true"].on-sb, [contenteditable="true"].on-sb:hover, div.notas-rich.on-sb{ cursor:default !important; }
   div.notas-rich:empty:before{ content:attr(data-placeholder); color:var(--text-dim); pointer-events:none; }
   div.notas-rich b, div.notas-rich strong{ font-weight:800; }
   .notas-bar{ display:flex; gap:6px; margin:0 0 6px; }
@@ -1190,6 +1204,15 @@
   .anat-mus .am.s path{ fill: rgba(255,154,92,0.62); stroke: var(--anat-s); }
   .anat-mus .am.p path{ fill: rgba(255,77,77,0.8); stroke: var(--anat-p); filter: drop-shadow(0 0 4px rgba(255,77,77,0.7)); }
   .anat-mus .am.sel path{ stroke:#fff; stroke-width:1.8; }
+  /* Q-12: volumen realista — luz y sombra por músculo, sombra interior en los bordes, contornos finos */
+  .anat-mus .am > path{ stroke-width:.6; stroke-linejoin:round; }
+  .anat-mus .am path.vo{ stroke:none !important; fill-opacity:1 !important; pointer-events:none; filter:none !important; }
+  .anat-mus .am .vi{ pointer-events:none; }
+  .anat-mus .am .vi path{ fill:#000 !important; stroke:none !important; filter:none !important; pointer-events:none; }
+  .anat-mus .am.p > path{ fill: rgba(214,52,56,0.92); stroke: rgba(255,120,110,.9); }
+  .anat-mus .am.s > path{ fill: rgba(236,128,72,0.78); }
+  .anat-root.show-skin .anat-mus .am path.vo{ opacity:.55; }
+  .anat-root.show-skin .anat-mus .am .vi{ opacity:.6; }
   /* piel (Q-18) */
   .anat-skin{ display:none; pointer-events:none; }
   .anat-skin{ filter: drop-shadow(0 0 .8px rgba(70,34,18,.75)); }
@@ -1233,7 +1256,7 @@
   .anat-mn em{ font-style:normal; font-size:10px; padding:1px 7px; border-radius:999px; margin-left:6px; }
   .anat-mn em.p{ background: rgba(255,77,77,0.3); } .anat-mn em.s{ background: rgba(255,154,92,0.3); }
   /* panel flotante — acoplado al costado de las tarjetas (Q-15) */
-  .anat-fab{ position:fixed; left:20px; bottom:112px; z-index:80; width:48px; height:48px; border-radius:50%; border:none; background:#2a3a44; color:#ff8a7a; box-shadow:0 6px 18px rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; cursor:pointer; transition: transform .15s, background .2s; }
+  .anat-fab{ position:fixed; left:20px; bottom:112px; z-index:80; width:48px; height:48px; border-radius:50%; border:none; background:#2a3a44; color:#ff8a7a; box-shadow:0 6px 18px rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; cursor:pointer; transition: transform .15s, background .2s, bottom .2s; }
   .anat-fab:hover{ transform:scale(1.07); background:#34495a; }
   .anat-fab.open{ background:#ff4d4d; color:#1a0d0d; }
   .anat-fab svg{ width:26px; height:26px; }
@@ -1597,6 +1620,12 @@
   }
   .muro-avatar:hover{ box-shadow: 0 0 0 2px var(--coral), 0 4px 14px rgba(0,0,0,0.45); }
   .muro-avatar img{ width:100%; height:100%; object-fit:cover; }
+  /* R-1 / V-1: franja bajo la portada, a la derecha de la foto de perfil y alineada a la IZQUIERDA, para el chip "Links de esta pestaña" */
+  .muro-links-row{
+    display:flex; justify-content:flex-start; align-items:center;
+    min-height:46px; padding:0 14px 0 120px;
+    position:relative; z-index:3;
+  }
   .muro-cover-actions{
     position:absolute; right:14px; bottom:14px;
     display:flex; gap:8px;
@@ -2161,6 +2190,30 @@
   .fase-icon-badge .fase-uni{ font-size:21px; line-height:1; display:block; }
   .fase-icon-badge .fase-uni.combo{ font-size:11px; letter-spacing:-1px; white-space:nowrap; }
   .fase-pick-emo{ max-height:300px; overflow-y:auto; padding:2px 4px 2px 0; }
+
+  /* S-4: contenido pegado con formato (tablas, títulos, negritas, listas) */
+  .rich-bar{ display:flex; justify-content:flex-end; margin:0 0 6px; }
+  .rich-btn{ border:1px solid var(--line); background:transparent; color:var(--text-dim); font:inherit; font-size:11px; font-weight:700; letter-spacing:.04em; padding:4px 12px; border-radius:999px; cursor:pointer; }
+  .rich-btn:hover{ color:var(--text); border-color:var(--text-dim); }
+  .rich-html.rich-editing{ outline:1px dashed var(--line); outline-offset:3px; border-radius:6px; }
+  .rich-html table, div.notas-rich table, .log-notes table{ display:block; width:100%; max-width:100%; overflow-x:auto; border-collapse:collapse; margin:8px 0 14px; font-size:13px; white-space:normal; }
+  .rich-html th, div.notas-rich th, .log-notes th{ text-align:left; padding:8px 12px; background:rgba(255,255,255,0.06); color:var(--text); font-weight:700; border:1px solid var(--line-soft); }
+  .rich-html td, div.notas-rich td, .log-notes td{ padding:8px 12px; border:1px solid var(--line-soft); vertical-align:top; }
+  .rich-html h1, .rich-html h2, .rich-html h3, .rich-html h4, div.notas-rich h1, div.notas-rich h2, div.notas-rich h3, div.notas-rich h4, .log-notes h1, .log-notes h2, .log-notes h3, .log-notes h4{ margin:14px 0 8px; color:var(--text); line-height:1.25; font-family:var(--font-display, inherit); white-space:normal; }
+  .rich-html h1, .rich-html h2, div.notas-rich h1, div.notas-rich h2, .log-notes h1, .log-notes h2{ font-size:18px; }
+  .rich-html h3, .rich-html h4, div.notas-rich h3, div.notas-rich h4, .log-notes h3, .log-notes h4{ font-size:15px; }
+  .rich-html p, div.notas-rich p{ margin:0 0 10px; white-space:normal; }
+  .rich-html ul, .rich-html ol, div.notas-rich ul, div.notas-rich ol, .log-notes ul, .log-notes ol{ margin:0 0 12px; padding-left:22px; white-space:normal; }
+  .rich-html li, div.notas-rich li, .log-notes li{ margin:4px 0; }
+  .rich-html hr, div.notas-rich hr, .log-notes hr{ border:0; border-top:1px solid var(--line-soft); margin:16px 0; }
+  .rich-html blockquote, div.notas-rich blockquote, .log-notes blockquote{ margin:8px 0; padding:4px 0 4px 12px; border-left:3px solid var(--line); color:var(--text-soft); }
+  .rich-html strong, .rich-html b{ color:var(--text); font-weight:700; }
+  .rich-html a{ color:var(--gold, inherit); }
+  /* R-3: pestañas "Ícono | Emoji" del creador de categorías */
+  .fase-tabs{ display:inline-flex; gap:2px; padding:3px; border:1px solid var(--line); border-radius:999px; background:var(--surface-2, transparent); margin-bottom:8px; }
+  .fase-tab{ border:0; background:transparent; color:var(--text-dim); font:inherit; font-size:12px; font-weight:700; letter-spacing:.04em; padding:5px 16px; border-radius:999px; cursor:pointer; }
+  .fase-tab:hover{ color:var(--text); }
+  .fase-tab.on{ background:var(--surface-3); color:var(--text); box-shadow: inset 0 0 0 1px var(--line); }
   .fase-pick-sub{ grid-column:1 / -1; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); font-weight:700; margin-top:6px; }
   .fase-pick-e{ display:flex; align-items:center; justify-content:center; padding:2px; }
   .fase-pick-e img.fase-emo{ width:100%; height:100%; max-width:38px; max-height:38px; object-fit:contain; border-radius:6px; background:rgba(255,255,255,.94); padding:1px; box-sizing:border-box; }
@@ -2469,7 +2522,7 @@
   .qcalc-btn:hover{ background:var(--teal); color:#08201d; }
 
   /* ===== Calculadora (Q-2/Q-3/Q-4): FAB a la izquierda + ventana con teclado, entrenamiento y tabla de unidades ===== */
-  .calc-fab{ position:fixed; left:20px; bottom:168px; z-index:80; width:48px; height:48px; border-radius:50%; border:none; background:var(--gold-vivid,#FFB454); color:#2a1d06; box-shadow:0 6px 18px rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform .15s, box-shadow .15s; }
+  .calc-fab{ position:fixed; left:20px; bottom:168px; z-index:80; width:48px; height:48px; border-radius:50%; border:none; background:var(--gold-vivid,#FFB454); color:#2a1d06; box-shadow:0 6px 18px rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform .15s, box-shadow .15s, bottom .2s; }
   .calc-fab:hover{ transform:scale(1.07); box-shadow:0 8px 22px rgba(0,0,0,0.42); }
   .calc-fab:active{ transform:scale(0.96); }
   .calc-fab svg{ width:24px; height:24px; }
@@ -2516,6 +2569,22 @@
 /* U-1: ayuda bajo "Rutina realizada" (rutina sugerida según el día) */
 .field-hint{ display:block; margin-top:5px; font-size:11.5px; color:var(--text-dim); letter-spacing:.01em; min-height:1em; }
 .field-hint-link{ color:var(--accent, #e8744f); text-decoration:underline; cursor:pointer; }
+.log-gap{ margin:0 16px 10px; padding:5px 10px; display:inline-block; border:1px dashed var(--line); border-radius:999px; font-size:12px; color:var(--text-soft, var(--text-dim)); background:rgba(255,180,84,0.08); }
+.log-gap-hint{ color: var(--gold-vivid, #FFB454); }
+.tabs-order-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; max-height:52vh; overflow:auto; }
+.tabs-order-row{ display:flex; align-items:center; gap:8px; padding:7px 8px; border:1px solid var(--line-soft); border-radius:10px; background:var(--surface-3); cursor:grab; position:relative; }
+.tabs-order-row.current{ border-color:var(--gold-vivid, #FFB454); }
+.tabs-order-row.moved{ animation: tabsOrderFlash .7s ease; }
+.tabs-order-row.dragging{ opacity:.45; }
+.tabs-order-row.over-top::before, .tabs-order-row.over-bottom::after{ content:""; position:absolute; left:6px; right:6px; height:3px; border-radius:2px; background:var(--teal, #2DD4BF); }
+.tabs-order-row.over-top::before{ top:-5px; } .tabs-order-row.over-bottom::after{ bottom:-5px; }
+.tabs-order-grip{ color:var(--text-dim); letter-spacing:-2px; font-size:14px; user-select:none; }
+.tabs-order-n{ min-width:18px; text-align:center; font-size:11.5px; color:var(--text-dim); font-variant-numeric:tabular-nums; }
+.tabs-order-name{ flex:1; min-width:0; font-size:13.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rut-modal .tabs-order-btn{ padding:5px 10px; font-size:12px; line-height:1; min-width:34px; min-height:32px; }
+.rut-modal .tabs-order-btn:disabled{ opacity:.3; cursor:default; }
+.tabs-order-foot{ display:flex; gap:8px; justify-content:space-between; margin-top:12px; flex-wrap:wrap; }
+@keyframes tabsOrderFlash{ 0%{ background:rgba(45,212,191,.35); } 100%{ background:var(--surface-3); } }
 
 /* U-2: engranaje del Registro diario, menú avanzado en Ajustes y campos ocultables */
 .reg-toolbar{ position:relative; display:flex; justify-content:flex-end; margin:0 0 10px; }
@@ -2573,6 +2642,57 @@ button.danger{ color:#F0A296 !important; }
   .notas-bar input[type=color]{ width:30px; height:28px; padding:1px; border:1px solid var(--line); border-radius:4px; background:var(--surface-3); cursor:pointer; }
   div.notas-rich .nn{ text-shadow:0 0 4px currentColor, 0 0 10px currentColor, 0 0 18px currentColor; }
   div.notas-rich span[style*="font-size: medium"]{ font-size:1em !important; }
+
+/* Q-7: Autocontrol — pantalla aparte dentro de Registro diario (3 estilos elegibles) */
+.reg-screen-nav{ display:flex; gap:4px; margin:0 0 14px; padding:4px; border:1px solid var(--line); border-radius:12px; background:var(--surface-2); width:fit-content; max-width:100%; }
+.reg-screen-nav button{ padding:8px 16px; border-radius:9px; border:0; background:transparent; color:var(--text-soft); font:inherit; font-weight:600; cursor:pointer; transition:background .15s, color .15s; }
+.reg-screen-nav button:hover{ color:var(--text); }
+.reg-screen-nav button.on{ background:var(--surface-3); color:var(--text); }
+.ac-root{ --ac-accent:#C9B27C; --ac-hero-bg:linear-gradient(160deg,#2d2b25,#1f2421); --ac-font:Georgia,"Times New Roman",serif; --ac-glow:none; --ac-hero-border:rgba(201,178,124,.45); }
+.ac-root.ac-minimalista{ --ac-accent:#E6E9E8; --ac-hero-bg:transparent; --ac-font:inherit; --ac-glow:none; --ac-hero-border:var(--line); }
+.ac-root.ac-energia{ --ac-accent:#FF7A2F; --ac-hero-bg:linear-gradient(160deg,#2f1c13,#1f2421); --ac-font:inherit; --ac-glow:0 0 26px rgba(255,122,47,.35); --ac-hero-border:rgba(255,122,47,.55); }
+.ac-style-pick{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+.ac-style-pick button{ padding:7px 14px; border-radius:999px; border:1px solid var(--line); background:var(--surface-2); color:var(--text-soft); font:inherit; font-size:13px; cursor:pointer; }
+.ac-style-pick button.on{ border-color:var(--ac-accent); color:var(--ac-accent); background:var(--surface-3); }
+.ac-hero{ display:flex; align-items:center; gap:18px; padding:18px 20px; border-radius:14px; border:1px solid var(--ac-hero-border); background:var(--ac-hero-bg); box-shadow:var(--ac-glow); }
+.ac-glyph{ width:56px; height:56px; flex:0 0 56px; color:var(--ac-accent); filter:drop-shadow(var(--ac-glow)); }
+.ac-glyph svg{ width:100%; height:100%; display:block; }
+.ac-hero-num{ font-family:var(--ac-font); font-size:56px; line-height:1; color:var(--ac-accent); font-weight:700; }
+.ac-hero-label{ margin-top:4px; font-size:13px; color:var(--text-soft); }
+.ac-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
+.ac-stats > div{ padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); text-align:center; }
+.ac-stats b{ display:block; font-family:var(--ac-font); font-size:22px; color:var(--ac-accent); }
+.ac-stats span{ font-size:11.5px; color:var(--text-dim); }
+.ac-strip{ display:flex; gap:5px; margin-top:14px; flex-wrap:wrap; }
+.ac-dot{ width:18px; height:18px; border-radius:50%; border:1px solid var(--line); background:var(--surface-3); }
+.ac-dot.on{ background:var(--ac-accent); border-color:var(--ac-accent); opacity:calc(.3 + var(--lv) * .14); }
+.ac-dot.today{ outline:2px solid var(--ac-accent); outline-offset:2px; }
+.ac-nivel{ display:flex; gap:6px; }
+.ac-nivel button{ width:42px; height:42px; border-radius:10px; border:1px solid var(--line); background:var(--surface-2); color:var(--text-soft); font:inherit; font-weight:700; cursor:pointer; transition:background .15s, color .15s, border-color .15s; }
+.ac-nivel button:hover{ border-color:var(--ac-accent); color:var(--text); }
+.ac-nivel button.on{ background:var(--ac-accent); border-color:var(--ac-accent); color:#1a1d1b; box-shadow:var(--ac-glow); }
+.ac-nivel-cap{ margin-top:6px; font-size:12px; color:var(--text-soft); }
+.ac-root textarea{ width:100%; resize:vertical; }
+.ac-link{ background:none; border:0; padding:4px 6px; color:var(--ac-accent); font:inherit; font-size:13px; cursor:pointer; text-decoration:underline; }
+.ac-link.danger{ color:#e5533d; }
+.ac-entry{ padding:12px 0; border-bottom:1px solid var(--line); }
+.ac-entry:last-child{ border-bottom:0; }
+.ac-entry-head{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.ac-entry-date{ font-family:var(--ac-font); font-weight:700; color:var(--text); }
+.ac-entry-lv{ font-size:12.5px; color:var(--ac-accent); }
+.ac-entry-actions{ margin-left:auto; display:flex; gap:4px; }
+.ac-entry-text{ margin-top:6px; font-size:14px; color:var(--text-soft); white-space:pre-wrap; word-break:break-word; }
+@media (max-width:520px){ .ac-hero-num{ font-size:44px; } .ac-nivel button{ width:38px; height:38px; } }
+
+  /* T-1: celulares en vertical (hasta 480 px): menos márgenes anidados para que las tarjetas de ejercicios ganen ancho,
+     y las barras Time Work / Preparación / Metrónomo se achican en vez de salirse de la tarjeta (Avanzado y Quitar quedan en el otro extremo) */
+  @media (max-width: 480px){
+    .wrap{ padding: 14px 6px 0; }
+    .panel-body{ padding: 12px 8px 14px; }
+    .ex-list{ padding: 8px 6px; }
+    .stat-wide{ min-width:0; max-width:100%; box-sizing:border-box; padding:8px 10px; gap:8px; }
+    .ex-stats-extra{ padding-left:10px; padding-right:10px; }
+  }
 </style>
 </head>
 
@@ -2605,6 +2725,7 @@ button.danger{ color:#F0A296 !important; }
     </div>
   </div>
   <nav class="tabs" id="tabs">
+    <button class="tabs-arrow tabs-arrow-l" type="button" id="tabsArrowL" aria-label="Pestañas anteriores" title="Pestañas anteriores">&#8249;</button>
     <button class="tab-btn" data-view="muro">Muro</button>
     <button class="tab-btn active" data-view="rutinaA" data-rutina="A">Rutina A</button>
     <button class="tab-btn" data-view="rutinaB" data-rutina="B">Rutina B</button>
@@ -2615,6 +2736,7 @@ button.danger{ color:#F0A296 !important; }
     <button class="tab-btn" data-view="anatomia">Anatomía</button>
     <button class="tab-btn" data-view="registro">Registro diario</button>
     <button class="tab-btn" data-view="semanal">Conclusiones semanales</button>
+    <button class="tabs-arrow tabs-arrow-r" type="button" id="tabsArrowR" aria-label="Pestañas siguientes" title="Pestañas siguientes">&#8250;</button>
   </nav>
   <div class="masthead-menu-wrap" id="mastheadMenuWrap">
     <button class="masthead-menu-btn" id="mastheadMenuBtn" onclick="openSettingsModal()" title="Ajustes" aria-label="Ajustes" aria-haspopup="true" aria-expanded="false">
@@ -3097,6 +3219,8 @@ function applyCustomFases(){
   FASE_ORDER.push("accesorio");
 }
 let _faseDraft = null;
+let _faseTab = "icon"; // R-3: pestaña activa del selector "Ícono | Emoji"
+function faseSetTab(t){ _faseTab = (t === "emoji") ? "emoji" : "icon"; renderFaseModal(true); }
 function openFaseModal(id){
   if(!Array.isArray(STATE.fasesCustom)) STATE.fasesCustom = [];
   const cur = id ? STATE.fasesCustom.find(c=>c.id === id) : null;
@@ -3108,6 +3232,7 @@ function openFaseModal(id){
   } else
   _faseDraft = cur ? { id:cur.id, label:cur.label, color:cur.color, icon:cur.icon }
                    : { id:null, label:"", color:freeColor, icon:"estrella" };
+  _faseTab = (typeof _faseDraft.icon === "string" && /^(emo|uni):/.test(_faseDraft.icon)) ? "emoji" : "icon";
   renderFaseModal();
   document.getElementById("faseModalOverlay").classList.add("open");
   const inp = document.getElementById("faseName"); if(inp) inp.focus();
@@ -3149,8 +3274,13 @@ function renderFaseModal(keepName){
     <div class="add-ex-modal-body">
       <label class="add-ex-field"><span>${nl("Nombre","Name")}</span>
         <input type="text" id="faseName" maxlength="28" ${isBase ? "readonly" : ""} value="${escapeHtml(nameVal)}" placeholder="${nl("Ej: Yoga, Natación, Movilidad…","E.g. Yoga, Swimming, Mobility…")}" oninput="faseDraftSet('label', this.value)"></label>
-      <div class="add-ex-field"><span>${nl("Ícono","Icon")}</span><div class="fase-pick-grid">${icons}</div></div>
-      <div class="add-ex-field"><span>${nl("Emojis (en vez de un ícono)","Emojis (instead of an icon)")}</span><div class="fase-pick-grid fase-pick-emo">${faseEmojiPickerHtml(d)}</div></div>
+      <div class="add-ex-field">
+        <div class="fase-tabs" role="tablist">
+          <button type="button" role="tab" class="fase-tab ${_faseTab === "icon" ? "on" : ""}" aria-selected="${_faseTab === "icon"}" onclick="faseSetTab('icon')">${nl("Ícono","Icon")}</button>
+          <button type="button" role="tab" class="fase-tab ${_faseTab === "emoji" ? "on" : ""}" aria-selected="${_faseTab === "emoji"}" onclick="faseSetTab('emoji')">${nl("Emoji","Emoji")}</button>
+        </div>
+        ${_faseTab === "emoji" ? `<div class="fase-pick-grid fase-pick-emo">${faseEmojiPickerHtml(d)}</div>` : `<div class="fase-pick-grid">${icons}</div>`}
+      </div>
       <div class="add-ex-field"><span>${nl("Color","Color")}</span>
         <div class="fase-pick-colors">${sw}<label class="fase-pick-custom" title="${nl("Elegir otro color","Pick another color")}"><input type="color" value="${/^#[0-9a-f]{6}$/i.test(d.color) ? d.color : "#5E7268"}" oninput="faseDraftSet('color', this.value)"></label></div></div>
       <div class="add-ex-field"><span>${nl("Vista previa","Preview")}</span>
@@ -3493,7 +3623,9 @@ const LK_TAB_BTN_VIEWS = ["muro","calentamiento","tecnica","anatomia","registro"
 function lkInjectTabBtns(){
   LK_TAB_BTN_VIEWS.forEach(v=>{
     const root = document.getElementById("view-" + v); if(!root) return;
-    const head = root.querySelector(".panel-head"); if(!head || head.querySelector(".lk-tabbtn")) return;
+    // R-1: en el Muro el chip va en la franja bajo la portada (a la derecha de la foto de perfil), no sobre la imagen
+    const head = (v === "muro") ? root.querySelector("#muroLinksRow") : root.querySelector(".panel-head");
+    if(!head || head.querySelector(".lk-tabbtn")) return;
     const b = document.createElement("button");
     b.type = "button"; b.className = "lk-chip lk-tabbtn"; b.dataset.lkV = "cur";
     b.title = "Links desde y hacia esta pestaña";
@@ -3727,6 +3859,97 @@ function escapeHtml(s){
   return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 function nl2br(s){ return escapeHtml(s).replace(/\n/g, "<br>"); }
+
+// ============================================================
+// S-4: pegar con formato (tablas, títulos, negritas, listas, ✅). Se guarda HTML LIMPIO (lista blanca de etiquetas,
+// sin estilos, scripts ni imágenes). Notas de tarjetas -> ex.<campo>Fmt; Biblioteca -> contenidoHtml + formato:"html";
+// Registro diario -> bloque ⟦H:…⟧ dentro del texto de notas.
+// ============================================================
+const RICH_OK = { TABLE:1,THEAD:1,TBODY:1,TFOOT:1,TR:1,TH:1,TD:1,CAPTION:1,H1:1,H2:1,H3:1,H4:1,H5:1,H6:1,P:1,BR:1,DIV:1,UL:1,OL:1,LI:1,HR:1,BLOCKQUOTE:1,PRE:1,CODE:1,STRONG:1,B:1,EM:1,I:1,U:1,S:1,SUP:1,SUB:1,A:1 };
+const RICH_DROP = { SCRIPT:1,STYLE:1,IFRAME:1,OBJECT:1,EMBED:1,LINK:1,META:1,TITLE:1,HEAD:1,NOSCRIPT:1,TEMPLATE:1,SVG:1,CANVAS:1,VIDEO:1,AUDIO:1,IMG:1,INPUT:1,BUTTON:1,SELECT:1,TEXTAREA:1,FORM:1,PICTURE:1 };
+function richClean(html){
+  let doc;
+  try{ doc = new DOMParser().parseFromString("<body>" + String(html || "") + "</body>", "text/html"); }catch(e){ return ""; }
+  function walk(n){
+    let out = "";
+    n.childNodes.forEach(function(ch){
+      if(ch.nodeType === 3){
+        const p = ch.parentNode ? ch.parentNode.tagName : "";
+        let t = ch.nodeValue.replace(/\u200b/g, "");
+        if(/^(TABLE|THEAD|TBODY|TFOOT|TR|UL|OL)$/.test(p) && !t.trim()) return;
+        if(p === "PRE") out += escapeHtml(t).replace(/\r?\n/g, "<br>");
+        else out += escapeHtml(t.replace(/[ \t\r\n]+/g, " "));
+        return;
+      }
+      if(ch.nodeType !== 1) return;
+      const tag = String(ch.tagName).toUpperCase();
+      if(RICH_DROP[tag]) return;
+      const inner = walk(ch);
+      const st = ch.style || {};
+      if(tag === "SPAN" || tag === "FONT" || !RICH_OK[tag]){
+        let r = inner;
+        if(!r) return;
+        if(/^(bold|[6-9]00)$/.test(st.fontWeight || "")) r = "<strong>" + r + "</strong>";
+        if(st.fontStyle === "italic") r = "<em>" + r + "</em>";
+        if(/underline/.test((st.textDecorationLine || "") + (st.textDecoration || ""))) r = "<u>" + r + "</u>";
+        out += r; return;
+      }
+      if((tag === "B" || tag === "STRONG") && /^(normal|[1-5]00)$/.test(st.fontWeight || "")){ out += inner; return; } // envoltorio de Google Docs
+      if(tag === "BR"){ out += "<br>"; return; }
+      if(tag === "HR"){ out += "<hr>"; return; }
+      let t2 = tag.toLowerCase();
+      if(tag === "B") t2 = "strong"; else if(tag === "I") t2 = "em";
+      let attrs = "";
+      if(tag === "TD" || tag === "TH"){
+        const cs = parseInt(ch.getAttribute("colspan"), 10), rs = parseInt(ch.getAttribute("rowspan"), 10);
+        if(cs > 1 && cs < 50) attrs += ' colspan="' + cs + '"';
+        if(rs > 1 && rs < 200) attrs += ' rowspan="' + rs + '"';
+      }
+      if(tag === "A"){
+        const h = String(ch.getAttribute("href") || "");
+        if(/^(https?:\/\/|mailto:)/i.test(h)) attrs += ' href="' + escapeHtml(h) + '" target="_blank" rel="noopener noreferrer"';
+      }
+      out += "<" + t2 + attrs + ">" + inner + "</" + t2 + ">";
+    });
+    return out;
+  }
+  return walk(doc.body).replace(/^(\s|<br>)+|(\s|<br>)+$/g, "");
+}
+function richHasStructure(html){ return /<(table|h[1-6]|hr|ul|ol|blockquote|pre|strong|em|u|s)[\s>]/i.test(String(html || "")); }
+function richHasBlock(html){ return /<(table|h[1-6]|hr|ul|ol|blockquote|pre)[\s>]/i.test(String(html || "")); }
+// Botón "Editar texto" / "Ver con formato" de las notas de las tarjetas
+function richToggle(btn){
+  const bar = btn.closest(".rich-bar"), el = bar && bar.nextElementSibling;
+  if(!el) return;
+  if(el.getAttribute("contenteditable") !== "true"){
+    el.setAttribute("contenteditable", "true"); el.classList.add("rich-editing");
+    el.addEventListener("blur", onEditableBlur);
+    btn.textContent = nl("Ver con formato", "View formatted");
+    el.focus();
+  } else {
+    el.removeEventListener("blur", onEditableBlur);
+    onEditableBlur({ target: el });
+    el.setAttribute("contenteditable", "false"); el.classList.remove("rich-editing");
+    btn.textContent = nl("Editar texto", "Edit text");
+  }
+}
+// Campo de nota que pasa de texto a texto con formato (recién pegado): se muestra con formato y con su botón
+function richToView(el, fmt){
+  if(!el || el.dataset.fmt) return;
+  el.dataset.fmt = "1"; el.classList.add("rich-html");
+  el.innerHTML = fmt;
+  el.setAttribute("contenteditable", "false");
+  el.removeEventListener("blur", onEditableBlur);
+  const bar = document.createElement("div");
+  bar.className = "rich-bar";
+  bar.innerHTML = `<button type="button" class="rich-btn" onclick="richToggle(this)">${nl("Editar texto", "Edit text")}</button>`;
+  el.parentNode.insertBefore(bar, el);
+}
+function exNoteHtml(ex, field, ph){
+  const fmt = ex[field + "Fmt"] ? richClean(ex[field + "Fmt"]) : "";
+  if(fmt) return `<div class="rich-bar"><button type="button" class="rich-btn" onclick="richToggle(this)">${nl("Editar texto", "Edit text")}</button></div><div class="rich-html" contenteditable="false" data-field="${field}" data-fmt="1" data-richpaste="1">${fmt}</div>`;
+  return `<div contenteditable="true" data-field="${field}" data-richpaste="1" data-placeholder="${ph}">${nl2br(ex[field] || "")}</div>`;
+}
 function flashSaved(){
   const el = document.getElementById("savedFlash");
   el.classList.add("show");
@@ -4218,7 +4441,7 @@ async function ensureDriveToken(){
 // Ahora se guarda la "base" (la última copia que este dispositivo sincronizó) y, cuando el
 // archivo de Drive cambió desde entonces, se fusiona de 3 vías: lo que cambió acá se conserva,
 // lo que cambió en el otro dispositivo también; solo si se tocó EL MISMO dato en los dos gana
-// lo de este dispositivo. Ajustes de interfaz (STATE.ui / STATE.settings) siguen siendo del dispositivo.
+// lo de este dispositivo. R-2: los ajustes (STATE.settings, sin la cuenta/sesión) y el modelo anatómico ahora también viajan; STATE.ui (pestaña abierta y scroll) sigue siendo del dispositivo.
 const DRIVE_BASE_KEY = "drive_base_v1";
 let driveBase = null;
 let driveRenderPending = false;
@@ -4290,16 +4513,35 @@ function dMergeArr(b, l, r){
   if(l.length === r.length) return l.map((x, i)=> dm3(bb[i], x, r[i]));
   return l;
 }
+// R-2: STATE.settings ahora viaja entre dispositivos (idioma, sonido, colores, Registro, notificaciones),
+// salvo "cuenta" (correo/sesión), que es propia de cada dispositivo. STATE.ui (pestaña abierta y scroll) sigue local.
+function dSettingsShared(s){
+  if(!dIsObj(s)) return s;
+  const c = {};
+  Object.keys(s).forEach(k=>{ if(k !== "cuenta") c[k] = s[k]; });
+  return c;
+}
+function dMergeSettings(b, l, r){
+  if(!dIsObj(l)) return dIsObj(r) ? dSettingsShared(r) : l;
+  const m = dm3(dSettingsShared(b), dSettingsShared(l), dSettingsShared(r));
+  const out = Object.assign({}, dIsObj(m) ? m : dSettingsShared(l));
+  if(l.cuenta !== undefined) out.cuenta = l.cuenta; else delete out.cuenta;
+  return out;
+}
 function dStripDevice(o){
   const c = {};
-  Object.keys(o || {}).forEach(k=>{ if(k !== "ui" && k !== "settings") c[k] = o[k]; });
+  Object.keys(o || {}).forEach(k=>{
+    if(k === "ui") return;
+    c[k] = (k === "settings") ? dSettingsShared(o[k]) : o[k];
+  });
   return c;
 }
 function driveReconcile(remote){
   const local = STATE, out = {};
   const keys = new Set([...Object.keys(local || {}), ...Object.keys(remote || {})]);
   keys.forEach(k=>{
-    if(k === "ui" || k === "settings"){ if(local[k] !== undefined) out[k] = local[k]; return; }
+    if(k === "ui"){ if(local[k] !== undefined) out[k] = local[k]; return; }
+    if(k === "settings"){ const sv = dMergeSettings(driveBase ? driveBase[k] : undefined, local[k], remote[k]); if(sv !== undefined) out[k] = sv; return; }
     const v = dm3(driveBase ? driveBase[k] : undefined, local[k], remote[k]);
     if(v !== undefined) out[k] = v;
   });
@@ -4324,8 +4566,19 @@ function driveCanRenderNow(){
   if(document.querySelector(".timer-modal-overlay.open, .fullscreen-timer-overlay.open")) return false;
   return true;
 }
+// R-2: tras traer ajustes de otro dispositivo, se aplican a la interfaz (idioma, colores de fases, notas, modelo anatómico)
+function driveApplySharedPrefs(){
+  try{ ensureSettings(); }catch(e){}
+  try{ if(STATE.settings && STATE.settings.idioma) localStorage.setItem("btc_idioma", STATE.settings.idioma); }catch(e){}
+  try{ applyPhaseColors(); }catch(e){}
+  try{ regApplyNotasStyle(); }catch(e){}
+  try{ tabsApplyOrder(); }catch(e){}   // V-4
+  try{ anatSkinSync(); anatSync(); }catch(e){}
+  try{ if(document.getElementById("settingsModalOverlay").classList.contains("open")) renderSettingsModal(); }catch(e){}
+  try{ renderNotifCenter(); }catch(e){}
+}
 function driveRenderWhenSafe(){
-  if(driveCanRenderNow()){ driveRenderPending = false; try{ renderAll(); }catch(e){ console.error(e); } return; }
+  if(driveCanRenderNow()){ driveRenderPending = false; try{ driveApplySharedPrefs(); renderAll(); driveApplySharedPrefs(); }catch(e){ console.error(e); } return; }
   driveRenderPending = true;
   setTimeout(()=>{ if(driveRenderPending) driveRenderWhenSafe(); }, 2500);
 }
@@ -4351,7 +4604,11 @@ async function driveIncorporate(remote, askIfNewer){
       if(STATE) idbSaveBackup(STATE);
       STATE = remote;
       if(keepUi) STATE.ui = keepUi;
-      if(keepSettings) STATE.settings = keepSettings;
+      if(keepSettings){
+        // R-2: se adoptan los ajustes del otro dispositivo, pero se conserva la cuenta/sesión de este
+        if(dIsObj(remote.settings)){ STATE.settings = Object.assign({}, dSettingsShared(remote.settings)); if(keepSettings.cuenta !== undefined) STATE.settings.cuenta = keepSettings.cuenta; }
+        else STATE.settings = keepSettings;
+      }
       driveFixDefaults();
       await idbSet(IDB_KEY, STATE);
       await driveSaveBase(STATE);
@@ -4858,13 +5115,13 @@ function exerciseCard(ex, routineKey, idx){
       ${extraTabHtml}
     </div>
     <div class="ex-notes-panel" id="panel_ejec_${timerId}">
-      <div contenteditable="true" data-field="notas" data-placeholder="Agregar nota de ejecución, técnica, o referencia...">${nl2br(ex.notas||"")}</div>
+      ${exNoteHtml(ex, "notas", "Agregar nota de ejecución, técnica, o referencia...")}
     </div>
     <div class="ex-notes-panel aclaracion" id="panel_acl_${timerId}">
-      <div contenteditable="true" data-field="notasAclaracion" data-placeholder="Agregar una aclaración: por qué se hace así, contexto, advertencias...">${nl2br(ex.notasAclaracion||"")}</div>
+      ${exNoteHtml(ex, "notasAclaracion", "Agregar una aclaración: por qué se hace así, contexto, advertencias...")}
     </div>
     <div class="ex-notes-panel progresion" id="panel_prog_${timerId}">
-      <div contenteditable="true" data-field="reglasProgresion" data-placeholder="Opciones de progresión: Principiante / Intermedio / Avanzado...">${nl2br(ex.reglasProgresion||"")}</div>
+      ${exNoteHtml(ex, "reglasProgresion", "Opciones de progresión: Principiante / Intermedio / Avanzado...")}
     </div>
     <div class="ex-notes-panel video" id="panel_vid_${timerId}">
       <div class="video-links">
@@ -5094,12 +5351,12 @@ function onEditableBlur(e){
       return;
     }
     const field = el.dataset.field;
-    if(field === "notas"){
-      ex.notas = el.innerText.trim();
-    } else if(field === "notasAclaracion"){
-      ex.notasAclaracion = el.innerText.trim();
-    } else if(field === "reglasProgresion"){
-      ex.reglasProgresion = el.innerText.trim();
+    if(field === "notas" || field === "notasAclaracion" || field === "reglasProgresion"){
+      // S-4: texto plano de respaldo + HTML limpio si tiene tablas/títulos/negritas
+      const fmt = richClean(el.innerHTML);
+      ex[field] = el.innerText.trim();
+      if(richHasStructure(fmt)){ ex[field + "Fmt"] = fmt; if(!el.dataset.fmt) setTimeout(function(){ richToView(el, fmt); }, 0); }
+      else delete ex[field + "Fmt"];
     } else if(ex.stats && field in ex.stats){
       ex.stats[field] = el.innerText.trim();
       // si cambia la cantidad de sets, se redibujan las filas de Time Work por set (no mientras se escribe)
@@ -5832,7 +6089,7 @@ function defaultSettings(){
   return {
     idioma: (function(){ try{ return localStorage.getItem("btc_idioma") || "es"; }catch(e){ return "es"; } })(),
     cuenta: { accounts: [], activeIndex: -1 },
-    registro: { autosave: false, onLeaveTab: true, onClose: true, onIdle: true, idleMin: 10, rutinaAuto: true, rutinaPorDia: { 0:"", 1:"A", 2:"B", 3:"A", 4:"B", 5:"A", 6:"B" }, campos: { energia:true, fatiga:true, sueno:true, comida:true }, notasFs: 14, notasAlto: 140 },
+    registro: { autoEstilo: "estoico", autosave: false, onLeaveTab: true, onClose: true, onIdle: true, idleMin: 10, rutinaAuto: true, rutinaPorDia: { 0:"", 1:"A", 2:"B", 3:"A", 4:"B", 5:"A", 6:"B" }, campos: { energia:true, fatiga:true, sueno:true, comida:true }, notasFs: 14, notasAlto: 140 },
     notificaciones: { "export-reminder": { high:false, delay:3600000 }, "reg-draft": { high:false, delay:3600000 }, "file-origin": { high:false, delay:3600000 } },
     sonido: { modo: "simple", finalCount: 3, skipLastRest: true, fullscreenTimerEnabled: true, colores, coloresGlobal, phaseSound, finalCountSound: { family:"beep", variant:"short" } }
   };
@@ -6572,6 +6829,7 @@ function renderSettingsModal(){
     ${renderAccountSection(STATE.settings, T)}
     ${renderRegistroSection(STATE.settings.registro, T)}
     ${renderRutinaNombresSection()}
+    ${renderTabsOrderSection()}
     ${renderNotifSettingsSection(STATE.settings.notificaciones, T)}
     ${renderAnatSettingsSection()}
     ${renderSoundSection(STATE.settings.sonido, T)}
@@ -6897,7 +7155,7 @@ function renderBiblioteca(){
     main = `
     <div class="bib-main">
       <div class="bib-main-bar"><h3>${f.priv ? nl("Mi biblioteca privada","My private library") : nl("Mi biblioteca","My library")}</h3>
-        <div class="bib-bar-btns">${sel.formato === "md" ? `<button class="bib-btn" onclick="bibToggleMd('${id}')">${_bibEditMd[id] ? nl("Ver con formato","View formatted") : nl("Editar texto","Edit text")}</button>` : ""}${f.priv ? `<button class="bib-btn danger" onclick="bibDelete('${id}')">${nl("Eliminar","Delete")}</button>` : ""}<button class="bib-btn" onclick="bibSelect('${id}')">${nl("Cerrar","Close")}</button></div></div>
+        <div class="bib-bar-btns">${(sel.formato === "md" || sel.formato === "html") ? `<button class="bib-btn" onclick="bibToggleMd('${id}')">${_bibEditMd[id] ? nl("Ver con formato","View formatted") : nl("Editar texto","Edit text")}</button>` : ""}${f.priv ? `<button class="bib-btn danger" onclick="bibDelete('${id}')">${nl("Eliminar","Delete")}</button>` : ""}<button class="bib-btn" onclick="bibSelect('${id}')">${nl("Cerrar","Close")}</button></div></div>
       <div class="bib-load">
         <input id="bibAddr" class="bib-input" value="${escapeHtml(sel.url || "")}" placeholder="${nl("Pegá una dirección (URL) o la ruta de un archivo para completar la ficha","Paste an address (URL) or a file path to fill in the details")}"
           onkeydown="if(event.key==='Enter'){ bibApplyAddress('${id}', this.value); }" onpaste="var el=this; setTimeout(function(){ bibApplyAddress('${id}', el.value); }, 0)">
@@ -6909,7 +7167,11 @@ function renderBiblioteca(){
       ${tecnicaCollapsibleOpen("bib_" + id, `<h2 contenteditable="true" data-key="${k}.titulo">${escapeHtml(sel.titulo)}</h2>`)}
         ${(sel.formato === "md" && !_bibEditMd[id])
           ? `<div class="callout bib-md">${bibMdToHtml(sel.contenido)}</div>`
-          : `<div class="callout" style="line-height:1.55;" contenteditable="true" data-ph="${nl("Escribí o pegá el contenido acá…","Write or paste the content here…")}" data-key="${k}.contenido">${nl2br(sel.contenido)}</div>`}
+          : (sel.formato === "html" && sel.contenidoHtml && !_bibEditMd[id])
+          ? `<div class="callout bib-md rich-html">${richClean(sel.contenidoHtml)}</div>`
+          : (sel.formato === "html" && sel.contenidoHtml)
+          ? `<div class="callout rich-html rich-editing" style="line-height:1.55;" contenteditable="true" data-richpaste="1" data-key="${k}.contenido">${richClean(sel.contenidoHtml)}</div>`
+          : `<div class="callout" style="line-height:1.55;" contenteditable="true" ${sel.formato === "md" ? "" : 'data-richpaste="1"'} data-ph="${nl("Escribí o pegá el contenido acá…","Write or paste the content here…")}" data-key="${k}.contenido">${nl2br(sel.contenido)}</div>`}
       ${TECNICA_COLLAPSIBLE_CLOSE}
     </div>`;
     const ed = (field, label) => `<div class="bib-meta-row"><span>${label}</span><span contenteditable="true" data-ph="—" data-key="${k}.${field}">${escapeHtml(sel[field] || "")}</span></div>`;
@@ -6939,6 +7201,14 @@ function renderBiblioteca(){
       const m = document.getElementById("bibModified"); if(m) m.textContent = bibFmtDate(cd.modificado);
       const li = c.querySelector(`.bib-item[data-bib-id="${cd.id}"]`);
       if(li && field === "titulo"){ const t = li.querySelector(".bib-item-title"); if(t) t.textContent = el.innerText.trim(); }
+      if(field === "contenido" && cd.formato !== "md"){ // S-4: contenido pegado con formato
+        const html = richClean(el.innerHTML);
+        if(richHasStructure(html)){
+          const was = cd.formato === "html";
+          cd.contenidoHtml = html; cd.formato = "html";
+          if(!was) setTimeout(function(){ _bibEditMd[cd.id] = false; renderBiblioteca(); }, 0);
+        } else if(cd.formato === "html"){ delete cd.contenidoHtml; delete cd.formato; }
+      }
     });
   });
   attachEditableHandlers(c);
@@ -7608,7 +7878,7 @@ function dateTextFieldHtml(id, iso){
 function dateTextInput(id, ev){
   const txt = document.getElementById(id + "Txt"), hid = document.getElementById(id);
   if(!txt || !hid) return;
-  let v = txt.value.replace(/[^\d\/]/g, "");
+  let v = txt.value.replace(/[^\d\/]/g, "").replace(/\/{2,}/g, "/"); // sin barras dobles si se escribe la "/" a mano
   // Pone la barra sola al completar día y mes, pero solo cuando se está escribiendo al final
   const typing = ev && ev.inputType && ev.inputType.startsWith("insert");
   if(typing && txt.selectionStart === txt.value.length && (/^\d{2}$/.test(v) || /^\d{1,2}\/\d{2}$/.test(v))) v += "/";
@@ -7846,10 +8116,203 @@ function fatigaMiniHtml(cur){
   return `<span class="fatiga-mini">${bars}</span><span style="color:${L.c}; font-weight:700">${v}/5</span>`;
 }
 
+// ============================================================
+// Q-7: AUTOCONTROL — pantalla aparte dentro de Registro diario.
+// Datos en STATE.logs.autocontrol = { entries:[{id, date, nivel(1-5), diario, ts}] } (una entrada por día;
+// el id "ac_AAAA-MM-DD" es estable, así la sincronización entre dispositivos fusiona por día).
+// El estilo visual se elige en STATE.settings.registro.autoEstilo: estoico | minimalista | energia.
+// ============================================================
+let _regScreen = "registro";   // "registro" | "autocontrol"
+let _acEditDate = null;        // fecha que se está editando (null = día nuevo)
+let _acNivel = 0;              // nivel elegido en el formulario (0 = sin marcar)
+const AC_ESTILOS = [
+  {id:"estoico",     es:"Estoico clásico", en:"Classic Stoic",  titleEs:"Dominio de uno mismo", titleEn:"Self-mastery"},
+  {id:"minimalista", es:"Minimalista",     en:"Minimalist",     titleEs:"Autocontrol",          titleEn:"Self-control"},
+  {id:"energia",     es:"Energía",         en:"Energy",         titleEs:"Carga de voluntad",    titleEn:"Willpower charge"}
+];
+const AC_NIVELES = [
+  {n:1, es:"Sin control",    en:"No control"},
+  {n:2, es:"Poco control",   en:"Little control"},
+  {n:3, es:"Control medio",  en:"Moderate control"},
+  {n:4, es:"Buen control",   en:"Good control"},
+  {n:5, es:"Control total",  en:"Full control"}
+];
+function acList(){
+  if(!STATE.logs) STATE.logs = { daily: [], weekly: [] };
+  if(!STATE.logs.autocontrol || !Array.isArray(STATE.logs.autocontrol.entries)) STATE.logs.autocontrol = { entries: [] };
+  return STATE.logs.autocontrol.entries;
+}
+function acEstilo(){
+  const e = STATE.settings && STATE.settings.registro && STATE.settings.registro.autoEstilo;
+  return AC_ESTILOS.some(x=>x.id === e) ? e : "estoico";
+}
+function acByDate(){ const m = {}; acList().forEach(e=>{ m[e.date] = e; }); return m; }
+// Racha actual: días seguidos con registro. Si hoy todavía no se registró, la racha sigue viva desde ayer.
+function acStats(){
+  const m = acByDate();
+  const dates = Object.keys(m).sort();
+  const today = localISODate();
+  let cursor = m[today] ? today : isoAddDays(today, -1);
+  let actual = 0;
+  while(m[cursor]){ actual++; cursor = isoAddDays(cursor, -1); }
+  let mejor = 0, run = 0, prev = null;
+  dates.forEach(d=>{
+    run = (prev && isoAddDays(prev, 1) === d) ? run + 1 : 1;
+    if(run > mejor) mejor = run;
+    prev = d;
+  });
+  const desde = isoAddDays(today, -6);
+  const ult = dates.filter(d=>d >= desde && d <= today).map(d=>m[d].nivel);
+  const prom = ult.length ? Math.round(ult.reduce((a,b)=>a+b, 0) / ult.length * 10) / 10 : null;
+  return { actual, mejor, total: dates.length, prom, hoy: !!m[today] };
+}
+function acGlyph(estilo){
+  if(estilo === "energia") return '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M27 4L10 27h12l-2 17 18-24H26z"/></svg>';
+  if(estilo === "minimalista") return '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="24" cy="24" r="16"/><path d="M24 14v10l7 4"/></svg>';
+  return '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 9h28M13 13h22M17 13v24M24 13v24M31 13v24M13 37h22M10 41h28"/></svg>';
+}
+function acNivelLabel(n){ const L = AC_NIVELES.find(x=>x.n === n); return L ? _L(L.es, L.en) : ""; }
+function renderAutocontrolScreen(){
+  const est = acEstilo();
+  const E = AC_ESTILOS.find(x=>x.id === est);
+  const S = acStats();
+  const m = acByDate();
+  const today = localISODate();
+  const editing = _acEditDate && m[_acEditDate] ? m[_acEditDate] : null;
+  const formDate = _acEditDate || today;
+  const cur = editing;
+  if(!_acNivel && cur) _acNivel = cur.nivel;
+  const strip = [];
+  for(let i=13; i>=0; i--){
+    const d = isoAddDays(today, -i);
+    const e = m[d];
+    strip.push(`<span class="ac-dot ${e ? "on" : ""} ${d === today ? "today" : ""}" ${e ? `style="--lv:${e.nivel}"` : ""} title="${d}${e ? " · " + e.nivel + "/5" : ""}"></span>`);
+  }
+  const entries = acList().slice().sort((a,b)=> a.date < b.date ? 1 : -1);
+  const histHtml = entries.length ? entries.map(e=>`
+    <div class="ac-entry">
+      <div class="ac-entry-head">
+        <span class="ac-entry-date">${e.date}</span>
+        <span class="ac-entry-lv" style="--lv:${e.nivel}">${e.nivel}/5 · ${escapeHtml(acNivelLabel(e.nivel))}</span>
+        <span class="ac-entry-actions">
+          <button type="button" class="ac-link" onclick="acEdit('${e.date}')">${_L("Editar","Edit")}</button>
+          <button type="button" class="ac-link danger" onclick="acDelete('${e.date}')">${_L("Borrar","Delete")}</button>
+        </span>
+      </div>
+      ${e.diario ? `<div class="ac-entry-text">${escapeHtml(e.diario)}</div>` : ""}
+    </div>`).join("") : `<div class="empty-state">${_L("Todavía no hay registros de autocontrol. Guardá el primero con el formulario de arriba.","No self-control entries yet. Save the first one with the form above.")}</div>`;
+  return `
+  <div class="ac-root ac-${est}">
+    <div class="panel">
+      <div class="panel-head"><h2>${escapeHtml(_L(E.titleEs, E.titleEn))}</h2></div>
+      <div class="panel-body">
+        <div class="ac-style-pick" role="group" aria-label="${_L("Estilo visual","Visual style")}">
+          ${AC_ESTILOS.map(x=>`<button type="button" class="${x.id === est ? "on" : ""}" onclick="acSetEstilo('${x.id}')">${escapeHtml(_L(x.es, x.en))}</button>`).join("")}
+        </div>
+        <div class="ac-hero">
+          <div class="ac-glyph">${acGlyph(est)}</div>
+          <div>
+            <div class="ac-hero-num">${S.actual}</div>
+            <div class="ac-hero-label">${S.actual === 1 ? _L("día de racha","day streak") : _L("días de racha","day streak")}${S.hoy ? "" : ` · ${_L("registrá hoy para sostenerla","log today to keep it")}`}</div>
+          </div>
+        </div>
+        <div class="ac-stats">
+          <div><b>${S.mejor}</b><span>${_L("mejor racha","best streak")}</span></div>
+          <div><b>${S.total}</b><span>${_L("días registrados","days logged")}</span></div>
+          <div><b>${S.prom === null ? "—" : S.prom}</b><span>${_L("promedio 7 días","7-day average")}</span></div>
+        </div>
+        <div class="ac-strip" aria-label="${_L("Últimos 14 días","Last 14 days")}">${strip.join("")}</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>${editing ? _L("Editar registro","Edit entry") : _L("Registro de hoy","Today's entry")}</h2></div>
+      <div class="panel-body">
+        <div class="form-grid">
+          <div class="form-field">
+            <label>${_L("Fecha","Date")}</label>
+            ${dateTextFieldHtml("acDate", formDate)}
+          </div>
+          <div class="form-field">
+            <label>${_L("Nivel de autocontrol (1-5)","Self-control level (1-5)")}</label>
+            <div class="ac-nivel" id="acNivel">${AC_NIVELES.map(L=>`<button type="button" class="${_acNivel === L.n ? "on" : ""}" data-n="${L.n}" style="--lv:${L.n}" onclick="acPickNivel(${L.n})" title="${escapeHtml(_L(L.es, L.en))}">${L.n}</button>`).join("")}</div>
+            <div class="ac-nivel-cap" id="acNivelCap">${_acNivel ? `${_acNivel}/5 · ${escapeHtml(acNivelLabel(_acNivel))}` : _L("Sin marcar","Not set")}</div>
+          </div>
+        </div>
+        <div class="form-field" style="margin-bottom:14px">
+          <label>${_L("Diario personal","Personal journal")}</label>
+          <textarea id="acDiario" rows="4" placeholder="${_L("Qué situaciones pusieron a prueba tu autocontrol, qué hiciste, qué aprendiste...","Which situations tested your self-control, what you did, what you learned...")}">${escapeHtml(cur ? (cur.diario || "") : "")}</textarea>
+        </div>
+        <button class="primary-btn" onclick="acSave()">${editing ? _L("Guardar cambios","Save changes") : _L("Guardar registro","Save entry")}</button>
+        ${editing ? `<button type="button" class="ac-link" style="margin-left:12px" onclick="acCancelEdit()">${_L("Cancelar","Cancel")}</button>` : ""}
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>${_L("Historial","History")}</h2><span class="count">${entries.length} ${_L("entradas","entries")}</span></div>
+      <div class="panel-body">${histHtml}</div>
+    </div>
+  </div>`;
+}
+function regScreenNavHtml(){
+  const b = (id, es, en)=>`<button type="button" class="${_regScreen === id ? "on" : ""}" onclick="acSetScreen('${id}')">${_L(es, en)}</button>`;
+  return `<div class="reg-screen-nav" role="tablist">${b("registro","Registro","Log")}${b("autocontrol","Autocontrol","Self-control")}</div>`;
+}
+function acSetScreen(id){ _regScreen = id; if(id === "autocontrol"){ _acEditDate = null; _acNivel = 0; } renderRegistro(); }
+function acSetEstilo(id){
+  ensureSettings();
+  STATE.settings.registro.autoEstilo = id;
+  saveState(true);
+  renderRegistro();
+}
+function acPickNivel(n){
+  _acNivel = (_acNivel === n) ? 0 : n;   // tocar de nuevo el mismo nivel lo quita
+  document.querySelectorAll("#acNivel button").forEach(b=> b.classList.toggle("on", Number(b.dataset.n) === _acNivel));
+  const cap = document.getElementById("acNivelCap");
+  if(cap) cap.textContent = _acNivel ? `${_acNivel}/5 · ${acNivelLabel(_acNivel)}` : _L("Sin marcar","Not set");
+}
+function acSave(){
+  const hid = document.getElementById("acDate");
+  const date = hid ? hid.value : "";
+  if(!date){ alert(_L("Elegí una fecha.","Pick a date.")); return; }
+  if(!_acNivel){ alert(_L("Marcá tu nivel de autocontrol (1 a 5).","Set your self-control level (1 to 5).")); return; }
+  const diario = (document.getElementById("acDiario").value || "").trim();
+  const list = acList();
+  const prev = list.find(e=>e.date === date);
+  if(prev && _acEditDate !== date && !confirm(_L("Ya hay un registro de autocontrol en esa fecha. ¿Reemplazarlo?","There is already an entry for that date. Replace it?"))) return;
+  const entry = { id: "ac_" + date, date, nivel: _acNivel, diario, ts: Date.now() };
+  if(prev) list[list.indexOf(prev)] = entry; else list.push(entry);
+  list.sort((a,b)=> a.date < b.date ? -1 : 1);
+  _acEditDate = null; _acNivel = 0;
+  saveState();
+  renderRegistro();
+}
+function acEdit(date){
+  const e = acByDate()[date]; if(!e) return;
+  _acEditDate = date; _acNivel = e.nivel;
+  renderRegistro();
+  const f = document.getElementById("acDiario"); if(f) f.scrollIntoView({behavior:"smooth", block:"center"});
+}
+function acCancelEdit(){ _acEditDate = null; _acNivel = 0; renderRegistro(); }
+function acDelete(date){
+  if(!confirm(_L("¿Borrar este registro de autocontrol? Esta acción no se puede deshacer.","Delete this self-control entry? This cannot be undone."))) return;
+  const list = acList();
+  const i = list.findIndex(e=>e.date === date);
+  if(i >= 0) list.splice(i, 1);
+  if(_acEditDate === date){ _acEditDate = null; _acNivel = 0; }
+  saveState();
+  renderRegistro();
+}
+
 function renderRegistro(){
   const container = document.getElementById("view-registro");
+  if(_regScreen === "autocontrol"){
+    container.innerHTML = `${regGearHtml()}${regScreenNavHtml()}${renderAutocontrolScreen()}`;
+    return;
+  }
   let html = `
   ${regGearHtml()}
+  ${regScreenNavHtml()}
   ${renderTrackerPanel()}
   <div class="panel">
     <div class="panel-head"><h2>Nuevo registro diario</h2></div>
@@ -7869,6 +8332,7 @@ function renderRegistro(){
             <option value="Otro">Otra actividad</option>
           </select>
           <small id="newLogRoutineHint" class="field-hint"></small>
+          <small id="newLogGapHint" class="field-hint log-gap-hint" style="display:none"></small>
         </div>
         <div class="form-field" data-regfield="energia">
           <label>Energía (1-5)</label>
@@ -8009,6 +8473,7 @@ function entryToHtml(entry){
       <div class="log-field"><label>Sueño</label><div class="v">${escapeHtml(entry.sueno||"—")}</div></div>
       <div class="log-field"><label>Alimentación</label><div class="v">${comidaViewHtml(entry)}</div></div>
     </div>
+    ${(()=>{ const g = logGapValue(entry); return g > 0 ? `<div class="log-gap" title="Días sin sesión desde el registro anterior de esta rutina; descansos y días fuera del programa no cuentan">⏳ ${gapTexto(g)}</div>` : ""; })()}
     ${entry.notas ? `<div class="log-notes"><label style="font-size:10px;text-transform:uppercase;color:var(--text-dim);font-weight:700">Notas</label><div class="v">${notasHtml(entry.notas)}</div></div>` : ""}
     <div style="padding:0 16px 14px; text-align:right">
       <button class="secondary-btn" onclick="startEditLog('${entry.id}')" style="margin-right:8px">Editar</button>
@@ -8124,7 +8589,13 @@ function notasHtml(s){
     return m;
   });
   while(depth-- > 0) html += "</span>";
-  return html.replace(/\n/g, "<br>");
+  // S-4: bloques con formato pegados (tablas, títulos, listas): se vuelven a expandir limpios
+  html = html.replace(/\n?\u27E6H:([^\u27E7]*)\u27E7\n?/g, function(m, enc){
+    let h = ""; try{ h = richClean(decodeURIComponent(enc)); }catch(e){}
+    return "\u0001" + h + "\u0002";
+  });
+  html = html.replace(/\n/g, "<br>");
+  return html.replace(/\u0001/g, "").replace(/\u0002/g, "");
 }
 function notasHex(c){
   const m = String(c||"").match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
@@ -8148,6 +8619,11 @@ function notasSerialize(root){
       const lv = {"x-small":1,small:2,medium:3,large:4,"x-large":5,"xx-large":6,"xxx-large":7}[st.fontSize||""]; if(NOTAS_TAM[lv]) at.push("s:" + lv);
       const col = notasHex(st.color || (tag === "FONT" ? ch.getAttribute("color") : "")); if(col) at.push("c:" + col);
       if(ch.classList && ch.classList.contains("nn")) at.push("n");
+      if(/^(TABLE|H[1-6]|HR|UL|OL|BLOCKQUOTE|PRE)$/.test(tag)){
+        if(out && !out.endsWith("\n")) out += "\n";
+        out += "\u27E6H:" + encodeURIComponent(richClean(ch.outerHTML)).replace(/[*'()!~]/g, function(x){ return "%" + x.charCodeAt(0).toString(16).toUpperCase(); }) + "\u27E7\n";
+        return;
+      }
       const block = (tag === "DIV" || tag === "P");
       if(block && out && !out.endsWith("\n")) out += "\n";
       const keep = out; out = ""; walk(ch); let inner = out; out = keep;
@@ -8245,9 +8721,17 @@ document.addEventListener("selectionchange", function(){
 });
 // Pegar (W-2): entra el texto sin estilos ajenos y HEREDA el estilo activo en el cursor (fuente, negrita, color, etc.)
 document.addEventListener("paste", function(e){
-  const t = e.target && e.target.closest && e.target.closest("div.notas-rich");
+  const t = e.target && e.target.closest && e.target.closest("div.notas-rich, [data-richpaste]");
   if(!t) return;
   e.preventDefault();
+  // S-4: si lo copiado trae tablas, títulos, listas o negritas, entra con formato (HTML limpio)
+  const hh = (e.clipboardData || window.clipboardData).getData("text/html");
+  const clean = hh ? richClean(hh) : "";
+  if(clean && richHasStructure(clean) && (richHasBlock(clean) || /<(strong|em)[\s>]/i.test(clean))){
+    document.execCommand("insertHTML", false, clean);
+    t.dispatchEvent(new Event("input", { bubbles:true }));
+    return;
+  }
   const txt = (e.clipboardData || window.clipboardData).getData("text/plain").replace(/\r\n?/g, "\n");
   txt.split("\n").forEach(function(line, i){
     if(i) document.execCommand("insertLineBreak");
@@ -8295,6 +8779,16 @@ document.addEventListener("keydown", function(e){
   if(t.id === "newLogNotas"){ saveNewLog(); return; }
   const btn = document.querySelector('button[onclick^="saveEditLog("]');
   if(btn) btn.click();
+}, true);
+// S-3: igual que M-2, en las notas de las tarjetas de ejercicios (ejecución, aclaración, reglas de progresión):
+// Enter guarda (confirma el campo) y Shift+Enter baja un renglón
+document.addEventListener("keydown", function(e){
+  const t = e.target;
+  if(!t || !t.isContentEditable || !t.dataset || !/^(notas|notasAclaracion|reglasProgresion)$/.test(t.dataset.field || "")) return;
+  if(e.key !== "Enter" || e.isComposing || e.altKey || e.ctrlKey || e.metaKey) return;
+  e.preventDefault();
+  if(e.shiftKey){ document.execCommand("insertLineBreak"); return; }
+  try{ t.blur(); }catch(err){} // el blur guarda el campo, igual que al tocar afuera
 }, true);
 // U-1: la rutina del "Nuevo registro diario" se calcula sola según el día de la semana.
 // Mapa por defecto (0 = domingo): A = lun, mié, vie (y domingo, opcional); B = mar, jue, sáb.
@@ -8470,6 +8964,7 @@ function rutinasSyncTabs(){
       try{ renderRoutine("rutinaX_" + id); }catch(e){}
     }
   });
+  try{ tabsApplyOrder(); }catch(e){}   // V-4
 }
 function rutinaPersonalPanel(key, r){
   const f = (name, label, ph) => `<div class="rut-pers-f"><label>${label}</label><span contenteditable="true" data-routine-field="${name}" data-routine="${key}" data-ph="${ph}">${escapeHtml(r[name] || "")}</span></div>`;
@@ -8733,6 +9228,115 @@ function rutinaEditTab(btn){
   ["pointerup","pointercancel"].forEach(ev=>document.addEventListener(ev, ()=>clearTimeout(t)));
   document.addEventListener("pointermove", function(e){ if(t && (Math.abs(e.clientX - sx) > 8 || Math.abs(e.clientY - sy) > 8)) clearTimeout(t); });
 })();
+// ============================================================
+// V-4: orden editable de las pestañas (STATE.settings.tabOrder, viaja con la cuenta)
+// ============================================================
+function tabsNavButtons(){
+  const nav = document.getElementById("tabs");
+  return nav ? Array.from(nav.children).filter(el=>el.classList && el.classList.contains("tab-btn")) : [];
+}
+function tabsDefaultOrder(){
+  const extras = (typeof rutinasExtraIds === "function" ? rutinasExtraIds() : []).map(i=>"rutinaX_" + i);
+  return ["muro","rutinaA","rutinaB"].concat(extras, ["rutinas","calentamiento","tecnica","biblioteca","anatomia","registro","semanal"]);
+}
+function tabsApplyOrder(){
+  const nav = document.getElementById("tabs"), arrowR = document.getElementById("tabsArrowR");
+  if(!nav || !arrowR) return;
+  const btns = tabsNavButtons(); if(!btns.length) return;
+  const st0 = (STATE && STATE.settings && Array.isArray(STATE.settings.tabOrder)) ? STATE.settings.tabOrder : [];
+  const saved = st0.length ? st0 : tabsDefaultOrder();
+  const byView = {}; btns.forEach(b=>{ byView[b.dataset.view] = b; });
+  const result = [];
+  saved.forEach(k=>{ if(byView[k] && !result.includes(k)) result.push(k); });
+  // pestañas que el orden guardado no conoce (p. ej. una rutina nueva): quedan después de la que las precedía
+  const cur = btns.map(b=>b.dataset.view);
+  cur.forEach((k,i)=>{
+    if(result.includes(k)) return;
+    let at = 0;
+    for(let j = i - 1; j >= 0; j--){ const ix = result.indexOf(cur[j]); if(ix >= 0){ at = ix + 1; break; } }
+    result.splice(at, 0, k);
+  });
+  if(cur.join("|") === result.join("|")) return;
+  result.forEach(k=>nav.insertBefore(byView[k], arrowR));
+  try{ if(window.tabsArrowsUpdate) window.tabsArrowsUpdate(); }catch(e){}
+}
+function tabsOrderCurrent(){ return tabsNavButtons().map(b=>({ key:b.dataset.view, label:(b.textContent || "").trim() })); }
+function tabsOrderSet(keys, save){
+  ensureSettings();
+  STATE.settings.tabOrder = keys.slice();
+  tabsApplyOrder();
+  if(save !== false) saveState();
+}
+function tabsOrderMove(key, dir){
+  const keys = tabsOrderCurrent().map(t=>t.key), i = keys.indexOf(key), j = i + dir;
+  if(i < 0 || j < 0 || j >= keys.length) return;
+  keys.splice(j, 0, keys.splice(i, 1)[0]);
+  tabsOrderSet(keys);
+  tabsOrderRender(key);
+}
+function tabsOrderMoveTo(key, targetKey, after){
+  const keys = tabsOrderCurrent().map(t=>t.key).filter(k=>k !== key);
+  let at = keys.indexOf(targetKey); if(at < 0) return;
+  keys.splice(after ? at + 1 : at, 0, key);
+  tabsOrderSet(keys);
+  tabsOrderRender(key);
+}
+function tabsOrderReset(){
+  ensureSettings();
+  STATE.settings.tabOrder = [];
+  tabsApplyOrder();
+  saveState();
+  tabsOrderRender();
+}
+function tabsOrderRender(flashKey){
+  const ul = document.getElementById("tabsOrderList"); if(!ul) return;
+  const tabs = tabsOrderCurrent(), active = (typeof _currentView !== "undefined") ? _currentView : "";
+  ul.innerHTML = tabs.map((t, i)=>`<li class="tabs-order-row${t.key === flashKey ? " moved" : ""}${t.key === active ? " current" : ""}" draggable="true" data-key="${escapeHtml(t.key)}">
+      <span class="tabs-order-grip" aria-hidden="true">⋮⋮</span>
+      <span class="tabs-order-n">${i + 1}</span>
+      <span class="tabs-order-name">${escapeHtml(t.label)}</span>
+      <button type="button" class="tabs-order-btn" ${i === 0 ? "disabled" : ""} onclick="tabsOrderMove('${escapeHtml(t.key)}',-1)" aria-label="${_L("Subir", "Move up")}" title="${_L("Mover antes", "Move earlier")}">▲</button>
+      <button type="button" class="tabs-order-btn" ${i === tabs.length - 1 ? "disabled" : ""} onclick="tabsOrderMove('${escapeHtml(t.key)}',1)" aria-label="${_L("Bajar", "Move down")}" title="${_L("Mover después", "Move later")}">▼</button>
+    </li>`).join("");
+  let dragKey = null;
+  ul.querySelectorAll(".tabs-order-row").forEach(li=>{
+    li.addEventListener("dragstart", e=>{ dragKey = li.dataset.key; li.classList.add("dragging"); try{ e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", dragKey); }catch(_){} });
+    li.addEventListener("dragend", ()=>{ dragKey = null; ul.querySelectorAll(".tabs-order-row").forEach(x=>x.classList.remove("dragging","over-top","over-bottom")); });
+    li.addEventListener("dragover", e=>{
+      if(!dragKey || dragKey === li.dataset.key) return;
+      e.preventDefault();
+      const r = li.getBoundingClientRect(), after = e.clientY > r.top + r.height / 2;
+      ul.querySelectorAll(".tabs-order-row").forEach(x=>x.classList.remove("over-top","over-bottom"));
+      li.classList.add(after ? "over-bottom" : "over-top");
+    });
+    li.addEventListener("drop", e=>{
+      if(!dragKey || dragKey === li.dataset.key) return;
+      e.preventDefault();
+      const r = li.getBoundingClientRect();
+      tabsOrderMoveTo(dragKey, li.dataset.key, e.clientY > r.top + r.height / 2);
+    });
+  });
+  const m = ul.querySelector(".moved"); if(m && m.scrollIntoView) try{ m.scrollIntoView({ block:"nearest" }); }catch(e){}
+}
+function tabsOrderOpen(){
+  try{ closeSettingsModal(); }catch(e){}
+  rutModal(`<h3>${_L("Ordenar pestañas", "Reorder tabs")}</h3>
+    <div class="reg-gear-desc" style="margin:0 0 10px">${_L("Arrastrá cada fila o usá ▲ ▼. El cambio se ve al instante en la barra de pestañas y se guarda en tu cuenta.", "Drag each row or use ▲ ▼. The change shows right away in the tab bar and is saved to your account.")}</div>
+    <ul class="tabs-order-list" id="tabsOrderList"></ul>
+    <div class="tabs-order-foot">
+      <button type="button" onclick="tabsOrderReset()">${_L("Restablecer orden original", "Restore original order")}</button>
+      <button type="button" class="tabs-order-done" onclick="rutModalClose()">${_L("Listo", "Done")}</button>
+    </div>`, ()=>tabsOrderRender());
+}
+function renderTabsOrderSection(){
+  return `
+  <div class="settings-section">
+    <div class="settings-section-head"><h2>${_L("Orden de las pestañas", "Tab order")}</h2></div>
+    <div class="settings-row"><span class="reg-gear-desc" style="max-width:250px">${_L("Elegí en qué orden querés ver las pestañas de arriba.", "Choose the order of the tabs at the top.")}</span>
+      <button type="button" class="reg-reset-btn" onclick="tabsOrderOpen()">${_L("Editar orden", "Edit order")}</button></div>
+  </div>`;
+}
+
 function renderRutinaNombresSection(){
   const inp = "background:var(--surface-3); color:var(--text); border:1px solid var(--line-soft); border-radius:8px; padding:5px 9px; font-size:12.5px; width:190px";
   const row = (k, def) => `<div class="settings-row"><span class="settings-row-label">${_L("Pestaña", "Tab")} “${def}”</span>
@@ -8745,8 +9349,55 @@ function renderRutinaNombresSection(){
       <button type="button" class="reg-reset-btn" onclick="rutinaResetNombres()">${_L("Restablecer", "Reset")}</button></div>
   </div>`;
 }
+// V-3: días sin entrenar de una tarjeta de Registro diario.
+// Cuenta los días entre el registro anterior de la MISMA rutina y este (sin incluir ninguno de los dos) en los que
+// no hubo ninguna sesión. No cuenta los días de descanso ni de otra actividad (en un registro o marcados en el
+// Tracker de constancia) ni los días que el calendario semanal deja sin rutina (fuera del programa).
+function gapEsRutinaEntreno(r){ return !!r && r !== "Descanso" && r !== "Otro"; }
+function diasSinEntrenarCalc(routine, dateISO, excludeId){
+  if(!gapEsRutinaEntreno(routine) || !/^\d{4}-\d{2}-\d{2}$/.test(dateISO || "")) return null;
+  const logs = (STATE.logs && STATE.logs.daily) || [];
+  let prev = null;
+  logs.forEach(l=>{ if(l.id !== excludeId && l.routine === routine && l.date && l.date < dateISO && (!prev || l.date > prev)) prev = l.date; });
+  if(!prev) return null;
+  const byDate = {};
+  logs.forEach(l=>{ if(l.id !== excludeId && l.date){ (byDate[l.date] = byDate[l.date] || []).push(l.routine); } });
+  const trk = {};
+  ((STATE.tracker && STATE.tracker.days) || []).forEach(d=>{ if(d.date && d.status) trk[d.date] = d.status; });
+  const cfg = regCfg(), progOn = cfg.rutinaAuto;
+  let n = 0, cur = isoAddDays(prev, 1), guard = 0;
+  while(cur < dateISO && guard++ < 800){
+    const rs = byDate[cur];
+    let skip = false;
+    if(rs && rs.length) skip = true;                                   // hubo sesión (o descanso/otra actividad) registrada
+    else if(trk[cur]) skip = true;                                      // marcado a mano en el Tracker (entreno, descanso u otra actividad)
+    else if(progOn){                                                    // día sin rutina en el calendario semanal = fuera del programa
+      const v = cfg.rutinaPorDia[new Date(cur + "T12:00:00").getDay()];
+      if(!gapEsRutinaEntreno(v)) skip = true;
+    }
+    if(!skip) n++;
+    cur = isoAddDays(cur, 1);
+  }
+  return n;
+}
+function logGapValue(e){
+  if(e && typeof e.diasSinEntrenar === "number") return e.diasSinEntrenar;   // guardado en la tarjeta
+  return diasSinEntrenarCalc(e && e.routine, e && e.date, e && e.id);          // tarjetas viejas: se calcula al mostrar
+}
+function gapTexto(n){ return n + (n === 1 ? " día" : " días") + " sin entrenar"; }
+function updateNewLogGap(){
+  const el = document.getElementById("newLogGapHint"); if(!el) return;
+  const rs = document.getElementById("newLogRoutine"), dh = document.getElementById("newLogDate");
+  const n = (rs && dh) ? diasSinEntrenarCalc(rs.value, dh.value) : null;
+  el.textContent = n > 0 ? "⏳ " + gapTexto(n) + " desde el último registro de esta rutina" : "";
+  el.style.display = n > 0 ? "" : "none";
+}
+
 let _newLogRoutineManual = false;
 function syncNewLogRoutine(force){
+  try{ _syncNewLogRoutineCore(force); } finally { updateNewLogGap(); }
+}
+function _syncNewLogRoutineCore(force){
   const sel = document.getElementById("newLogRoutine"), dateEl = document.getElementById("newLogDate");
   if(!sel || !dateEl) return;
   const hint = document.getElementById("newLogRoutineHint");
@@ -8798,6 +9449,9 @@ function commitLog(f){
     comidaCal: f.comidaCal || null, comidaTipos: Array.isArray(f.comidaTipos) ? f.comidaTipos : [],
     notas: f.notas || ""
   });
+  { const nl = STATE.logs.daily[STATE.logs.daily.length - 1];
+    const g = diasSinEntrenarCalc(nl.routine, nl.date, nl.id);
+    if(g > 0) nl.diasSinEntrenar = g; }        // V-3: queda guardado dentro de la tarjeta
   clearRegistroDraft();
   _regFollowUp = false;
   hideRegToast();
@@ -8965,7 +9619,7 @@ function editLogHtml(e){
     </div>
     <div class="log-edit-body">
       <div class="form-grid">
-        <div class="form-field"><label>Fecha</label><input type="date" id="editLogDate" value="${escapeHtml(e.date || "")}"></div>
+        <div class="form-field"><label>Fecha</label>${dateTextFieldHtml("editLogDate", e.date || "")}</div>
         <div class="form-field"><label>Rutina realizada</label>
           <select id="editLogRoutine">
             ${opt("A", rutinaNombreLargo("A"))}
@@ -9012,7 +9666,12 @@ function saveEditLog(id){
   const entry = STATE.logs.daily.find(l=>l.id === id);
   if(!entry){ _editingLogId = null; renderRegistro(); return; }
   const date = document.getElementById("editLogDate").value;
-  if(!date){ alert("Elegí una fecha."); return; }
+  const dateTxtEl = document.getElementById("editLogDateTxt");
+  if(!date){
+    alert(dateTxtEl && dateTxtEl.value.trim() ? "La fecha no es válida. Escribila como dd/mm/aaaa (por ejemplo 27/06/2026)." : "Elegí una fecha.");
+    if(dateTxtEl) dateTxtEl.focus();
+    return;
+  }
   const en = document.querySelector('#scaleEditEnergia .scale-dot.active');
   const fa = document.querySelector('#scaleEditFatiga .scale-dot.active');
   const d = new Date(date + "T12:00:00");
@@ -9028,6 +9687,8 @@ function saveEditLog(id){
   entry.comidaTipos = cm.tipos;
   entry.notas = document.getElementById("editLogNotas").value.trim();
   entry.editedAt = new Date().toISOString();
+  { const g = diasSinEntrenarCalc(entry.routine, entry.date, entry.id);   // V-3: se recalcula al cambiar fecha o rutina
+    if(g > 0) entry.diasSinEntrenar = g; else delete entry.diasSinEntrenar; }
   _editingLogId = null;
   saveState();
   renderRegistro();
@@ -9058,11 +9719,11 @@ function renderSemanal(){
       <div class="form-grid">
         <div class="form-field">
           <label>Semana del</label>
-          <input type="date" id="newWeekStart">
+          ${dateTextFieldHtml("newWeekStart", "")}
         </div>
         <div class="form-field">
           <label>Al</label>
-          <input type="date" id="newWeekEnd">
+          ${dateTextFieldHtml("newWeekEnd", "")}
         </div>
       </div>
       <div class="form-grid">
@@ -9123,7 +9784,12 @@ function weekToHtml(w){
 function saveWeekly(){
   const start = document.getElementById("newWeekStart").value;
   const end = document.getElementById("newWeekEnd").value;
-  if(!start || !end){ alert("Completá ambas fechas."); return; }
+  if(!start || !end){
+    const bad = ["newWeekStart","newWeekEnd"].map(i=>document.getElementById(i+"Txt")).find(t=>t && t.value.trim() && !document.getElementById(t.id.slice(0,-3)).value);
+    alert(bad ? "Una de las fechas no es válida. Escribila como dd/mm/aaaa (por ejemplo 27/06/2026)." : "Completá ambas fechas.");
+    if(bad) bad.focus();
+    return;
+  }
   const sF = new Date(start+"T12:00:00").toLocaleDateString('es-AR',{day:'numeric',month:'short'});
   const eF = new Date(end+"T12:00:00").toLocaleDateString('es-AR',{day:'numeric',month:'short'});
   STATE.logs.weekly.push({
@@ -9201,6 +9867,7 @@ function renderMuro(){
         <input type="file" id="coverFileInput" accept="image/*,video/*" style="display:none">
         <input type="file" id="avatarFileInput" accept="image/*,video/*" style="display:none">
       </div>
+      <div class="muro-links-row" id="muroLinksRow"></div>
     </div>
   </div>
   <div class="muro-modal" id="muroModal">
@@ -9324,6 +9991,21 @@ function renderMuro(){
 // (con debounce mientras te desplazás), así que sobrevive a cerrar/recargar la
 // app: al abrirla vuelve a la misma pestaña y al mismo punto donde la dejaste.
 const _scrollPositions = {};          // copia en memoria de la sesión (más fresca que STATE)
+try{ if("scrollRestoration" in history) history.scrollRestoration = "manual"; }catch(e){}  // Q-11: la app restaura el scroll sola
+let _initRestoring = false;           // Q-11: mientras se restaura el scroll al abrir la app, no se guarda ni se pisa el valor
+function restoreInitialScroll(view, y){
+  if(!y) return;
+  _initRestoring = true;
+  const evs = ["wheel","touchstart","keydown","mousedown"];
+  const stop = ()=>{ if(!_initRestoring) return; _initRestoring = false; evs.forEach(ev=>window.removeEventListener(ev, stop, true)); };
+  evs.forEach(ev=>window.addEventListener(ev, stop, { capture:true, passive:true }));
+  // El contenido (imágenes, tarjetas, fuentes) puede terminar de armarse después: se reintenta hasta que haya alto suficiente
+  [0, 200, 600, 1200, 2200].forEach(ms=>setTimeout(()=>{
+    if(!_initRestoring || _currentView !== view) return;
+    if(Math.abs(window.scrollY - y) > 2) window.scrollTo(0, y);
+  }, ms));
+  setTimeout(stop, 2600);
+}
 let _currentView = "rutinaA";         // se corrige al arrancar con STATE.ui.vista
 const VISTAS_VALIDAS = ["muro","rutinaA","rutinaB","rutinas","calentamiento","tecnica","biblioteca","anatomia","registro","semanal"];
 function vistaValida(v){ return VISTAS_VALIDAS.includes(v) || (rutinaKeyFromView(v) !== null && !!rutinaGet(v)); }
@@ -9334,6 +10016,7 @@ function ensureUiState(){
   return STATE.ui;
 }
 function persistUiState(){
+  if(_initRestoring) return;
   const ui = ensureUiState();
   ui.vista = _currentView;
   ui.scroll[_currentView] = Math.round(window.scrollY);
@@ -9358,7 +10041,7 @@ function updateAddExFab(viewKey){
 let _uiScrollSaveTimer = null;
 let _restoringScroll = false;
 window.addEventListener("scroll", ()=>{
-  if(_restoringScroll || !STATE) return;
+  if(_restoringScroll || _initRestoring || !STATE) return;
   _scrollPositions[_currentView] = window.scrollY;
   clearTimeout(_uiScrollSaveTimer);
   _uiScrollSaveTimer = setTimeout(persistUiState, 400);
@@ -9389,6 +10072,44 @@ function restoreScrollFor(viewKey){
   });
 }
 
+// V-2: en el Muro, los botones flotantes de la izquierda (calculadora y anatomía) se corren
+// para no tapar la foto de perfil. Solo se mueven mientras se solapan; si no, quedan en su lugar.
+function fabMuroDodge(){
+  const fabs = Array.from(document.querySelectorAll(".anat-fab, .calc-fab"));
+  // Mide la posición "natural" (sin desplazamiento y sin animación) para no oscilar
+  const prev = fabs.map(f=>f.style.bottom);
+  fabs.forEach(f=>{ f.style.transition = "none"; f.style.bottom = ""; });
+  let target = fabs.map(()=>"");
+  try{
+    const av = document.getElementById("muroAvatar");
+    const vis = fabs.filter(f=>{ const r = f.getBoundingClientRect(); return r.width > 0 && r.height > 0; });
+    if(_currentView === "muro" && av && vis.length){
+      const a = av.getBoundingClientRect();
+      if(a.width){
+        const GAP = 10, H = window.innerHeight;
+        let top = Infinity, bottom = -Infinity, left = Infinity, right = -Infinity;
+        vis.forEach(f=>{ const r = f.getBoundingClientRect(); top = Math.min(top, r.top); bottom = Math.max(bottom, r.bottom); left = Math.min(left, r.left); right = Math.max(right, r.right); });
+        const hit = !(right + GAP <= a.left || a.right + GAP <= left || bottom + GAP <= a.top || a.bottom + GAP <= top);
+        if(hit){
+          const up = bottom - a.top + GAP;      // subir hasta quedar encima de la foto
+          const down = a.bottom + GAP - top;    // bajar hasta quedar debajo de la foto
+          const dy = (top - up >= 8) ? up : ((bottom + down <= H - 8) ? -down : up);
+          target = fabs.map(f=> vis.includes(f) ? ((parseFloat(getComputedStyle(f).bottom) || 0) + dy) + "px" : "");
+        }
+      }
+    }
+  }catch(e){}
+  // Vuelve al estado anterior, reactiva la animación y recién ahí aplica el destino (anima solo si cambió)
+  fabs.forEach((f,i)=>{ f.style.bottom = prev[i]; });
+  void document.body.offsetWidth;
+  fabs.forEach((f,i)=>{ f.style.transition = ""; if(f.style.bottom !== target[i]) f.style.bottom = target[i]; });
+}
+let _fabDodgeRaf = 0;
+function fabMuroDodgeSoon(){ if(_fabDodgeRaf) return; _fabDodgeRaf = requestAnimationFrame(()=>{ _fabDodgeRaf = 0; try{ fabMuroDodge(); }catch(e){} }); }
+window.addEventListener("scroll", fabMuroDodgeSoon, { passive:true });
+window.addEventListener("resize", fabMuroDodgeSoon);
+setInterval(()=>{ if(_currentView === "muro") fabMuroDodgeSoon(); }, 600);
+
 function showView(viewKey){
   if(viewKey === "estandar") viewKey = "biblioteca"; // N-1: la pestaña "Estándar de repeticiones" pasó a la Biblioteca
   setTimeout(psUpdateFloating, 80); setTimeout(psUpdateFloating, 450); // P-1
@@ -9403,6 +10124,7 @@ function showView(viewKey){
   document.getElementById(`view-${viewKey}`).classList.add('active');
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelector(`.tab-btn[data-view="${viewKey}"]`).classList.add('active');
+  try{ document.querySelector(`.tab-btn[data-view="${viewKey}"]`).scrollIntoView({ block:'nearest', inline:'nearest' }); }catch(e){}
   _currentView = viewKey;
   closeLkPop(); setTimeout(lkRefreshCounts, 0);
   try{ dockUpdate(); }catch(e){}
@@ -9420,6 +10142,7 @@ function showView(viewKey){
   }
   if(viewKey === "rutinas"){ try{ rutinasRender(); }catch(e){ console.error(e); } }
   updateAddExFab(viewKey);
+  setTimeout(fabMuroDodgeSoon, 60); setTimeout(fabMuroDodgeSoon, 500); // V-2
 }
 
 // ============================================================
@@ -9492,53 +10215,124 @@ const ANAT_M = {
         f:"Músculos estabilizadores de ritmo lento; se fatigan en posturas sostenidas y mejoran con trabajo de retracción controlada.",
         m:"Retracción escapular (juntar las escápulas), rotación inferior y estabilización durante remos y dominadas. Compensan el exceso de trabajo de pecho y hombros." } },
   dorsal:{ n:"Dorsal ancho", g:"sup",
-    v:{ b:"M100 134 C116 124 130 108 134 102 C137 132 130 168 120 190 L100 198 Z" },
+    v:{}, kids:["dorsal_sup", "dorsal_inf"],
     i:{ a:"Latísimo del dorso: nace en las espinosas de T7 a L5, la fascia toracolumbar y la cresta ilíaca; se inserta en el surco intertubercular del húmero. Es el músculo más ancho de la espalda.",
         f:"Gran músculo de tracción, con mucha capacidad de fuerza. Responde a series de tracción vertical y horizontal con descenso controlado.",
         m:"Aducción, extensión y rotación interna del hombro; lleva el brazo hacia el cuerpo. Dominadas (tracción vertical) y remos (horizontal) son sus ejercicios base; en la colgada trabaja de forma isométrica y decomprime la columna." } },
+  dorsal_sup:{ n:"Dorsal ancho · porción superior", g:"sup",
+    v:{ b:"M100 134 C116 124 130 108 134 102 C135.2 114 134.8 127 133.2 139.6 C122 148 112 160 100 166 Z" },
+    deco:{ b:["M101.4 141 L130.6 112", "M101.2 149 L132 120", "M101 157 L132.6 130"] },
+    i:{ a:"Fibras altas del latísimo. Nacen en las apófisis espinosas dorsales bajas (alrededor de T7 a T10) y suben casi en horizontal hacia el húmero, pasando por debajo del ángulo inferior de la escápula.",
+        f:"Fibras de tracción con mucha capacidad de fuerza. Trabajan muy bien en remos, donde el codo se lleva hacia atrás con el torso inclinado, y en tracciones con los brazos por encima de la cabeza.",
+        m:"Aducción, extensión y rotación interna del hombro. Participan en remos, dominadas, jalones y en la colgada, donde además ayudan a estabilizar el hombro." } },
+  dorsal_inf:{ n:"Dorsal ancho · porción inferior", g:"sup",
+    v:{ b:"M100 166 C112 160 122 148 133.2 139.6 C130.9 158.6 126 176.8 120 190 L100 198 Z" },
+    deco:{ b:["M101.6 177 L128.4 150", "M101.4 187 L127.2 160", "M102 195 L121.6 177"] },
+    i:{ a:"Fibras bajas del latísimo. Nacen en las espinosas lumbares, la fascia toracolumbar, la cresta ilíaca y las últimas costillas, y suben en diagonal hacia el húmero formando el contorno lateral de la espalda.",
+        f:"Fibras más verticales que la porción alta; se estiran bastante cuando el brazo está por encima de la cabeza y son las que más ayudan a dar la forma de V al torso.",
+        m:"Aducción y extensión del hombro, llevando el brazo hacia la cadera. Trabajan en dominadas, jalones y remos con el codo pegado al cuerpo; en la colgada se estiran y descomprimen la columna." } },
   erectores:{ n:"Erectores lumbares", g:"core",
     v:{ b:"M100 152 L109 152 C111 172 110 192 106 208 L100 208 Z" },
     i:{ a:"Erector de la columna (iliocostal, longísimo y espinoso) junto con los multífidos. Recorren la columna desde la pelvis hasta el cráneo.",
         f:"Alta proporción de fibras de tipo I: están hechos para sostener la postura durante mucho tiempo. Trabajan sobre todo de forma isométrica.",
         m:"Extensión y estabilización de la columna. Sostienen la espalda neutra en el peso muerto, las sentadillas y los remos; si fallan, la técnica se rompe antes que la fuerza de piernas." } },
   abdominales:{ n:"Recto abdominal", g:"core",
-    v:{ f:"M101 120 L117 120 C118 150 117 176 113 194 L101 194 Z" },
-    deco:{ f:["M101 138 L117 138","M101 156 L116.5 156","M101 174 L115 174"] },
+    v:{}, kids:["abdominales_sup", "abdominales_inf"],
     i:{ a:"Recto abdominal: nace en la cresta y la sínfisis del pubis y se inserta en los cartílagos de las costillas 5 a 7 y en el xifoides. Las líneas transversales son intersecciones tendinosas.",
         f:"Músculo postural y dinámico a la vez. Responde bien al trabajo isométrico y a tensiones sostenidas, que además enseñan a controlar la pelvis.",
         m:"Flexión del tronco y retroversión de la pelvis. En el hollow hold lo exige de forma isométrica manteniendo la zona lumbar contra el suelo; en las elevaciones de piernas suspendido y el crunch inverso actúa para elevar la pelvis." } },
+  abdominales_sup:{ n:"Recto abdominal · porción superior", g:"core",
+    v:{ f:"M101 120 L117 120 C117.4 132.8 117.5 144.9 117.1 156.0 L101 156 Z" },
+    deco:{ f:["M101 138 L117.2 138", "M109 121 L109.2 155", "M104.6 122 L104.8 154", "M113.4 122 L113.6 154"] },
+    i:{ a:"Mitad alta del recto abdominal. Se inserta en los cartílagos de las costillas 5 a 7 y en el xifoides del esternón, y está atravesada por las intersecciones tendinosas que dibujan los cuadrados del abdomen.",
+        f:"Músculo postural y dinámico a la vez, con fibras que responden bien a tensiones sostenidas. Aunque es un solo músculo, esta zona se carga más cuando el movimiento arranca desde el tórax.",
+        m:"Flexión del tronco. Trabaja en crunches, elevaciones de tronco y en el hollow hold, y ayuda a mantener la caja torácica abajo y controlada cuando se carga peso por encima de la cabeza." } },
+  abdominales_inf:{ n:"Recto abdominal · porción inferior", g:"core",
+    v:{ f:"M101 156 L117.1 156.0 C116.6 170.8 115.3 183.7 113.0 194.0 L101 194 Z" },
+    deco:{ f:["M101 174 L115.4 174", "M109 157 L109 193", "M104.6 158 L104.6 192", "M112.8 158 L112.6 190"] },
+    i:{ a:"Mitad baja del recto abdominal. Nace en la cresta y la sínfisis del pubis y sube en fibras verticales hasta unirse con la porción alta a través de las intersecciones tendinosas.",
+        f:"Mismo músculo que la porción superior, pero con más participación cuando el movimiento arranca desde la pelvis. Es la que más cuesta aislar y se fatiga con facilidad si la zona lumbar no está bien controlada.",
+        m:"Retroversión de la pelvis y flexión del tronco desde abajo. Se exige en elevaciones de piernas, crunch inverso y en el hollow hold para mantener la zona lumbar contra el suelo." } },
   oblicuos:{ n:"Oblicuos y transverso", g:"core",
     v:{}, kids:["oblicuo_ext", "oblicuo_int", "transverso"],
     i:{ a:"Oblicuo externo, oblicuo interno y transverso del abdomen forman la pared lateral del abdomen, en capas con fibras de distinta dirección.",
         f:"Trabajan mucho como estabilizadores (anti-rotación y anti-inclinación) más que moviendo carga. El transverso actúa como faja natural al comprimir el abdomen.",
         m:"Rotación y flexión lateral del tronco, compresión abdominal. En cualquier ejercicio unilateral o con carga asimétrica (remo unilateral, búlgaras) evitan que el tronco se tuerza." } },
   serrato:{ n:"Serrato anterior", g:"sup",
-    v:{ f:"M126 104 L133 100 C134 112 133 124 128 132 C126 124 126 114 126 104 Z" },
+    v:{}, kids:["serrato_sup", "serrato_med", "serrato_inf"],
     i:{ a:"Nace en las costillas superiores y se inserta en el borde medial de la escápula por su cara anterior; se ve como 'dedos' al costado de las costillas.",
         f:"Estabilizador clave de la escápula; suele quedar débil si solo se entrena empuje horizontal.",
         m:"Protracción y rotación superior de la escápula. Mantiene el omóplato pegado a la caja torácica en flexiones y en cualquier movimiento sobre la cabeza. Sin serrato la escápula 'se despega'." } },
+  serrato_sup:{ n:"Serrato anterior · porción superior", g:"sup",
+    v:{ f:"M126.0 104.0 C126.0 107.4 126.0 110.8 126.1 114.1 L133.3 108.6 C133.4 105.8 133.2 102.9 133.0 100.0 Z" },
+    deco:{ f:["M126.0 107.1 L133.2 102.6", "M126.0 110.9 L133.3 105.9"] },
+    i:{ a:"Porción alta del serrato. Nace en las primeras costillas (1 y 2) y se inserta en el ángulo superior de la escápula, por su cara anterior. Queda en gran parte tapada por el pectoral.",
+        f:"Fibras que sostienen la escápula contra la caja torácica y la mantienen estable bajo carga. Es la porción que menos se ve y la que más cuesta sentir.",
+        m:"Sujeta y eleva ligeramente la escápula, y ayuda a la protracción. Trabaja como estabilizador en presses, flexiones y movimientos sobre la cabeza." } },
+  serrato_med:{ n:"Serrato anterior · porción intermedia", g:"sup",
+    v:{ f:"M126.1 114.1 C126.2 117.2 126.3 120.3 126.6 123.2 L132.4 119.5 C133.0 116.0 133.3 112.4 133.3 108.6 Z" },
+    deco:{ f:["M126.2 116.9 L133.3 111.9", "M126.3 120.4 L132.9 116.1"] },
+    i:{ a:"Porción central del serrato. Nace en las costillas 2 a 4 y se inserta en todo el borde medial de la escápula, por su cara anterior.",
+        f:"Fibras de resistencia que mantienen el omóplato pegado al tórax. Si falla, la escápula se 'despega' (escápula alada) al empujar o al levantar el brazo.",
+        m:"Protracción de la escápula: llevarla hacia adelante y afuera, como en la fase final de una flexión con el plus de serrato. Estabiliza al apoyar las manos y en las colgadas." } },
+  serrato_inf:{ n:"Serrato anterior · porción inferior", g:"sup",
+    v:{ f:"M126.6 123.2 C126.9 126.3 127.3 129.3 128.0 132.0 L128.0 132.0 C130.2 128.5 131.6 124.2 132.4 119.5 Z" },
+    deco:{ f:["M126.9 126.0 L131.5 123.6", "M127.4 129.3 L129.9 128.4"] },
+    i:{ a:"Porción baja del serrato, la que se ve como 'dedos' al costado de las costillas, junto a los oblicuos. Nace en las costillas 5 a 9 y se inserta en el ángulo inferior de la escápula.",
+        f:"Es la más fuerte y la de fibras más largas. Trabaja mucho de forma sostenida cuando los brazos están por encima de la cabeza o cargados.",
+        m:"Rotación superior de la escápula y protracción. Es clave en flexiones, planchas, press por encima de la cabeza y dominadas, donde ayuda a subir el omóplato." } },
   flexores_cadera:{ n:"Flexores de cadera (iliopsoas)", g:"core",
     v:{ f:"M103 200 C112 200 122 206 125 222 C120 230 112 232 108 232 C104 222 102 212 103 200 Z" },
     i:{ a:"Iliopsoas (psoas mayor e ilíaco): nace en las vértebras T12 a L5 y en el ilíaco, y se inserta en el trocánter menor del fémur. Trabaja junto con el recto femoral del cuádriceps.",
         f:"Músculo profundo que se acorta con facilidad por las posturas sentadas; se beneficia de estiramientos y de trabajo de fuerza controlado.",
         m:"Flexión de cadera. Dominan las elevaciones de piernas suspendido y los mountain climbers; si el abdomen no frena la pelvis, el psoas tira de la zona lumbar." } },
   gluteo_mayor:{ n:"Glúteo mayor", g:"inf",
-    v:{ b:"M100 208 C114 202 129 210 130 234 C128 252 114 258 100 252 Z" },
+    v:{}, kids:["gluteo_mayor_sup", "gluteo_mayor_inf"],
     i:{ a:"El músculo más voluminoso del cuerpo. Nace en el sacro, el cóccix y la cara posterior del ilíaco; se inserta en la tuberosidad glútea del fémur y en la cintilla iliotibial.",
         f:"Gran capacidad de producir fuerza y potencia. Se activa más cuanto mayor es la flexión de cadera al inicio del movimiento, y responde muy bien a cargas altas.",
         m:"Extensión y rotación externa de cadera. Protagonista en sentadillas profundas, zancadas, búlgaras, peso muerto y saltos; es el motor que sube del fondo." } },
+  gluteo_mayor_sup:{ n:"Glúteo mayor · porción superior", g:"inf",
+    v:{ b:"M100 208 C114 202 129 210 130 234 C122 238 110 236 100 230 Z" },
+    deco:{ b:["M101.4 211 L126.6 222", "M101.2 217 L128.6 227", "M101 223 L129.4 232"] },
+    i:{ a:"Fibras altas del glúteo mayor. Nacen en la cresta ilíaca, la fascia lumbar y el sacro, y se insertan sobre todo en la cintilla iliotibial. Quedan justo debajo del glúteo medio.",
+        f:"Fibras que trabajan en gran parte como estabilizadoras de la pelvis, junto al glúteo medio. Se activan más con la cadera cerca de la extensión y en movimientos en los que la pierna se abre.",
+        m:"Extensión y abducción de cadera, y estabilización de la pelvis al apoyar una pierna. Colaboran en zancadas, subidas a cajón, abducciones y marcha." } },
+  gluteo_mayor_inf:{ n:"Glúteo mayor · porción inferior", g:"inf",
+    v:{ b:"M100 230 C110 236 122 238 130 234 C128 252 114 258 100 252 Z" },
+    deco:{ b:["M101.4 236 L128.6 243", "M101.2 242 L126 249", "M101.2 248 L119.4 254"] },
+    i:{ a:"Fibras bajas del glúteo mayor, las más voluminosas. Nacen en el sacro y el cóccix y se insertan sobre todo en la tuberosidad glútea del fémur, dando la proyección hacia atrás de la cadera.",
+        f:"Gran capacidad de fuerza y potencia. Se activan más cuanta mayor es la flexión de cadera al inicio del movimiento y responden muy bien a cargas altas y a rangos profundos.",
+        m:"Extensión y rotación externa de cadera. Protagonistas en sentadillas profundas, búlgaras, peso muerto, hip thrust y saltos; son el motor que sube del fondo." } },
   gluteo_medio:{ n:"Glúteo medio", g:"inf",
-    v:{ b:"M110 202 C120 196 130 204 130 218 C124 212 116 210 106 214 Z" },
+    v:{}, kids:["gluteo_medio_post", "gluteo_medio_med", "gluteo_medio_ant"],
     i:{ a:"Nace en la cara externa del ilion y se inserta en el trocánter mayor del fémur. Está parcialmente cubierto por el glúteo mayor.",
         f:"Su función principal es de estabilización, con fibras que sostienen la pelvis a cada paso; se fatiga rápido en trabajo unilateral.",
         m:"Abducción de cadera y estabilización lateral de la pelvis al apoyar una sola pierna. La elevación lateral con tobillera lo trabaja directo; las búlgaras y sentadillas unilaterales lo exigen para que la rodilla no se cierre." } },
+  gluteo_medio_post:{ n:"Glúteo medio · fibras posteriores", g:"inf",
+    v:{ b:"M110.0 202.0 C113.0 200.2 116.0 199.7 118.7 200.2 L114.5 212.0 C111.8 212.1 109.0 212.8 106.0 214.0 Z" },
+    deco:{ b:["M110.1 205.0 L113.2 203.9 L116.3 203.6", "M108.7 209.3 L111.8 208.3 L114.8 207.8"] },
+    i:{ a:"Fibras de la parte trasera del abanico del glúteo medio. Nacen en la cara externa del ilion, cerca de la cresta ilíaca y del sacro, y se insertan en el trocánter mayor. Gran parte queda cubierta por el glúteo mayor.",
+        f:"Fibras casi horizontales, hechas para estabilizar la pelvis más que para mover mucha carga. Se fatigan rápido en trabajo unilateral y con la pierna apoyada.",
+        m:"Abducción y rotación externa de cadera, con apoyo en la extensión. Controlan que la pelvis no caiga hacia un lado en zancadas, búlgaras y al caminar." } },
+  gluteo_medio_med:{ n:"Glúteo medio · fibras medias", g:"inf",
+    v:{ b:"M118.7 200.2 C121.1 200.6 123.3 201.8 125.0 203.7 L120.9 212.6 C118.9 212.0 116.7 211.8 114.5 212.0 Z" },
+    deco:{ b:["M118.4 203.9 L120.8 204.6 L123.0 205.8", "M116.9 207.9 L119.3 208.3 L121.5 209.1"] },
+    i:{ a:"Porción central del glúteo medio, la más gruesa y la más claramente visible por encima del glúteo mayor. Nace en la cara externa del ilion y se inserta en la cara externa del trocánter mayor.",
+        f:"Combina fuerza y resistencia: trabaja como motor de la abducción y como estabilizador al apoyar una sola pierna.",
+        m:"Abducción de cadera y estabilización lateral de la pelvis. La elevación lateral con tobillera la trabaja de forma directa; sentadillas y búlgaras la exigen para que la rodilla no se cierre." } },
+  gluteo_medio_ant:{ n:"Glúteo medio · fibras anteriores", g:"inf",
+    v:{ b:"M125.0 203.7 C128.1 206.8 130.0 211.8 130.0 218.0 L130.0 218.0 C127.4 215.4 124.3 213.5 120.9 212.6 Z" },
+    deco:{ b:["M125.1 207.5 L127.8 211.2 L129.6 215.9", "M123.7 210.3 L126.8 212.9 L129.2 216.4"] },
+    i:{ a:"Fibras de la parte delantera del abanico. Nacen en la cara externa del ilion, por debajo de la cresta, y se insertan en el trocánter mayor. Trabajan en conjunto con el tensor de la fascia lata.",
+        f:"Fibras orientadas hacia adelante, con buena capacidad de sostener carga durante la marcha y al correr.",
+        m:"Abducción y rotación interna de cadera, con una leve ayuda en la flexión. Participan en la marcha, la carrera y los movimientos de lado, y evitan que la cadera se hunda al apoyar." } },
   cuadriceps:{ n:"Cuádriceps", g:"inf",
     v:{}, kids:["recto_femoral", "vasto_lateral", "vasto_medial", "vasto_intermedio"],
     i:{ a:"Cuatro porciones: recto femoral, vasto lateral, vasto medial y vasto intermedio. Se unen en el tendón rotuliano que se inserta en la tuberosidad de la tibia.",
         f:"Mezcla de fibras rápidas y lentas. Es muy exigido en saltos y sprints, y por su volumen genera mucha fatiga general en sets largos.",
         m:"Extensión de rodilla; el recto femoral también flexiona la cadera. Sentadillas, búlgaras, saltos y sprints lo trabajan; cuanto más profunda la flexión de rodilla, mayor su demanda." } },
   aductores:{ n:"Aductores", g:"inf",
-    v:{ f:"M102 246 L105 242 C108 270 108 298 107 316 C104 300 102 270 102 246 Z" },
+    v:{}, kids:["aductor_mayor", "aductor_corto", "pectineo", "aductor_largo", "gracil"],
     i:{ a:"Aductor mayor, largo y corto, pectíneo y grácil: nacen en el pubis y la rama isquiopubiana y se insertan en el fémur (el grácil en la tibia).",
         f:"Estabilizadores de la pelvis y la rodilla; el aductor mayor se comporta casi como un isquiotibial en la extensión de cadera.",
         m:"Aducción de cadera. Además estabilizan en sentadillas y zancadas, y trabajan en jumping jacks al juntar las piernas. Es una zona frecuente de tirones si se fuerza la flexibilidad." } },
@@ -9548,15 +10342,62 @@ const ANAT_M = {
         f:"Predominan las fibras rápidas y trabajan mucho de forma excéntrica, frenando la extensión de la rodilla. Son una lesión frecuente en sprints y estiramientos forzados.",
         m:"Extensión de cadera y flexión de rodilla. El peso muerto los carga con la cadera hacia atrás mientras se alargan; los sprints y los saltos los exigen al frenar y al despegar." } },
   pantorrilla:{ n:"Pantorrilla (gemelos y sóleo)", g:"inf",
-    v:{ b:"M106 342 C117 338 127 346 125 368 C123 388 120 408 116 420 C111 410 107 384 106 342 Z" },
+    v:{}, kids:["soleo", "gemelo_lateral", "gemelo_medial"],
     i:{ a:"Gemelos (dos cabezas que nacen en el fémur) y sóleo (nace en tibia y peroné). Se unen en el tendón de Aquiles, que se inserta en el calcáneo.",
         f:"El sóleo tiene predominio de fibras lentas y soporta mucho trabajo; los gemelos son más rápidos y explosivos. Ambos tienen mucha capacidad de fuerza elástica en saltos.",
         m:"Flexión plantar del tobillo. Con la rodilla extendida trabajan más los gemelos; con la rodilla flexionada, el sóleo. Sprints, saltos y la elevación plantar unilateral los trabajan." } },
+  soleo:{ n:"Sóleo", g:"inf",
+    v:{ b:"M107 372 C106.2 388 108.4 402 113.2 410 L113.6 424 L117.4 424 L118 410 C122.8 402 125 388 124.4 372 C121 381 118 385 116.2 387 C113 385 109.6 381 107 372 Z" },
+    deco:{ b:["M110 398 L113.6 408", "M121 398 L117.6 408", "M113.8 412 L113.8 423", "M116.8 412 L116.8 423", "M108.6 384 L112.4 394", "M122.8 384 L119 394"] },
+    i:{ a:"Nace en la cara posterior de la cabeza del peroné y en la tibia, y se inserta en el calcáneo por el tendón de Aquiles. Queda debajo de los gemelos y se asoma a los lados y por debajo de ellos.",
+        f:"Predominan las fibras lentas, muy resistentes a la fatiga: sostiene el cuerpo de pie y al caminar durante horas. Cruza solo el tobillo, por eso no depende de la posición de la rodilla y es el que más trabaja cuando la rodilla está flexionada.",
+        m:"Flexión plantar del tobillo, sobre todo con la rodilla flexionada (elevación de talones sentado). Estabiliza la pierna al estar de pie y empuja en cada paso. Responde bien a repeticiones altas y tiempos bajo tensión largos." } },
+  gemelo_lateral:{ n:"Pantorrilla · gemelo externo", g:"inf",
+    v:{ b:"M116.6 346 C119 341.5 124 342 125.4 348 C126 362 124.4 376 121.4 387 C119 388.6 117.2 384 116.8 372 C116.4 362 116.4 354 116.6 346 Z" },
+    deco:{ b:["M124.6 350 L117.6 357", "M124.8 358 L117.8 365", "M124.2 366 L117.8 373", "M122.8 374 L118 380"] },
+    i:{ a:"Cabeza externa del gastrocnemio. Nace en el cóndilo lateral del fémur, justo encima de la rodilla, y se inserta en el calcáneo por el tendón de Aquiles. Es algo más corta y alta que la cabeza interna.",
+        f:"Tiene buena proporción de fibras rápidas, así que es potente y explosiva. Cruza rodilla y tobillo, por eso rinde más con la rodilla extendida y se estira mucho al flexionar el tobillo con la pierna recta.",
+        m:"Flexión plantar del tobillo y ayuda a flexionar la rodilla. Trabaja en elevaciones de talones de pie, saltos, sprints y caminar en puntas. Apoyar el peso hacia el borde externo del pie la carga un poco más." } },
+  gemelo_medial:{ n:"Pantorrilla · gemelo interno", g:"inf",
+    v:{ b:"M106.4 343 C110 341 114.8 342 116 346 C116.6 362 115.6 380 113 392 C110.6 394 108.4 390 107.6 380 C106.6 368 106.2 356 106.4 343 Z" },
+    deco:{ b:["M107.2 348 L115.2 355", "M106.8 357 L115.6 364", "M106.6 366 L115.4 373", "M107.4 375 L114.6 381", "M108.6 384 L113.6 389"] },
+    i:{ a:"Cabeza interna del gastrocnemio. Nace en el cóndilo medial del fémur, por encima de la rodilla, y se inserta en el calcáneo por el tendón de Aquiles. Es la más grande de las dos cabezas y baja un poco más que la externa.",
+        f:"Es la que más volumen aporta a la pantorrilla y la que suele dominar en saltos y empujes. Como cruza la rodilla, trabaja mejor con la pierna extendida y se fatiga rápido con series pesadas o explosivas.",
+        m:"Flexión plantar del tobillo y ayuda a flexionar la rodilla. Es clave en elevaciones de talones de pie, saltos, sprints y cuerdas. Apoyar el peso hacia el borde interno del pie la carga un poco más." } },
   tibial:{ n:"Tibial anterior", g:"inf",
-    v:{ f:"M108 344 C116 340 124 346 123 372 C122 398 119 418 116 428 C111 412 108 380 108 344 Z" },
+    v:{}, kids:["tibial_vientre", "tibial_tendon"],
     i:{ a:"Nace en la cara externa de la tibia y se inserta en el primer cuneiforme y el primer metatarsiano.",
         f:"Fibras resistentes a la fatiga, imprescindible para el control del pie al caminar y correr.",
         m:"Dorsiflexión (levantar la punta del pie) e inversión. Frena el pie al apoyar y participa en la amortiguación de saltos y sprints." } },
+  tibial_vientre:{ n:"Tibial anterior · vientre", g:"inf",
+    v:{ f:"M108 344 C116 340 124 346 123 372 C122.6 388 120 400 115.8 409 C112.4 400 108.2 378 108 344 Z" },
+    deco:{ f:["M115.6 346 L115.6 402", "M122.8 360 L116 368", "M122.8 376 L116 384", "M120.8 392 L116 398", "M108.4 358 L115.2 366", "M108.4 372 L115.2 380", "M110 388 L115.4 394"] },
+    i:{ a:"Parte muscular del tibial anterior. Nace en la cara externa de la tibia, en su mitad superior, y en la membrana interósea; es el músculo que se marca al costado de la espinilla.",
+        f:"Fibras resistentes a la fatiga que trabajan sin parar al caminar y correr, y que se tensan fuerte al frenar el pie en cada apoyo. Es el que más se siente al caminar de talones.",
+        m:"Dorsiflexión (levantar la punta del pie) e inversión. Frena el pie al apoyar, participa en la amortiguación de saltos y sprints y se carga mucho en subidas y bajadas." } },
+  tibial_tendon:{ n:"Tibial anterior · tendón", g:"inf",
+    v:{ f:"M114.8 396 C115.4 395.4 116.2 395.6 116.8 397.4 C117.6 410 117.4 420 116.6 429 L115.2 429 C114.2 420 113.8 408 114.8 396 Z" },
+    deco:{ f:["M115.6 399 L116 428"] },
+    i:{ a:"Tendón largo que baja desde el vientre, cruza por delante del tobillo y se inserta en el primer cuneiforme y en la base del primer metatarsiano, en el lado interno del pie.",
+        f:"Transmite la fuerza del músculo al pie y almacena algo de energía elástica en cada paso. Es una zona que conviene calentar y cargar de forma progresiva, sobre todo al aumentar kilómetros o desniveles.",
+        m:"Lleva el pie hacia arriba y hacia adentro. Se marca bajo la piel al levantar la punta del pie con el tobillo en el aire." } },
+  fibulares:{ n:"Fibulares (peroneos)", g:"inf",
+    v:{}, kids:["peroneo_corto", "peroneo_largo"],
+    i:{ a:"Grupo lateral de la pierna formado por el peroneo largo y el peroneo corto. Nacen en el peroné y sus tendones pasan por detrás del maléolo externo hacia el pie.",
+        f:"Fibras resistentes a la fatiga que trabajan de forma casi constante al caminar, correr y mantener el equilibrio.",
+        m:"Eversión del pie (llevar la planta hacia afuera), ayuda en la flexión plantar y estabilización lateral del tobillo." } },
+  peroneo_corto:{ n:"Fibulares · peroneo corto", g:"inf",
+    v:{ f:"M121.8 388 C123 385.6 124.6 386.6 124.8 391 C124.9 400 124.6 408 123.9 415 C124.2 420 124.6 424 125.3 429.6 L124.2 430 C123.4 425 122.7 420 122.5 414 C121.6 406 121.2 396 121.8 388 Z" },
+    deco:{ f:["M122.6 390 L123 412", "M124.4 394 L123 399", "M121.9 396 L123 401", "M124.4 404 L123.2 408"] },
+    i:{ a:"Nace en los dos tercios inferiores de la cara externa del peroné, queda debajo del peroneo largo y su tendón rodea el maléolo externo hasta insertarse en la base del quinto metatarsiano.",
+        f:"Fibras lentas y muy resistentes. Es el principal evertor del pie y trabaja de forma sostenida para que el tobillo no ceda hacia adentro.",
+        m:"Eversión del pie y ayuda a la flexión plantar. Se carga en cambios de dirección, terreno irregular, saltos y ejercicios de equilibrio sobre una pierna, y protege contra los esguinces por inversión." } },
+  peroneo_largo:{ n:"Fibulares · peroneo largo", g:"inf",
+    v:{ f:"M123.6 346 C125 343.6 126.4 345.6 126.4 351 C126.5 372 126 389 124.9 401 C124.6 410 124.9 419 125 427 L124 427.6 C123.6 419 123.4 409 123.2 400 C122.6 388 122.6 368 123.6 346 Z" },
+    deco:{ f:["M124.8 348 L124.6 398", "M126 356 L124.8 362", "M126 368 L124.7 374", "M125.7 380 L124.6 386", "M123.2 360 L124.6 365", "M123.1 372 L124.5 377", "M123.2 384 L124.5 389"] },
+    i:{ a:"Es el más largo y superficial de los dos. Nace en la cabeza del peroné y en su tercio superior, y su tendón baja por detrás del maléolo externo, cruza la planta del pie y se inserta en el primer cuneiforme y el primer metatarsiano.",
+        f:"Fibras de resistencia, con un tendón largo que funciona como un estribo bajo el pie: ayuda a sostener el arco transverso y a fijar el primer dedo contra el suelo al empujar.",
+        m:"Eversión y flexión plantar del pie, y estabilización del arco. Trabaja en caminar, correr, saltos con apoyo lateral y en cada despegue del pie, donde ayuda a cargar el peso sobre el dedo gordo." } },
   // ── Tanda 1 (Q-6): hombro, escápula y cuello. l:"d" = capa profunda (se ve al activarla o cuando el músculo está en uso)
   esternocleido:{ n:"Esternocleidomastoideo", g:"hom",
     v:{ f:"M107 44 L108 52 C106 60 104 65 101 68 L99 66 C101 58 104 50 107 44 Z" },
@@ -9827,6 +10668,36 @@ const ANAT_M = {
     i:{ a:"Porción más profunda e interna de los isquiotibiales, tapada en parte por el semitendinoso. Nace en la tuberosidad isquiática y se inserta en la cara posterior del cóndilo medial de la tibia.",
         f:"Es el isquiotibial más voluminoso y fuerte para extender la cadera; con el semitendinoso forma la pared medial de la corva.",
         m:"Extiende la cadera, flexiona la rodilla y rota la pierna hacia adentro. Se carga en el peso muerto, las sentadillas profundas y los puentes." } },
+  aductor_mayor:{ n:"Aductores · aductor mayor", g:"inf", l:"d",
+    v:{ f:"M105.4 298.0 C105.9 304.9 106.4 311.0 107.0 316.0 L107.0 316.0 C107.5 310.6 107.8 304.3 108.0 297.4 Z", b:"M104 256 C105 253 106.6 254 107 258 C107.2 282 108 300 108.6 314 L105.8 322 C104.8 304 103.9 282 104 256 Z" },
+    deco:{ f:["M106.7 301.8 L106.9 308.7 L107.0 314.9"], b:["M105 262 L105.8 300", "M106.2 259 L107 298"] },
+    i:{ a:"El aductor más grande y potente. Nace en la rama isquiopubiana y la tuberosidad isquiática, y se inserta en toda la línea áspera del fémur y en el tubérculo aductor, cerca de la rodilla. Tiene una porción que aduce y otra que extiende la cadera.",
+        f:"Mucha masa y capacidad de fuerza. Su porción posterior se comporta casi como un isquiotibial, así que trabaja fuerte en extensión de cadera, sobre todo con la cadera muy flexionada.",
+        m:"Aducción y extensión de cadera. Participa en sentadillas profundas, sumo, zancadas y peso muerto, y estabiliza la pelvis al apoyar una pierna. Es una zona común de tirones si se fuerza la apertura de piernas." } },
+  aductor_corto:{ n:"Aductores · aductor corto", g:"inf", l:"d",
+    v:{ f:"M102.0 254.4 C102.3 262.6 102.7 271.1 103.2 279.3 L106.5 278.4 C106.1 270.2 105.6 261.5 104.9 252.8 Z" },
+    deco:{ f:["M103.7 256.8 L104.2 266.3 L104.7 275.8"] },
+    i:{ a:"Músculo corto y triangular que queda detrás del pectíneo y del aductor largo. Nace en el pubis y se inserta en la parte alta de la línea áspera del fémur.",
+        f:"Fibras de resistencia que actúan como apoyo de los otros aductores y estabilizan la cadera durante la marcha.",
+        m:"Aducción y leve flexión de cadera. Trabaja junto al aductor largo en movimientos de juntar las piernas, cambios de dirección y patadas." } },
+  pectineo:{ n:"Aductores · pectíneo", g:"inf",
+    v:{ f:"M102.5 244.6 C102.8 251.2 103.1 258.1 103.5 264.9 L107.1 263.7 C106.6 256.6 105.9 249.3 105.0 242.0 Z" },
+    deco:{ f:["M103.1 247.3 L106.2 258.9", "M104.4 248.9 L106.9 260.4"] },
+    i:{ a:"Pequeño músculo plano en la parte alta del muslo interno. Nace en la rama superior del pubis y se inserta en la línea pectínea del fémur, justo debajo del trocánter menor.",
+        f:"Participa mucho en la estabilidad de la cadera y se tensa fácilmente al hacer cambios de dirección o abrir las piernas con fuerza.",
+        m:"Aducción y flexión de cadera, con una ligera rotación externa. Se activa al llevar la pierna hacia adelante y adentro, como al subir un escalón o patear." } },
+  aductor_largo:{ n:"Aductores · aductor largo", g:"inf",
+    v:{ f:"M103.5 264.9 C104.1 277.0 104.7 289.1 105.5 299.4 L107.9 298.7 C108.2 288.3 108.0 276.2 107.1 263.7 Z" },
+    deco:{ f:["M104.2 267.9 L107.3 281.4", "M104.7 275.8 L107.5 290.4", "M105.0 283.4 L107.4 296.1"] },
+    i:{ a:"El aductor más superficial y visible. Nace en el pubis, justo debajo de la espina púbica, y se inserta en el tercio medio de la línea áspera del fémur.",
+        f:"Fibras de contracción relativamente rápida. Es muy exigido en cambios de dirección, patadas y deportes con movimientos de lado, y es uno de los músculos que más se lesionan en la ingle.",
+        m:"Aducción de cadera con ayuda en la flexión. Trabaja al juntar las piernas, en el jumping jack, en zancadas laterales y para estabilizar la pelvis en sentadillas y búlgaras." } },
+  gracil:{ n:"Aductores · grácil", g:"inf",
+    v:{ f:"M101.2 248.2 C101.3 271.8 103.3 300.5 107.0 316.0 L107.0 316.0 C105.1 299.8 103.8 271.7 102.6 246.9 Z", b:"M102.2 254 C103 254 103.9 255 103.9 258 C104.2 284 105 306 106 324 L104.6 325 C103.2 306 102.2 282 102.2 254 Z" },
+    deco:{ f:["M102.1 252.9 L103.6 284.5 L106.3 311.8"], b:["M103 258 L104.8 318"] },
+    i:{ a:"Músculo largo y delgado del borde interno del muslo. Nace en el pubis y se inserta en la cara interna de la tibia (pata de ganso), cruzando la cadera y la rodilla.",
+        f:"Fibras largas, de resistencia. Al cruzar dos articulaciones, trabaja en estiramiento durante aberturas de piernas y zancadas laterales.",
+        m:"Aducción de cadera, flexión de rodilla y rotación interna de la pierna. Ayuda a estabilizar la rodilla en sentadillas y zancadas." } },
   frontal:{ n:"Frontal (frente)", g:"cab",
     v:{ "f": "M100 10.6 C104.4 10.6 108.8 11.6 111 14.6 C112.2 17 111.6 20 110 22.4 C106.4 20.6 103 20.4 100 20.6 Z" },
     deco:{ "f": ["M104 11.6 L104 20", "M107.6 12.6 L107.8 20.6", "M110 15.4 L109.8 21.6"] },
@@ -9926,7 +10797,9 @@ const ANAT_RULES = [
   [/\bpress\b(?! de (banca|pecho)| frances)/, ["deltoides_ant","deltoides_lat","triceps"], ["trapecio","serrato"]],
   [/elevaci(on|ones) frontal/, ["deltoides_ant"], ["trapecio","serrato","pectoral"]],
   [/elevaci(on|ones) lateral/, ["deltoides_lat"], ["trapecio"]],
-  [/gluteo medio|abduccion/, ["gluteo_medio"], ["gluteo_mayor","oblicuos"]],
+  [/peroneo|fibular|eversion|evertor/, ["fibulares"], ["tibial","plantares_pie"]],
+  [/\baduccion|copenhag/, ["aductores"], ["abdominales","oblicuos"]],
+  [/gluteo medio|abduccion/, ["gluteo_medio"], ["gluteo_mayor_sup","oblicuos"]],
   [/bulgara|zancada|desplante|lunge|step.?up/, ["cuadriceps","gluteo_mayor"], ["isquiotibiales","aductores","gluteo_medio","pantorrilla"]],
   [/peso muerto/, ["gluteo_mayor","isquiotibiales","erectores"], ["dorsal","trapecio","antebrazo","cuadriceps","abdominales"]],
   [/sentadilla|squat|goblet/, ["cuadriceps","gluteo_mayor"], ["isquiotibiales","aductores","erectores","abdominales","pantorrilla"]],
@@ -9946,7 +10819,8 @@ const ANAT_RULES = [
   [/crunch oblicuo|oblicuo/, ["oblicuos"], ["abdominales"]],
   [/crunch|abdominal/, ["abdominales"], ["oblicuos"]],
   [/pie corto|short foot|arco del pie|dedos del pie|toe/, ["plantares_pie"], ["tibial","extensores_pie"]],
-  [/plantar|gemelo|pantorrilla|calf/, ["pantorrilla"], ["tibial","plantares_pie"]],
+  [/^(?!.*(sentad[oa]|seated|soleo)).*(plantar|gemelo|pantorrilla|calf|elevacion(es)? de talon(es)?|heel raise)/, ["pantorrilla"], ["tibial","plantares_pie","fibulares"]],
+  [/(?=.*(sentad[oa]|seated))(?=.*(plantar|gemelo|pantorrilla|talon|calf|heel))|soleo/, ["soleo"], ["gemelo_medial","gemelo_lateral","tibial","plantares_pie","fibulares"]],
   [/plancha|plank/, ["abdominales"], ["oblicuos","deltoides","serrato","gluteo_mayor"]],
   [/puente|hip.?thrust|elevacion de cadera/, ["gluteo_mayor"], ["isquiotibiales"]]
 ];
@@ -9969,7 +10843,22 @@ function anatAuto(name){
 }
 // Músculos de un ejercicio: corrección guardada > automático
 // Un músculo "padre" (p. ej. pectoral) se reemplaza por sus porciones; así las correcciones y reglas viejas siguen funcionando
-function anatSkinOn(){ try{ return localStorage.getItem("btc_anat_skin") === "1"; }catch(e){ return false; } }
+// R-2: piel, panel abierto (por pestaña) y panel expandido viven en STATE.anatomia.prefs (viajan entre dispositivos).
+// Posición del panel (btc_anat_pos) sigue local. localStorage queda como respaldo/migración.
+function anatPrefsRead(){ const a = STATE && STATE.anatomia; return (a && a.prefs && typeof a.prefs === "object") ? a.prefs : null; }
+function anatPrefsEnsure(){
+  const a = anatState();
+  if(!a.prefs || typeof a.prefs !== "object"){
+    a.prefs = { skin:false, exp:false, open:{} };
+    try{ a.prefs.skin = localStorage.getItem("btc_anat_skin") === "1"; a.prefs.exp = localStorage.getItem("btc_anat_exp") === "1"; a.prefs.open = JSON.parse(localStorage.getItem("btc_anat_open") || "{}") || {}; }catch(e){}
+  }
+  if(!a.prefs.open || typeof a.prefs.open !== "object") a.prefs.open = {};
+  return a.prefs;
+}
+function anatPrefsSave(){ try{ saveState(true); }catch(e){} }
+function anatSetSkin(on){ anatPrefsEnsure().skin = !!on; try{ localStorage.setItem("btc_anat_skin", on ? "1" : "0"); }catch(e){} anatPrefsSave(); }
+function anatSetExp(on){ anatPrefsEnsure().exp = !!on; try{ localStorage.setItem("btc_anat_exp", on ? "1" : "0"); }catch(e){} anatPrefsSave(); }
+function anatSkinOn(){ const p = anatPrefsRead(); if(p) return !!p.skin; try{ return localStorage.getItem("btc_anat_skin") === "1"; }catch(e){ return false; } }
 function anatSkinSync(){ const on = anatSkinOn(); (ANAT.roots || []).forEach(r=>{ r.classList.toggle("show-skin", on); const b = r.querySelector('[data-a="skin"]'); if(b) b.classList.toggle("on", on); }); }
 function anatExpand(keys){ const out = []; (keys || []).forEach(k=>{ const m = ANAT_M[k]; (m && m.kids ? anatExpand(m.kids) : [k]).forEach(x=>{ if(!out.includes(x)) out.push(x); }); }); return out; }
 function anatKeys(){ return Object.keys(ANAT_M).filter(k=>!ANAT_M[k].kids); }
@@ -9994,7 +10883,7 @@ function anatSvg(view){
   let h = `<svg class="anat-svg" data-view="${view}" viewBox="0 0 200 460" xmlns="http://www.w3.org/2000/svg" aria-label="${view === "f" ? "Vista frontal" : "Vista posterior"}">`;
   h += `<g class="anat-sil"><path d="${ANAT_SIL.head}"/><path d="${ANAT_SIL.neck}"/>${pair(ANAT_SIL.body)}${pair(ANAT_SIL.arm)}${pair(ANAT_SIL.hand)}</g>`;
   const u = ++ANAT_UID, sk = ANAT_SKIN[view] || { shadow:[], light:[], line:[] };
-  h += `<defs><linearGradient id="sg${u}" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#e3b99c"/><stop offset=".55" stop-color="#cfa085"/><stop offset="1" stop-color="#a97a5e"/></linearGradient><radialGradient id="sh${u}" cx=".5" cy=".4" r=".65"><stop offset="0" stop-color="#e3b99c"/><stop offset="1" stop-color="#b78767"/></radialGradient><radialGradient id="mh${u}" cx=".42" cy=".34" r=".72"><stop offset="0" stop-color="rgba(255,240,226,.50)"/><stop offset=".5" stop-color="rgba(255,228,208,.10)"/><stop offset="1" stop-color="rgba(70,34,18,.34)"/></radialGradient><filter id="sb${u}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.1"/></filter></defs>`;
+  h += `<defs><linearGradient id="sg${u}" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#e3b99c"/><stop offset=".55" stop-color="#cfa085"/><stop offset="1" stop-color="#a97a5e"/></linearGradient><radialGradient id="sh${u}" cx=".5" cy=".4" r=".65"><stop offset="0" stop-color="#e3b99c"/><stop offset="1" stop-color="#b78767"/></radialGradient><radialGradient id="mh${u}" cx=".42" cy=".34" r=".72"><stop offset="0" stop-color="rgba(255,240,226,.50)"/><stop offset=".5" stop-color="rgba(255,228,208,.10)"/><stop offset="1" stop-color="rgba(70,34,18,.34)"/></radialGradient><filter id="sb${u}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.1"/></filter><radialGradient id="vg${u}" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="rgba(255,255,255,.5)"/><stop offset=".35" stop-color="rgba(255,255,255,.12)"/><stop offset=".68" stop-color="rgba(0,0,0,.16)"/><stop offset="1" stop-color="rgba(0,0,0,.5)"/></radialGradient><filter id="iv${u}" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB"><feComponentTransfer in="SourceAlpha" result="inv"><feFuncA type="table" tableValues="1 0"/></feComponentTransfer><feGaussianBlur in="inv" stdDeviation="2.1" result="bl"/><feFlood flood-color="#12060a" flood-opacity=".9"/><feComposite in2="bl" operator="in" result="sh"/><feComposite in="sh" in2="SourceAlpha" operator="in"/></filter></defs>`;
   const sp = (d, f) => `<path d="${d}" fill="url(#${f}${u})"/>`, spp = (d, f) => `<path d="${d}" fill="url(#${f}${u})"/><path d="${d}" fill="url(#${f}${u})" ${mir}/>`;
   h += `<g class="anat-skin">${sp(ANAT_SIL.head, "sh")}${sp(ANAT_SIL.neck, "sh")}${spp(ANAT_SIL.body, "sg")}${spp(ANAT_SIL.arm, "sg")}${spp(ANAT_SIL.hand, "sg")}`;
   const mk = Object.keys(ANAT_M).filter(k=>ANAT_M[k].l !== "d" && !ANAT_M[k].kids && ANAT_M[k].v[view]);
@@ -10002,7 +10891,7 @@ function anatSvg(view){
   h += `<g class="sk-g" filter="url(#sb${u})">${mk.map(k=>pair(ANAT_M[k].v[view])).join("")}</g>`;
   h += `<g class="sk-s" filter="url(#sb${u})">${sk.shadow.map(d=>pair(d)).join("")}</g><g class="sk-l" filter="url(#sb${u})">${sk.light.map(d=>pair(d)).join("")}</g><g class="sk-n">${sk.line.map(d=>pair(d)).join("")}</g></g>`;
   h += `<g class="anat-mus">`;
-  [false, true].forEach(deep=>{ Object.keys(ANAT_M).forEach(k=>{ const m = ANAT_M[k], d = m.v[view]; if(d && (m.l === "d") === deep) h += `<g class="am${deep ? " deep" : ""}" data-m="${k}">${pair(d)}</g>`; }); });
+  [false, true].forEach(deep=>{ Object.keys(ANAT_M).forEach(k=>{ const m = ANAT_M[k], d = m.v[view]; if(d && (m.l === "d") === deep) h += `<g class="am${deep ? " deep" : ""}" data-m="${k}">${pair(d)}<g class="vi" filter="url(#iv${u})">${pair(d)}</g>${pair(d).replace(/<path /g, `<path class="vo" style="fill:url(#vg${u})" `)}</g>`; }); });
   h += `</g><g class="anat-deco">`;
   (ANAT_DECO[view] || []).forEach(d=>{ h += `<path d="${d}"/><path d="${d}" ${mir}/>`; });
   Object.keys(ANAT_M).forEach(k=>{ ((ANAT_M[k].deco || {})[view] || []).forEach(d=>{ h += `<path d="${d}"/><path d="${d}" ${mir}/>`; }); });
@@ -10118,8 +11007,8 @@ function anatClick(root, ev){
   if(btn){
     const a = btn.dataset.a;
     if(a === "turn") anatTurn(root, st.view === "f" ? "b" : "f");
-    else if(a === "edit"){ if(!act) return; st.edit = !st.edit; if(st.edit && anatSkinOn()){ try{ localStorage.setItem("btc_anat_skin", "0"); }catch(e){} anatSkinSync(); } st.draft = st.edit ? (()=>{ const f = anatFor(act.name); return { p:f.p, s:f.s, src:"edit" }; })() : null; anatPaint(root, "noturn"); }
-    else if(a === "skin"){ const on = !anatSkinOn(); try{ localStorage.setItem("btc_anat_skin", on ? "1" : "0"); }catch(e){} anatSkinSync(); }
+    else if(a === "edit"){ if(!act) return; st.edit = !st.edit; if(st.edit && anatSkinOn()){ anatSetSkin(false); anatSkinSync(); } st.draft = st.edit ? (()=>{ const f = anatFor(act.name); return { p:f.p, s:f.s, src:"edit" }; })() : null; anatPaint(root, "noturn"); }
+    else if(a === "skin"){ const on = !anatSkinOn(); anatSetSkin(on); anatSkinSync(); }
     else if(a === "deep"){ const on = root.classList.toggle("show-deep"); btn.classList.toggle("on", on); }
     else if(a === "cancel"){ st.edit = false; st.draft = null; anatPaint(root, "noturn"); }
     else if(a === "save" && act){
@@ -10183,8 +11072,8 @@ function anatTrack(){
 function anatTrackSoon(){ if(_anatRaf) return; _anatRaf = requestAnimationFrame(()=>{ _anatRaf = 0; try{ anatTrack(); }catch(e){} }); }
 // ---- Panel flotante + botón + pestaña ----
 const ANAT_TABS = ["muro","rutinaA","rutinaB","calentamiento","tecnica","biblioteca","registro","semanal"];
-function anatOpenMap(){ try{ return JSON.parse(localStorage.getItem("btc_anat_open") || "{}"); }catch(e){ return {}; } }
-function anatSetOpen(view, v){ const m = anatOpenMap(); m[view] = !!v; try{ localStorage.setItem("btc_anat_open", JSON.stringify(m)); }catch(e){} anatSync(); }
+function anatOpenMap(){ const p = anatPrefsRead(); if(p && p.open) return p.open; try{ return JSON.parse(localStorage.getItem("btc_anat_open") || "{}"); }catch(e){ return {}; } }
+function anatSetOpen(view, v){ const pr = anatPrefsEnsure(); pr.open[view] = !!v; try{ localStorage.setItem("btc_anat_open", JSON.stringify(pr.open)); }catch(e){} anatPrefsSave(); anatSync(); }
 function anatSync(){
   const fab = document.getElementById("anatFab"), pan = document.getElementById("anatPanel"); if(!fab || !pan) return;
   const on = !!anatState().tabs[_currentView];
@@ -10194,7 +11083,7 @@ function anatSync(){
   anatLayout();
   if(open) anatRefreshAll();
 }
-function anatExpanded(){ try{ return localStorage.getItem("btc_anat_exp") === "1"; }catch(e){ return false; } }
+function anatExpanded(){ const p = anatPrefsRead(); if(p) return !!p.exp; try{ return localStorage.getItem("btc_anat_exp") === "1"; }catch(e){ return false; } }
 function anatLayout(){
   const pan = document.getElementById("anatPanel"); if(!pan) return;
   const open = pan.classList.contains("open"), exp = anatExpanded();
@@ -10223,7 +11112,7 @@ function anatInitUI(){
   pan.querySelector(".anat-pclose").addEventListener("click", ()=>anatSetOpen(_currentView, false));
   anatMount(pan.querySelector(".anat-pbody"), "panel");
   // posición recordada (por dispositivo) y arrastre
-  pan.querySelector(".anat-pexp").addEventListener("click", ()=>{ try{ localStorage.setItem("btc_anat_exp", anatExpanded() ? "0" : "1"); }catch(e){} anatLayout(); anatRefreshAll(); });
+  pan.querySelector(".anat-pexp").addEventListener("click", ()=>{ anatSetExp(!anatExpanded()); anatLayout(); anatRefreshAll(); });
   window.addEventListener("resize", anatLayout);
   const head = pan.querySelector(".anat-phead");
   head.addEventListener("pointerdown", ev=>{
@@ -11858,8 +12747,12 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   {
     const ui = ensureUiState();
     const vista = ui.vista === "estandar" ? "biblioteca" : (vistaValida(ui.vista) ? ui.vista : "rutinaA");
-    _currentView = vista;
+    // Q-11: se lee la posición guardada ANTES de showView; antes, con _currentView ya puesto, showView
+    // guardaba el scroll actual (0 al abrir la app de cero) encima del valor guardado y se perdía.
+    const savedY = Math.round((ui.scroll && ui.scroll[vista]) || 0);
+    _currentView = null;
     showView(vista);
+    restoreInitialScroll(vista, savedY);
   }
   updateAddExFab(_currentView || "rutinaA");
   updateMastheadVolumeUI();
@@ -11891,6 +12784,43 @@ document.addEventListener("DOMContentLoaded", async ()=>{
     if(!btn) return;
     showView(btn.dataset.view);
   });
+
+  // Q-10: cursor flecha sobre la barra de desplazamiento de los campos editables (notas del registro, etc.)
+  (function sbCursorInit(){
+    let last = null;
+    function clear(){ if(last){ last.classList.remove("on-sb"); last = null; } }
+    document.addEventListener("mousemove", (e)=>{
+      const el = e.target && e.target.closest ? e.target.closest('[contenteditable="true"]') : null;
+      if(!el){ clear(); return; }
+      const r = el.getBoundingClientRect();
+      const vOver = el.scrollHeight > el.clientHeight + 1, hOver = el.scrollWidth > el.clientWidth + 1;
+      const onV = vOver && e.clientX >= r.left + el.clientLeft + el.clientWidth;
+      const onH = hOver && e.clientY >= r.top + el.clientTop + el.clientHeight;
+      if(onV || onH){ if(last !== el){ clear(); el.classList.add("on-sb"); last = el; } }
+      else clear();
+    }, { passive:true });
+    document.addEventListener("mouseleave", clear);
+  })();
+
+  // Q-9: flechas de desplazamiento lateral de las pestañas
+  (function tabsArrowsInit(){
+    const nav = document.getElementById("tabs"), L = document.getElementById("tabsArrowL"), R = document.getElementById("tabsArrowR");
+    if(!nav || !L || !R) return;
+    function upd(){
+      const max = nav.scrollWidth - nav.clientWidth;
+      L.classList.toggle("show", max > 2 && nav.scrollLeft > 2);
+      R.classList.toggle("show", max > 2 && nav.scrollLeft < max - 2);
+    }
+    function go(dir){ nav.scrollBy({ left: dir * Math.max(120, Math.round(nav.clientWidth * 0.6)), behavior: "smooth" }); }
+    L.addEventListener("click", ()=>go(-1));
+    R.addEventListener("click", ()=>go(1));
+    nav.addEventListener("scroll", upd, { passive:true });
+    window.addEventListener("resize", upd);
+    if(window.ResizeObserver) new ResizeObserver(upd).observe(nav);
+    if(window.MutationObserver) new MutationObserver(upd).observe(nav, { childList:true, subtree:true, characterData:true });
+    window.tabsArrowsUpdate = upd;
+    upd(); setTimeout(upd, 300); setTimeout(upd, 1200);
+  })();
 
   document.getElementById("startDate").addEventListener("blur", (e)=>{
     STATE.meta.startDate = e.target.textContent.trim();
